@@ -55,21 +55,16 @@ flowchart TD
 When does Hermes pay for itself?
 
 ```mermaid
-block-beta
-    columns 1
-    block:title["Break-Even Points"]:1
-    block:rows
-        columns 3
-        "Content writer" "$20/mo (API)" "$3,000/mo human → break-even: Day 1"
-        "Support agent" "$30/mo (API)" "$2,500/mo human → break-even: Day 1"
-        "Data analyst" "$40/mo (API)" "$4,500/mo human → break-even: Day 1"
-        "Monitoring tool" "$0 (scripts)" "$150/mo SaaS → break-even: Day 1"
-        "Full-time dev" "$200/mo (API)" "$8,000/mo human → break-even: Day 1"
-    end
-    block:conclusion
-        "Conclusion: Hermes ALWAYS pays for itself."
-        "The question isn't \"should I?\" — it's \"how much should I spend?\""
-    end
+flowchart TD
+    title["<b>Break-Even Points</b>"]
+    row1["<b>Content writer</b> | $20/mo (API) | $3,000/mo human → break-even: Day 1"]
+    row2["<b>Support agent</b> | $30/mo (API) | $2,500/mo human → break-even: Day 1"]
+    row3["<b>Data analyst</b> | $40/mo (API) | $4,500/mo human → break-even: Day 1"]
+    row4["<b>Monitoring tool</b> | $0 (scripts) | $150/mo SaaS → break-even: Day 1"]
+    row5["<b>Full-time dev</b> | $200/mo (API) | $8,000/mo human → break-even: Day 1"]
+    conclusion1["<b>Conclusion:</b> Hermes ALWAYS pays for itself."]
+    conclusion2["The question isn't \"should I?\" — it's \"how much should I spend?\""]
+    title --> row1 --> row2 --> row3 --> row4 --> row5 --> conclusion1 --> conclusion2
 ```
 
 ---
@@ -142,23 +137,20 @@ Skills aren't just for your own use. Package them as products.
 A sellable skill solves a specific, painful, expensive problem:
 
 ```mermaid
-block-beta
-    columns 1
-    block:title["Sellable Skill Checklist"]:1
-    block:good["✅ Must Have"]
-        "✅ Solves a specific pain point"
-        "✅ Saves 5+ hours per week"
-        "✅ Works out of the box (minimal config)"
-        "✅ Has clear ROI the client can measure"
-        "✅ Doesn't require technical knowledge to use"
-        "✅ Can be demonstrated in 5 minutes"
-    end
-    block:bad["❌ Red Flags"]
-        "❌ Generic (e.g., \"write better code\")"
-        "❌ Requires custom setup per client"
-        "❌ Vague ROI (\"saves time\")"
-        "❌ Needs a developer to operate"
-    end
+flowchart TD
+    title["<b>Sellable Skill Checklist</b>"]
+    good1["✅ Solves a specific pain point"]
+    good2["✅ Saves 5+ hours per week"]
+    good3["✅ Works out of the box (minimal config)"]
+    good4["✅ Has clear ROI the client can measure"]
+    good5["✅ Doesn't require technical knowledge to use"]
+    good6["✅ Can be demonstrated in 5 minutes"]
+    bad1["❌ Generic (e.g., \"write better code\")"]
+    bad2["❌ Requires custom setup per client"]
+    bad3["❌ Vague ROI (\"saves time\")"]
+    bad4["❌ Needs a developer to operate"]
+    title --> good1 --> good2 --> good3 --> good4 --> good5 --> good6
+    title --> bad1 --> bad2 --> bad3 --> bad4
 ```
 
 ### Example: The "Auto-SEO Blog" Skill Package
@@ -483,25 +475,12 @@ API costs will fluctuate. Providers will change pricing. The only hedge? Local m
 ### The Local Model Stack
 
 ```mermaid
-block-beta
-    columns 1
-    block:title["Local Model Options"]:1
-    block:opt1["llama.cpp (recommended)"]
-        "• Runs on CPU, no GPU needed"
-        "• Supports GGUF format"
-        "• 2–50 tok/s depending on model size"
-        "• Full offline capability"
-    end
-    block:opt2["Ollama (easiest setup)"]
-        "• One-command install"
-        "• Automatic model management"
-        "• OpenAI-compatible API server"
-    end
-    block:opt3["vLLM (highest performance)"]
-        "• Requires GPU"
-        "• Production-grade serving"
-        "• Best for high-throughput agency use"
-    end
+flowchart TD
+    title["<b>Local Model Options</b>"]
+    opt1["<b>llama.cpp (recommended)</b><br/>• Runs on CPU, no GPU needed<br/>• Supports GGUF format<br/>• 2–50 tok/s depending on model size<br/>• Full offline capability"]
+    opt2["<b>Ollama (easiest setup)</b><br/>• One-command install<br/>• Automatic model management<br/>• OpenAI-compatible API server"]
+    opt3["<b>vLLM (highest performance)</b><br/>• Requires GPU<br/>• Production-grade serving<br/>• Best for high-throughput agency use"]
+    title --> opt1 --> opt2 --> opt3
 ```
 
 ### Setting Up llama.cpp with Hermes
@@ -528,25 +507,14 @@ hermes -m deepseek/deepseek-chat "..."       # Cloud, smarter
 ### Hybrid Strategy: Cloud + Local
 
 ```mermaid
-block-beta
-    columns 2
-    block:local["LOCAL (free, private, slower)"]
-        "• Email triage and categorization"
-        "• Document summarization"
-        "• Data extraction and formatting"
-        "• Watchdog alert evaluation"
-        "• PII-heavy tasks"
-    end
-    block:cloud["CLOUD (paid, smart, fast)"]
-        "• Content creation (needs quality)"
-        "• Architecture decisions"
-        "• Code review (needs reasoning)"
-        "• Client-facing responses"
-        "• Complex data analysis"
-    end
-    block:rule["Rule"]:2
-        "If it touches client output → cloud.\nIf it's internal processing → local."
-    end
+flowchart TD
+    title["<b>Hybrid Strategy: Cloud + Local</b>"]
+    local["<b>LOCAL (free, private, slower)</b><br/>• Email triage and categorization<br/>• Document summarization<br/>• Data extraction and formatting<br/>• Watchdog alert evaluation<br/>• PII-heavy tasks"]
+    cloud["<b>CLOUD (paid, smart, fast)</b><br/>• Content creation (needs quality)<br/>• Architecture decisions<br/>• Code review (needs reasoning)<br/>• Client-facing responses<br/>• Complex data analysis"]
+    rule["<b>Rule:</b><br/>If it touches client output → cloud.<br/>If it's internal processing → local."]
+    title --> local
+    title --> cloud
+    title --> rule
 ```
 
 ### Edge Deployment — Hermes on a Phone
@@ -571,31 +539,27 @@ hermes config set providers.phone.base_url http://192.168.1.100:8080/v1
 ## The Business of Hermes — Decision Framework
 
 ```mermaid
-block-beta
-    columns 1
-    block:title["Should You Build a Business Around Hermes?"]:1
-    block:yes["YES, if you:"]
-        "• Already use Hermes daily"
-        "• Have 3+ skills you built for yourself"
-        "• Know businesses that waste time on manual work"
-        "• Can explain AI value in plain language"
-    end
-    block:start["START HERE:"]
-        "1. Pick ONE service (Chapter 9 scenarios)"
-        "2. Build it for yourself first (dogfood it)"
-        "3. Find 1 client who needs it"
-        "4. Deliver results, measure ROI"
-        "5. Use that case study to get 3 more clients"
-        "6. Systematize with profiles and crons"
-        "7. Hire VA when you hit 20 clients"
-    end
-    block:dont["DON'T:"]
-        "• Build the agency before having clients"
-        "• Over-promise what Hermes can do"
-        "• Ignore compliance (GDPR, PII)"
-        "• Price based on your cost (price on value)"
-        "• Scale before the system is stable"
-    end
+flowchart TD
+    title["<b>Should You Build a Business Around Hermes?</b>"]
+    yes1["• Already use Hermes daily"]
+    yes2["• Have 3+ skills you built for yourself"]
+    yes3["• Know businesses that waste time on manual work"]
+    yes4["• Can explain AI value in plain language"]
+    start1["1. Pick ONE service (Chapter 9 scenarios)"]
+    start2["2. Build it for yourself first (dogfood it)"]
+    start3["3. Find 1 client who needs it"]
+    start4["4. Deliver results, measure ROI"]
+    start5["5. Use that case study to get 3 more clients"]
+    start6["6. Systematize with profiles and crons"]
+    start7["7. Hire VA when you hit 20 clients"]
+    dont1["• Build the agency before having clients"]
+    dont2["• Over-promise what Hermes can do"]
+    dont3["• Ignore compliance (GDPR, PII)"]
+    dont4["• Price based on your cost (price on value)"]
+    dont5["• Scale before the system is stable"]
+    title --> yes1 --> yes2 --> yes3 --> yes4
+    title --> start1 --> start2 --> start3 --> start4 --> start5 --> start6 --> start7
+    title --> dont1 --> dont2 --> dont3 --> dont4 --> dont5
 ```
 
 ---

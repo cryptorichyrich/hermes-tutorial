@@ -741,27 +741,23 @@ hermes webhook subscribe lead-form \
 ## Master ROI Summary — All 10 Scenarios
 
 ```mermaid
-block-beta
-    columns 1
-    block:title["Total Impact: 10 Hermes Business Use Cases"]:1
-    block:stats
-        columns 2
-        "1. Content Marketing" "$21,000"
-        "2. Customer Support" "$5,000"
-        "3. Code Review" "$6,200"
-        "4. E-Commerce Ops" "$5,950"
-        "5. Competitive Intel" "$4,200"
-        "6. Freelancer Accel." "$15,000 (revenue gain)"
-        "7. SaaS Monitoring" "$14,650"
-        "8. Data Analysis" "$4,500"
-        "9. Email Management" "$3,000"
-        "10. Lead Generation" "+150% pipeline"
-    end
-    block:totals
-        "Total Estimated Value: ~$79,500/month"
-        "Hermes API Cost: ~$20–50/month"
-        "ROI: 1,590x – 3,975x"
-    end
+flowchart TD
+    title["<b>Total Impact: 10 Hermes Business Use Cases</b>"]
+    s1["1. Content Marketing | $21,000"]
+    s2["2. Customer Support | $5,000"]
+    s3["3. Code Review | $6,200"]
+    s4["4. E-Commerce Ops | $5,950"]
+    s5["5. Competitive Intel | $4,200"]
+    s6["6. Freelancer Accel. | $15,000 (revenue gain)"]
+    s7["7. SaaS Monitoring | $14,650"]
+    s8["8. Data Analysis | $4,500"]
+    s9["9. Email Management | $3,000"]
+    s10["10. Lead Generation | +150% pipeline"]
+    t1["Total Estimated Value: ~$79,500/month"]
+    t2["Hermes API Cost: ~$20–50/month"]
+    t3["ROI: 1,590x – 3,975x"]
+    title --> s1 --> s2 --> s3 --> s4 --> s5 --> s6 --> s7 --> s8 --> s9 --> s10
+    title --> t1 --> t2 --> t3
 ```
 
 ### Hermes Cost Breakdown

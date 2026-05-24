@@ -62,19 +62,19 @@ Sometimes a task takes more than one message. You want Hermes to keep working on
 flowchart TD
     subgraph without["WITHOUT /goal"]
         direction TB
-        U1["You: \"Refactor the auth module\""]
+        U1["You: Refactor the auth module"]
         U2["Hermes: refactors auth"]
-        U3["You: \"Also update the tests\""]
-        U4["Hermes: \"What tests?\" (lost context)"]
+        U3["You: Also update the tests"]
+        U4["Hermes: What tests? - lost context"]
         U1 --> U2 --> U3 --> U4
     end
     subgraph with["WITH /goal"]
         direction TB
         G1["You: /goal Refactor auth module to use JWT"]
         G2["Hermes: Goal set. Working on JWT refactor..."]
-        G3["You: \"Also update the tests\""]
+        G3["You: Also update the tests"]
         G4["Hermes: Still in JWT context, updates tests"]
-        G5["You: \"Check the middleware too\""]
+        G5["You: Check the middleware too"]
         G6["Hermes: Still in JWT context, checks MW"]
         G1 --> G2 --> G3 --> G4 --> G5 --> G6
     end

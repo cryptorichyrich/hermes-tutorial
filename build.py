@@ -717,6 +717,62 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         footer a {{ color: var(--ink); text-decoration: none; font-weight: 500; }}
         footer a:hover {{ text-decoration: underline; }}
 
+        /* ── Dark mode: override github-markdown-light ── */
+        [data-theme="dark"] .markdown-body {{ color: var(--body); }}
+        [data-theme="dark"] .markdown-body p,
+        [data-theme="dark"] .markdown-body li,
+        [data-theme="dark"] .markdown-body td {{ color: var(--body); }}
+        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body blockquote {{
+            color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft);
+        }}
+        [data-theme="dark"] .markdown-body a {{ color: var(--primary); }}
+        [data-theme="dark"] .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body pre {{ background: var(--canvas-soft); }}
+        [data-theme="dark"] .markdown-body pre code {{ color: var(--ink); }}
+        [data-theme="dark"] .markdown-body h1,
+        [data-theme="dark"] .markdown-body h2,
+        [data-theme="dark"] .markdown-body h3,
+        [data-theme="dark"] .markdown-body h4 {{ color: var(--ink); }}
+        [data-theme="dark"] .markdown-body table tr {{ border-color: var(--hairline); }}
+        [data-theme="dark"] .markdown-body table tr:nth-child(2n) {{ background: var(--canvas-soft); }}
+        [data-theme="dark"] .markdown-body strong {{ color: var(--ink); }}
+        [data-theme="dark"] .markdown-body hr {{ border-color: var(--hairline); }}
+        [data-theme="dark"] .copy-md-btn {{
+            background: var(--surface-card); color: var(--ink);
+            border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }}
+        [data-theme="dark"] .copy-md-btn.copied {{ background: #166534; color: white; }}
+        [data-theme="dark"] .author-bio {{ background: var(--canvas-soft); }}
+        @media (prefers-color-scheme: dark) {{
+            :root:not([data-theme]) .markdown-body {{ color: var(--body); }}
+            :root:not([data-theme]) .markdown-body p,
+            :root:not([data-theme]) .markdown-body li,
+            :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
+            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body blockquote {{
+                color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft);
+            }}
+            :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
+            :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body pre {{ background: var(--canvas-soft); }}
+            :root:not([data-theme]) .markdown-body pre code {{ color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body h1,
+            :root:not([data-theme]) .markdown-body h2,
+            :root:not([data-theme]) .markdown-body h3,
+            :root:not([data-theme]) .markdown-body h4 {{ color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body table tr {{ border-color: var(--hairline); }}
+            :root:not([data-theme]) .markdown-body table tr:nth-child(2n) {{ background: var(--canvas-soft); }}
+            :root:not([data-theme]) .markdown-body strong {{ color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body hr {{ border-color: var(--hairline); }}
+            :root:not([data-theme]) .copy-md-btn {{
+                background: var(--surface-card); color: var(--ink);
+                border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }}
+            :root:not([data-theme]) .copy-md-btn.copied {{ background: #166534; color: white; }}
+            :root:not([data-theme]) .author-bio {{ background: var(--canvas-soft); }}
+        }}
+
         @media (max-width: 768px) {{
             .markdown-body {{ padding: 24px 18px; }}
             .markdown-body h1 {{ font-size: 32px; letter-spacing: -0.32px; }}

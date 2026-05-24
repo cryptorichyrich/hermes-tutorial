@@ -505,6 +505,62 @@
         footer a { color: var(--ink); text-decoration: none; font-weight: 500; }
         footer a:hover { text-decoration: underline; }
 
+        /* ── Dark mode: override github-markdown-light ── */
+        [data-theme="dark"] .markdown-body { color: var(--body); }
+        [data-theme="dark"] .markdown-body p,
+        [data-theme="dark"] .markdown-body li,
+        [data-theme="dark"] .markdown-body td { color: var(--body); }
+        [data-theme="dark"] .markdown-body th { background: var(--surface-strong); color: var(--ink); }
+        [data-theme="dark"] .markdown-body blockquote {
+            color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft);
+        }
+        [data-theme="dark"] .markdown-body a { color: var(--primary); }
+        [data-theme="dark"] .markdown-body code { background: var(--canvas-soft); color: var(--ink); }
+        [data-theme="dark"] .markdown-body pre { background: var(--canvas-soft); }
+        [data-theme="dark"] .markdown-body pre code { color: var(--ink); }
+        [data-theme="dark"] .markdown-body h1,
+        [data-theme="dark"] .markdown-body h2,
+        [data-theme="dark"] .markdown-body h3,
+        [data-theme="dark"] .markdown-body h4 { color: var(--ink); }
+        [data-theme="dark"] .markdown-body table tr { border-color: var(--hairline); }
+        [data-theme="dark"] .markdown-body table tr:nth-child(2n) { background: var(--canvas-soft); }
+        [data-theme="dark"] .markdown-body strong { color: var(--ink); }
+        [data-theme="dark"] .markdown-body hr { border-color: var(--hairline); }
+        [data-theme="dark"] .copy-md-btn {
+            background: var(--surface-card); color: var(--ink);
+            border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        [data-theme="dark"] .copy-md-btn.copied { background: #166534; color: white; }
+        [data-theme="dark"] .author-bio { background: var(--canvas-soft); }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme]) .markdown-body { color: var(--body); }
+            :root:not([data-theme]) .markdown-body p,
+            :root:not([data-theme]) .markdown-body li,
+            :root:not([data-theme]) .markdown-body td { color: var(--body); }
+            :root:not([data-theme]) .markdown-body th { background: var(--surface-strong); color: var(--ink); }
+            :root:not([data-theme]) .markdown-body blockquote {
+                color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft);
+            }
+            :root:not([data-theme]) .markdown-body a { color: var(--primary); }
+            :root:not([data-theme]) .markdown-body code { background: var(--canvas-soft); color: var(--ink); }
+            :root:not([data-theme]) .markdown-body pre { background: var(--canvas-soft); }
+            :root:not([data-theme]) .markdown-body pre code { color: var(--ink); }
+            :root:not([data-theme]) .markdown-body h1,
+            :root:not([data-theme]) .markdown-body h2,
+            :root:not([data-theme]) .markdown-body h3,
+            :root:not([data-theme]) .markdown-body h4 { color: var(--ink); }
+            :root:not([data-theme]) .markdown-body table tr { border-color: var(--hairline); }
+            :root:not([data-theme]) .markdown-body table tr:nth-child(2n) { background: var(--canvas-soft); }
+            :root:not([data-theme]) .markdown-body strong { color: var(--ink); }
+            :root:not([data-theme]) .markdown-body hr { border-color: var(--hairline); }
+            :root:not([data-theme]) .copy-md-btn {
+                background: var(--surface-card); color: var(--ink);
+                border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
+            :root:not([data-theme]) .copy-md-btn.copied { background: #166534; color: white; }
+            :root:not([data-theme]) .author-bio { background: var(--canvas-soft); }
+        }
+
         @media (max-width: 768px) {
             .markdown-body { padding: 24px 18px; }
             .markdown-body h1 { font-size: 32px; letter-spacing: -0.32px; }
@@ -670,21 +726,16 @@
 <p>💡 <strong>Tip:</strong> The cheapest model that does the job is the right model. Use DeepSeek for bulk crons and GPT-4o-mini for daily chat. Reserve Claude Sonnet for complex architecture decisions only.</p>
 <h3 id="break-even-analysis">Break-Even Analysis</h3>
 <p>When does Hermes pay for itself?</p>
-<div class="mermaid">block-beta
-    columns 1
-    block:title["Break-Even Points"]:1
-    block:rows
-        columns 3
-        "Content writer" "$20/mo (API)" "$3,000/mo human → break-even: Day 1"
-        "Support agent" "$30/mo (API)" "$2,500/mo human → break-even: Day 1"
-        "Data analyst" "$40/mo (API)" "$4,500/mo human → break-even: Day 1"
-        "Monitoring tool" "$0 (scripts)" "$150/mo SaaS → break-even: Day 1"
-        "Full-time dev" "$200/mo (API)" "$8,000/mo human → break-even: Day 1"
-    end
-    block:conclusion
-        "Conclusion: Hermes ALWAYS pays for itself."
-        "The question isn't \"should I?\" — it's \"how much should I spend?\""
-    end</div>
+<div class="mermaid">flowchart TD
+    title["<b>Break-Even Points</b>"]
+    row1["<b>Content writer</b> | $20/mo (API) | $3,000/mo human → break-even: Day 1"]
+    row2["<b>Support agent</b> | $30/mo (API) | $2,500/mo human → break-even: Day 1"]
+    row3["<b>Data analyst</b> | $40/mo (API) | $4,500/mo human → break-even: Day 1"]
+    row4["<b>Monitoring tool</b> | $0 (scripts) | $150/mo SaaS → break-even: Day 1"]
+    row5["<b>Full-time dev</b> | $200/mo (API) | $8,000/mo human → break-even: Day 1"]
+    conclusion1["<b>Conclusion:</b> Hermes ALWAYS pays for itself."]
+    conclusion2["The question isn't \"should I?\" — it's \"how much should I spend?\""]
+    title --> row1 --> row2 --> row3 --> row4 --> row5 --> conclusion1 --> conclusion2</div>
 <hr />
 <h2 id="102-pricing-your-ai-powered-services">10.2 Pricing Your AI-Powered Services</h2>
 <p>You've automated your workflow. Now sell it. Here's how to price AI-powered services for profit.</p>
@@ -787,23 +838,20 @@ Example agency setup:
 <p>Skills aren't just for your own use. Package them as products.</p>
 <h3 id="what-makes-a-sellable-skill">What Makes a Sellable Skill</h3>
 <p>A sellable skill solves a specific, painful, expensive problem:</p>
-<div class="mermaid">block-beta
-    columns 1
-    block:title["Sellable Skill Checklist"]:1
-    block:good["✅ Must Have"]
-        "✅ Solves a specific pain point"
-        "✅ Saves 5+ hours per week"
-        "✅ Works out of the box (minimal config)"
-        "✅ Has clear ROI the client can measure"
-        "✅ Doesn't require technical knowledge to use"
-        "✅ Can be demonstrated in 5 minutes"
-    end
-    block:bad["❌ Red Flags"]
-        "❌ Generic (e.g., \"write better code\")"
-        "❌ Requires custom setup per client"
-        "❌ Vague ROI (\"saves time\")"
-        "❌ Needs a developer to operate"
-    end</div>
+<div class="mermaid">flowchart TD
+    title["<b>Sellable Skill Checklist</b>"]
+    good1["✅ Solves a specific pain point"]
+    good2["✅ Saves 5+ hours per week"]
+    good3["✅ Works out of the box (minimal config)"]
+    good4["✅ Has clear ROI the client can measure"]
+    good5["✅ Doesn't require technical knowledge to use"]
+    good6["✅ Can be demonstrated in 5 minutes"]
+    bad1["❌ Generic (e.g., \"write better code\")"]
+    bad2["❌ Requires custom setup per client"]
+    bad3["❌ Vague ROI (\"saves time\")"]
+    bad4["❌ Needs a developer to operate"]
+    title --> good1 --> good2 --> good3 --> good4 --> good5 --> good6
+    title --> bad1 --> bad2 --> bad3 --> bad4</div>
 <h3 id="example-the-auto-seo-blog-skill-package">Example: The "Auto-SEO Blog" Skill Package</h3>
 <pre class="highlight"><code class="language-bash"># What the client gets:
 ~/skills/auto-seo-blog/
@@ -1198,25 +1246,12 @@ hermes cron create &quot;0 8 * * 1&quot; \
 <h2 id="107-future-proofing-local-models-edge-deployment">10.7 Future-Proofing — Local Models &amp; Edge Deployment</h2>
 <p>API costs will fluctuate. Providers will change pricing. The only hedge? Local models that you control completely.</p>
 <h3 id="the-local-model-stack">The Local Model Stack</h3>
-<div class="mermaid">block-beta
-    columns 1
-    block:title["Local Model Options"]:1
-    block:opt1["llama.cpp (recommended)"]
-        "• Runs on CPU, no GPU needed"
-        "• Supports GGUF format"
-        "• 2–50 tok/s depending on model size"
-        "• Full offline capability"
-    end
-    block:opt2["Ollama (easiest setup)"]
-        "• One-command install"
-        "• Automatic model management"
-        "• OpenAI-compatible API server"
-    end
-    block:opt3["vLLM (highest performance)"]
-        "• Requires GPU"
-        "• Production-grade serving"
-        "• Best for high-throughput agency use"
-    end</div>
+<div class="mermaid">flowchart TD
+    title["<b>Local Model Options</b>"]
+    opt1["<b>llama.cpp (recommended)</b><br/>• Runs on CPU, no GPU needed<br/>• Supports GGUF format<br/>• 2–50 tok/s depending on model size<br/>• Full offline capability"]
+    opt2["<b>Ollama (easiest setup)</b><br/>• One-command install<br/>• Automatic model management<br/>• OpenAI-compatible API server"]
+    opt3["<b>vLLM (highest performance)</b><br/>• Requires GPU<br/>• Production-grade serving<br/>• Best for high-throughput agency use"]
+    title --> opt1 --> opt2 --> opt3</div>
 <h3 id="setting-up-llamacpp-with-hermes">Setting Up llama.cpp with Hermes</h3>
 <pre class="highlight"><code class="language-bash"># 1. Install llama.cpp
 git clone https://github.com/ggerganov/llama.cpp
@@ -1237,25 +1272,14 @@ hermes -m deepseek/deepseek-chat &quot;...&quot;       # Cloud, smarter
 </code></pre>
 
 <h3 id="hybrid-strategy-cloud-local">Hybrid Strategy: Cloud + Local</h3>
-<div class="mermaid">block-beta
-    columns 2
-    block:local["LOCAL (free, private, slower)"]
-        "• Email triage and categorization"
-        "• Document summarization"
-        "• Data extraction and formatting"
-        "• Watchdog alert evaluation"
-        "• PII-heavy tasks"
-    end
-    block:cloud["CLOUD (paid, smart, fast)"]
-        "• Content creation (needs quality)"
-        "• Architecture decisions"
-        "• Code review (needs reasoning)"
-        "• Client-facing responses"
-        "• Complex data analysis"
-    end
-    block:rule["Rule"]:2
-        "If it touches client output → cloud.\nIf it's internal processing → local."
-    end</div>
+<div class="mermaid">flowchart TD
+    title["<b>Hybrid Strategy: Cloud + Local</b>"]
+    local["<b>LOCAL (free, private, slower)</b><br/>• Email triage and categorization<br/>• Document summarization<br/>• Data extraction and formatting<br/>• Watchdog alert evaluation<br/>• PII-heavy tasks"]
+    cloud["<b>CLOUD (paid, smart, fast)</b><br/>• Content creation (needs quality)<br/>• Architecture decisions<br/>• Code review (needs reasoning)<br/>• Client-facing responses<br/>• Complex data analysis"]
+    rule["<b>Rule:</b><br/>If it touches client output → cloud.<br/>If it's internal processing → local."]
+    title --> local
+    title --> cloud
+    title --> rule</div>
 <h3 id="edge-deployment-hermes-on-a-phone">Edge Deployment — Hermes on a Phone</h3>
 <p>Yes, you can run a local LLM on your phone and Hermes can connect to it:</p>
 <pre class="highlight"><code class="language-bash"># On Android (Termux):
@@ -1271,31 +1295,27 @@ hermes config set providers.phone.base_url http://192.168.1.100:8080/v1
 <p>💡 <strong>Tip:</strong> A 2B-parameter model at Q4 quantization runs at 15-25 tokens/second on a modern phone (Snapdragon 8 Gen 3, Exynos 1580). Not fast enough for complex tasks, but perfect for simple triage and categorization — and completely free.</p>
 <hr />
 <h2 id="the-business-of-hermes-decision-framework">The Business of Hermes — Decision Framework</h2>
-<div class="mermaid">block-beta
-    columns 1
-    block:title["Should You Build a Business Around Hermes?"]:1
-    block:yes["YES, if you:"]
-        "• Already use Hermes daily"
-        "• Have 3+ skills you built for yourself"
-        "• Know businesses that waste time on manual work"
-        "• Can explain AI value in plain language"
-    end
-    block:start["START HERE:"]
-        "1. Pick ONE service (Chapter 9 scenarios)"
-        "2. Build it for yourself first (dogfood it)"
-        "3. Find 1 client who needs it"
-        "4. Deliver results, measure ROI"
-        "5. Use that case study to get 3 more clients"
-        "6. Systematize with profiles and crons"
-        "7. Hire VA when you hit 20 clients"
-    end
-    block:dont["DON'T:"]
-        "• Build the agency before having clients"
-        "• Over-promise what Hermes can do"
-        "• Ignore compliance (GDPR, PII)"
-        "• Price based on your cost (price on value)"
-        "• Scale before the system is stable"
-    end</div>
+<div class="mermaid">flowchart TD
+    title["<b>Should You Build a Business Around Hermes?</b>"]
+    yes1["• Already use Hermes daily"]
+    yes2["• Have 3+ skills you built for yourself"]
+    yes3["• Know businesses that waste time on manual work"]
+    yes4["• Can explain AI value in plain language"]
+    start1["1. Pick ONE service (Chapter 9 scenarios)"]
+    start2["2. Build it for yourself first (dogfood it)"]
+    start3["3. Find 1 client who needs it"]
+    start4["4. Deliver results, measure ROI"]
+    start5["5. Use that case study to get 3 more clients"]
+    start6["6. Systematize with profiles and crons"]
+    start7["7. Hire VA when you hit 20 clients"]
+    dont1["• Build the agency before having clients"]
+    dont2["• Over-promise what Hermes can do"]
+    dont3["• Ignore compliance (GDPR, PII)"]
+    dont4["• Price based on your cost (price on value)"]
+    dont5["• Scale before the system is stable"]
+    title --> yes1 --> yes2 --> yes3 --> yes4
+    title --> start1 --> start2 --> start3 --> start4 --> start5 --> start6 --> start7
+    title --> dont1 --> dont2 --> dont3 --> dont4 --> dont5</div>
 <hr />
 <h2 id="chapter-10-key-vocabulary">Chapter 10 Key Vocabulary</h2>
 <table>
@@ -1463,21 +1483,16 @@ flowchart TD
 When does Hermes pay for itself?
 
 ```mermaid
-block-beta
-    columns 1
-    block:title[&quot;Break-Even Points&quot;]:1
-    block:rows
-        columns 3
-        &quot;Content writer&quot; &quot;$20/mo (API)&quot; &quot;$3,000/mo human → break-even: Day 1&quot;
-        &quot;Support agent&quot; &quot;$30/mo (API)&quot; &quot;$2,500/mo human → break-even: Day 1&quot;
-        &quot;Data analyst&quot; &quot;$40/mo (API)&quot; &quot;$4,500/mo human → break-even: Day 1&quot;
-        &quot;Monitoring tool&quot; &quot;$0 (scripts)&quot; &quot;$150/mo SaaS → break-even: Day 1&quot;
-        &quot;Full-time dev&quot; &quot;$200/mo (API)&quot; &quot;$8,000/mo human → break-even: Day 1&quot;
-    end
-    block:conclusion
-        &quot;Conclusion: Hermes ALWAYS pays for itself.&quot;
-        &quot;The question isn&#x27;t \&quot;should I?\&quot; — it&#x27;s \&quot;how much should I spend?\&quot;&quot;
-    end
+flowchart TD
+    title[&quot;&lt;b&gt;Break-Even Points&lt;/b&gt;&quot;]
+    row1[&quot;&lt;b&gt;Content writer&lt;/b&gt; | $20/mo (API) | $3,000/mo human → break-even: Day 1&quot;]
+    row2[&quot;&lt;b&gt;Support agent&lt;/b&gt; | $30/mo (API) | $2,500/mo human → break-even: Day 1&quot;]
+    row3[&quot;&lt;b&gt;Data analyst&lt;/b&gt; | $40/mo (API) | $4,500/mo human → break-even: Day 1&quot;]
+    row4[&quot;&lt;b&gt;Monitoring tool&lt;/b&gt; | $0 (scripts) | $150/mo SaaS → break-even: Day 1&quot;]
+    row5[&quot;&lt;b&gt;Full-time dev&lt;/b&gt; | $200/mo (API) | $8,000/mo human → break-even: Day 1&quot;]
+    conclusion1[&quot;&lt;b&gt;Conclusion:&lt;/b&gt; Hermes ALWAYS pays for itself.&quot;]
+    conclusion2[&quot;The question isn&#x27;t \&quot;should I?\&quot; — it&#x27;s \&quot;how much should I spend?\&quot;&quot;]
+    title --&gt; row1 --&gt; row2 --&gt; row3 --&gt; row4 --&gt; row5 --&gt; conclusion1 --&gt; conclusion2
 ```
 
 ---
@@ -1550,23 +1565,20 @@ Skills aren&#x27;t just for your own use. Package them as products.
 A sellable skill solves a specific, painful, expensive problem:
 
 ```mermaid
-block-beta
-    columns 1
-    block:title[&quot;Sellable Skill Checklist&quot;]:1
-    block:good[&quot;✅ Must Have&quot;]
-        &quot;✅ Solves a specific pain point&quot;
-        &quot;✅ Saves 5+ hours per week&quot;
-        &quot;✅ Works out of the box (minimal config)&quot;
-        &quot;✅ Has clear ROI the client can measure&quot;
-        &quot;✅ Doesn&#x27;t require technical knowledge to use&quot;
-        &quot;✅ Can be demonstrated in 5 minutes&quot;
-    end
-    block:bad[&quot;❌ Red Flags&quot;]
-        &quot;❌ Generic (e.g., \&quot;write better code\&quot;)&quot;
-        &quot;❌ Requires custom setup per client&quot;
-        &quot;❌ Vague ROI (\&quot;saves time\&quot;)&quot;
-        &quot;❌ Needs a developer to operate&quot;
-    end
+flowchart TD
+    title[&quot;&lt;b&gt;Sellable Skill Checklist&lt;/b&gt;&quot;]
+    good1[&quot;✅ Solves a specific pain point&quot;]
+    good2[&quot;✅ Saves 5+ hours per week&quot;]
+    good3[&quot;✅ Works out of the box (minimal config)&quot;]
+    good4[&quot;✅ Has clear ROI the client can measure&quot;]
+    good5[&quot;✅ Doesn&#x27;t require technical knowledge to use&quot;]
+    good6[&quot;✅ Can be demonstrated in 5 minutes&quot;]
+    bad1[&quot;❌ Generic (e.g., \&quot;write better code\&quot;)&quot;]
+    bad2[&quot;❌ Requires custom setup per client&quot;]
+    bad3[&quot;❌ Vague ROI (\&quot;saves time\&quot;)&quot;]
+    bad4[&quot;❌ Needs a developer to operate&quot;]
+    title --&gt; good1 --&gt; good2 --&gt; good3 --&gt; good4 --&gt; good5 --&gt; good6
+    title --&gt; bad1 --&gt; bad2 --&gt; bad3 --&gt; bad4
 ```
 
 ### Example: The &quot;Auto-SEO Blog&quot; Skill Package
@@ -1891,25 +1903,12 @@ API costs will fluctuate. Providers will change pricing. The only hedge? Local m
 ### The Local Model Stack
 
 ```mermaid
-block-beta
-    columns 1
-    block:title[&quot;Local Model Options&quot;]:1
-    block:opt1[&quot;llama.cpp (recommended)&quot;]
-        &quot;• Runs on CPU, no GPU needed&quot;
-        &quot;• Supports GGUF format&quot;
-        &quot;• 2–50 tok/s depending on model size&quot;
-        &quot;• Full offline capability&quot;
-    end
-    block:opt2[&quot;Ollama (easiest setup)&quot;]
-        &quot;• One-command install&quot;
-        &quot;• Automatic model management&quot;
-        &quot;• OpenAI-compatible API server&quot;
-    end
-    block:opt3[&quot;vLLM (highest performance)&quot;]
-        &quot;• Requires GPU&quot;
-        &quot;• Production-grade serving&quot;
-        &quot;• Best for high-throughput agency use&quot;
-    end
+flowchart TD
+    title[&quot;&lt;b&gt;Local Model Options&lt;/b&gt;&quot;]
+    opt1[&quot;&lt;b&gt;llama.cpp (recommended)&lt;/b&gt;&lt;br/&gt;• Runs on CPU, no GPU needed&lt;br/&gt;• Supports GGUF format&lt;br/&gt;• 2–50 tok/s depending on model size&lt;br/&gt;• Full offline capability&quot;]
+    opt2[&quot;&lt;b&gt;Ollama (easiest setup)&lt;/b&gt;&lt;br/&gt;• One-command install&lt;br/&gt;• Automatic model management&lt;br/&gt;• OpenAI-compatible API server&quot;]
+    opt3[&quot;&lt;b&gt;vLLM (highest performance)&lt;/b&gt;&lt;br/&gt;• Requires GPU&lt;br/&gt;• Production-grade serving&lt;br/&gt;• Best for high-throughput agency use&quot;]
+    title --&gt; opt1 --&gt; opt2 --&gt; opt3
 ```
 
 ### Setting Up llama.cpp with Hermes
@@ -1936,25 +1935,14 @@ hermes -m deepseek/deepseek-chat &quot;...&quot;       # Cloud, smarter
 ### Hybrid Strategy: Cloud + Local
 
 ```mermaid
-block-beta
-    columns 2
-    block:local[&quot;LOCAL (free, private, slower)&quot;]
-        &quot;• Email triage and categorization&quot;
-        &quot;• Document summarization&quot;
-        &quot;• Data extraction and formatting&quot;
-        &quot;• Watchdog alert evaluation&quot;
-        &quot;• PII-heavy tasks&quot;
-    end
-    block:cloud[&quot;CLOUD (paid, smart, fast)&quot;]
-        &quot;• Content creation (needs quality)&quot;
-        &quot;• Architecture decisions&quot;
-        &quot;• Code review (needs reasoning)&quot;
-        &quot;• Client-facing responses&quot;
-        &quot;• Complex data analysis&quot;
-    end
-    block:rule[&quot;Rule&quot;]:2
-        &quot;If it touches client output → cloud.\nIf it&#x27;s internal processing → local.&quot;
-    end
+flowchart TD
+    title[&quot;&lt;b&gt;Hybrid Strategy: Cloud + Local&lt;/b&gt;&quot;]
+    local[&quot;&lt;b&gt;LOCAL (free, private, slower)&lt;/b&gt;&lt;br/&gt;• Email triage and categorization&lt;br/&gt;• Document summarization&lt;br/&gt;• Data extraction and formatting&lt;br/&gt;• Watchdog alert evaluation&lt;br/&gt;• PII-heavy tasks&quot;]
+    cloud[&quot;&lt;b&gt;CLOUD (paid, smart, fast)&lt;/b&gt;&lt;br/&gt;• Content creation (needs quality)&lt;br/&gt;• Architecture decisions&lt;br/&gt;• Code review (needs reasoning)&lt;br/&gt;• Client-facing responses&lt;br/&gt;• Complex data analysis&quot;]
+    rule[&quot;&lt;b&gt;Rule:&lt;/b&gt;&lt;br/&gt;If it touches client output → cloud.&lt;br/&gt;If it&#x27;s internal processing → local.&quot;]
+    title --&gt; local
+    title --&gt; cloud
+    title --&gt; rule
 ```
 
 ### Edge Deployment — Hermes on a Phone
@@ -1979,31 +1967,27 @@ hermes config set providers.phone.base_url http://192.168.1.100:8080/v1
 ## The Business of Hermes — Decision Framework
 
 ```mermaid
-block-beta
-    columns 1
-    block:title[&quot;Should You Build a Business Around Hermes?&quot;]:1
-    block:yes[&quot;YES, if you:&quot;]
-        &quot;• Already use Hermes daily&quot;
-        &quot;• Have 3+ skills you built for yourself&quot;
-        &quot;• Know businesses that waste time on manual work&quot;
-        &quot;• Can explain AI value in plain language&quot;
-    end
-    block:start[&quot;START HERE:&quot;]
-        &quot;1. Pick ONE service (Chapter 9 scenarios)&quot;
-        &quot;2. Build it for yourself first (dogfood it)&quot;
-        &quot;3. Find 1 client who needs it&quot;
-        &quot;4. Deliver results, measure ROI&quot;
-        &quot;5. Use that case study to get 3 more clients&quot;
-        &quot;6. Systematize with profiles and crons&quot;
-        &quot;7. Hire VA when you hit 20 clients&quot;
-    end
-    block:dont[&quot;DON&#x27;T:&quot;]
-        &quot;• Build the agency before having clients&quot;
-        &quot;• Over-promise what Hermes can do&quot;
-        &quot;• Ignore compliance (GDPR, PII)&quot;
-        &quot;• Price based on your cost (price on value)&quot;
-        &quot;• Scale before the system is stable&quot;
-    end
+flowchart TD
+    title[&quot;&lt;b&gt;Should You Build a Business Around Hermes?&lt;/b&gt;&quot;]
+    yes1[&quot;• Already use Hermes daily&quot;]
+    yes2[&quot;• Have 3+ skills you built for yourself&quot;]
+    yes3[&quot;• Know businesses that waste time on manual work&quot;]
+    yes4[&quot;• Can explain AI value in plain language&quot;]
+    start1[&quot;1. Pick ONE service (Chapter 9 scenarios)&quot;]
+    start2[&quot;2. Build it for yourself first (dogfood it)&quot;]
+    start3[&quot;3. Find 1 client who needs it&quot;]
+    start4[&quot;4. Deliver results, measure ROI&quot;]
+    start5[&quot;5. Use that case study to get 3 more clients&quot;]
+    start6[&quot;6. Systematize with profiles and crons&quot;]
+    start7[&quot;7. Hire VA when you hit 20 clients&quot;]
+    dont1[&quot;• Build the agency before having clients&quot;]
+    dont2[&quot;• Over-promise what Hermes can do&quot;]
+    dont3[&quot;• Ignore compliance (GDPR, PII)&quot;]
+    dont4[&quot;• Price based on your cost (price on value)&quot;]
+    dont5[&quot;• Scale before the system is stable&quot;]
+    title --&gt; yes1 --&gt; yes2 --&gt; yes3 --&gt; yes4
+    title --&gt; start1 --&gt; start2 --&gt; start3 --&gt; start4 --&gt; start5 --&gt; start6 --&gt; start7
+    title --&gt; dont1 --&gt; dont2 --&gt; dont3 --&gt; dont4 --&gt; dont5
 ```
 
 ---
