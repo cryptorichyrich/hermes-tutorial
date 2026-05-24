@@ -102,11 +102,14 @@
             width: 220px; padding: 6px 12px; border-color: var(--ink);
         }
         .nav-search-btn {
-            background: none; border: none; cursor: pointer;
-            color: var(--muted); font-size: 15px; padding: 4px;
-            display: flex; align-items: center; font-weight: 500;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            cursor: pointer; color: var(--muted); font-size: 15px;
+            padding: 6px 14px; border-radius: 9999px;
+            display: flex; align-items: center; gap: 6px; font-weight: 500;
+            font-family: inherit; letter-spacing: 0; transition: all 0.2s;
         }
-        .nav-search-btn:hover { color: var(--ink); }
+        .nav-search-btn:hover { color: var(--ink); border-color: var(--ink); }
+        .nav-search-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
         .search-dropdown {
             position: absolute; top: 44px; right: 0; width: 420px;
             max-height: 480px; overflow-y: auto;
@@ -218,7 +221,7 @@
         <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search">Search</button>
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
             <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>

@@ -344,11 +344,14 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             width: 220px; padding: 6px 12px; border-color: var(--ink);
         }}
         .nav-search-btn {{
-            background: none; border: none; cursor: pointer;
-            color: var(--muted); font-size: 15px; padding: 4px;
-            display: flex; align-items: center; font-weight: 500;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            cursor: pointer; color: var(--muted); font-size: 15px;
+            padding: 6px 14px; border-radius: 9999px;
+            display: flex; align-items: center; gap: 6px; font-weight: 500;
+            font-family: inherit; letter-spacing: 0; transition: all 0.2s;
         }}
-        .nav-search-btn:hover {{ color: var(--ink); }}
+        .nav-search-btn:hover {{ color: var(--ink); border-color: var(--ink); }}
+        .nav-search-btn svg {{ width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }}
 
         /* Search dropdown */
         .search-dropdown {{
@@ -454,9 +457,9 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         }}
 
         .markdown-body table {{
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            margin: 24px 0; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 0 0 1px var(--hairline);
+            border-collapse: separate; border-spacing: 0;
+            margin: 0; border-radius: 16px;
+            min-width: 100%;
         }}
         .markdown-body th {{
             background: var(--primary); color: white; font-weight: 500;
@@ -485,8 +488,28 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         }}
         .markdown-body a:hover {{ color: var(--primary-active); border-bottom-color: var(--primary-active); }}
 
-        /* Mermaid */
-        .mermaid {{ margin: 32px auto; text-align: center; }}
+        /* Mermaid — enlarged + zoomable */
+        .mermaid {{
+            margin: 48px auto; text-align: center;
+            cursor: zoom-in; position: relative;
+            padding: 24px; background: var(--surface-card);
+            border-radius: 16px; border: 1px solid var(--hairline);
+            overflow: hidden;
+        }}
+        .mermaid svg {{ max-width: 100%; height: auto; min-width: 600px; }}
+        .mermaid-zoom-overlay {{
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(12,10,9,0.6); backdrop-filter: blur(4px);
+            z-index: 1000; cursor: zoom-out; justify-content: center; align-items: center;
+        }}
+        .mermaid-zoom-overlay.active {{ display: flex; }}
+        .mermaid-zoom-overlay .mermaid-zoom-content {{
+            background: var(--surface-card); border-radius: 16px;
+            padding: 32px; max-width: 95vw; max-height: 90vh;
+            overflow: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            border: 1px solid var(--hairline);
+        }}
+        .mermaid-zoom-overlay svg {{ width: 100%; height: auto; }}
 
         /* Chapter nav */
         .chapter-nav {{
@@ -551,7 +574,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links">{nav_links}</div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search">Search</button>
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
             <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
@@ -586,6 +609,34 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
                 fontFamily: 'Inter'
             }},
             flowchart: {{ curve: 'basis', padding: 16 }}
+        }});
+        // Wrap tables in scrollable containers
+        document.querySelectorAll('.markdown-body table').forEach(function(t) {{
+            if (!t.parentElement.classList.contains('table-scroll-wrap')) {{
+                var wrap = document.createElement('div');
+                wrap.className = 'table-scroll-wrap';
+                wrap.style.cssText = 'overflow-x:auto;-webkit-overflow-scrolling:touch;margin:24px 0;border-radius:16px;box-shadow:0 0 0 1px var(--hairline);';
+                t.parentNode.insertBefore(wrap, t);
+                wrap.appendChild(t);
+            }}
+        }});
+        // Mermaid zoom on click
+        document.querySelectorAll('.mermaid').forEach(function(m) {{
+            m.addEventListener('click', function() {{
+                var overlay = document.createElement('div');
+                overlay.className = 'mermaid-zoom-overlay active';
+                var content = document.createElement('div');
+                content.className = 'mermaid-zoom-content';
+                content.innerHTML = m.innerHTML;
+                overlay.appendChild(content);
+                overlay.addEventListener('click', function(e) {{
+                    if (e.target === overlay || e.target === content) overlay.remove();
+                }});
+                document.addEventListener('keydown', function handler(e) {{
+                    if (e.key === 'Escape') {{ overlay.remove(); document.removeEventListener('keydown', handler); }}
+                }});
+                document.body.appendChild(overlay);
+            }});
         }});
     </script>
 </body>
@@ -709,11 +760,14 @@ def build_index() -> str:
             width: 220px; padding: 6px 12px; border-color: var(--ink);
         }}
         .nav-search-btn {{
-            background: none; border: none; cursor: pointer;
-            color: var(--muted); font-size: 15px; padding: 4px;
-            display: flex; align-items: center; font-weight: 500;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            cursor: pointer; color: var(--muted); font-size: 15px;
+            padding: 6px 14px; border-radius: 9999px;
+            display: flex; align-items: center; gap: 6px; font-weight: 500;
+            font-family: inherit; letter-spacing: 0; transition: all 0.2s;
         }}
-        .nav-search-btn:hover {{ color: var(--ink); }}
+        .nav-search-btn:hover {{ color: var(--ink); border-color: var(--ink); }}
+        .nav-search-btn svg {{ width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }}
         .search-dropdown {{
             position: absolute; top: 44px; right: 0; width: 420px;
             max-height: 480px; overflow-y: auto;
@@ -825,7 +879,7 @@ def build_index() -> str:
         <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links">{nav_links}</div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search">Search</button>
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
             <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
