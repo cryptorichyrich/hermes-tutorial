@@ -377,10 +377,10 @@ terminal(command="npm run build", background=True, notify_on_complete=True)
 flowchart TD
     START["START\nterminal(bg=true)"] --> RUNNING["RUNNING\nprocess(poll)"]
     RUNNING --> DONE["DONE\nAuto-notify"]
-    RUNNING --> CHECK["CHECK PROGRESS\npoll → see progress\nlog → full output\nwait → block until done"]
+    RUNNING --> CHECK["CHECK PROGRESS\npoll --> see progress\nlog --> full output\nwait --> block until done"]
 
-    DONE -.- NOTE1["notify_on_complete=True →\none notification at end"]
-    CHECK -.- NOTE2["watch_patterns=[\"Build OK\"] →\nnotify on rare mid-run text\n(rate limit: 1 per 15 sec)"]
+    DONE -.- NOTE1["notify_on_complete=True -->\none notification at end"]
+    CHECK -.- NOTE2["watch_patterns=('Build OK') -->\nnotify on rare mid-run text\n(rate limit: 1 per 15 sec)"]
 ```
 
 **Process management commands:**

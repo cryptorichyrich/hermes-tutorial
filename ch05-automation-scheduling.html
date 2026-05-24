@@ -937,8 +937,8 @@ Register-ScheduledTask -TaskName &quot;HermesHeartbeat&quot; `
     A -->|"stdout"| B
     B -->|"analysis"| C
 
-    B -.- NOTE_B["context_from: [\"job-a-id\"]"]
-    C -.- NOTE_C["context_from: [\"job-b-id\"]"]</div>
+    B -.- NOTE_B["context_from: [job-a-id]"]
+    C -.- NOTE_C["context_from:[job-a-id]"]</div>
 <p><strong>Practical example — daily competitive intelligence:</strong></p>
 <pre class="highlight"><code class="language-bash"># Job 1: Collect competitor updates (script-only, zero tokens)
 hermes cron create &quot;0 8 * * *&quot; \
