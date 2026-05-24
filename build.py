@@ -357,8 +357,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         :root:not([data-theme]) .markdown-body p,
         :root:not([data-theme]) .markdown-body li,
         :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
-        :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong
-); }}
+        :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
         :root:not([data-theme]) .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
         :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
         :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
@@ -379,8 +378,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             :root:not([data-theme]) .markdown-body p,
             :root:not([data-theme]) .markdown-body li,
             :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
-            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong
-); }}
+            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
             :root:not([data-theme]) .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
             :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
             :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
@@ -816,8 +814,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             :root:not([data-theme]) .markdown-body p,
             :root:not([data-theme]) .markdown-body li,
             :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
-            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong
-); }}
+            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
             :root:not([data-theme]) .markdown-body blockquote {{
                 color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft);
             }}
@@ -1200,8 +1197,7 @@ def build_index() -> str:
         :root:not([data-theme]) .markdown-body p,
         :root:not([data-theme]) .markdown-body li,
         :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
-        :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong
-); }}
+        :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
         :root:not([data-theme]) .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
         :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
         :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
@@ -1222,8 +1218,7 @@ def build_index() -> str:
             :root:not([data-theme]) .markdown-body p,
             :root:not([data-theme]) .markdown-body li,
             :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
-            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong
-); }}
+            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
             :root:not([data-theme]) .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
             :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
             :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
