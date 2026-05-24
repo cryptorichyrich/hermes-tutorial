@@ -56,14 +56,14 @@ When does Hermes pay for itself?
 
 ```mermaid
 flowchart TD
-    title["<b>Break-Even Points</b>"]
-    row1["<b>Content writer</b> | $20/mo (API) | $3,000/mo human → break-even: Day 1"]
-    row2["<b>Support agent</b> | $30/mo (API) | $2,500/mo human → break-even: Day 1"]
-    row3["<b>Data analyst</b> | $40/mo (API) | $4,500/mo human → break-even: Day 1"]
-    row4["<b>Monitoring tool</b> | $0 (scripts) | $150/mo SaaS → break-even: Day 1"]
-    row5["<b>Full-time dev</b> | $200/mo (API) | $8,000/mo human → break-even: Day 1"]
-    conclusion1["<b>Conclusion:</b> Hermes ALWAYS pays for itself."]
-    conclusion2["The question isn't \"should I?\" — it's \"how much should I spend?\""]
+    title["Break-Even Points"]
+    row1["Content writer — $20/mo API vs $3,000/mo human — Day 1"]
+    row2["Support agent — $30/mo API vs $2,500/mo human — Day 1"]
+    row3["Data analyst — $40/mo API vs $4,500/mo human — Day 1"]
+    row4["Monitoring tool — $0 scripts vs $150/mo SaaS — Day 1"]
+    row5["Full-time dev — $200/mo API vs $8,000/mo human — Day 1"]
+    conclusion1["Conclusion: Hermes ALWAYS pays for itself"]
+    conclusion2["The question is how much should I spend?"]
     title --> row1 --> row2 --> row3 --> row4 --> row5 --> conclusion1 --> conclusion2
 ```
 

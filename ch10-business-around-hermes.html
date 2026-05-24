@@ -103,6 +103,26 @@
             --surface-card: #1c1917;
             --surface-strong: #292524;
         }
+        [data-theme="dark"] .markdown-body { color: var(--body); }
+        [data-theme="dark"] .markdown-body p,
+        [data-theme="dark"] .markdown-body li,
+        [data-theme="dark"] .markdown-body td { color: var(--body); }
+        [data-theme="dark"] .markdown-body th { background: var(--surface-strong); color: var(--ink); }
+        [data-theme="dark"] .markdown-body blockquote { color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }
+        [data-theme="dark"] .markdown-body a { color: var(--primary); }
+        [data-theme="dark"] .markdown-body code { background: var(--canvas-soft); color: var(--ink); }
+        [data-theme="dark"] .markdown-body pre { background: var(--canvas-soft); }
+        [data-theme="dark"] .markdown-body pre code { color: var(--ink); }
+        [data-theme="dark"] .markdown-body h1,
+        [data-theme="dark"] .markdown-body h2,
+        [data-theme="dark"] .markdown-body h3,
+        [data-theme="dark"] .markdown-body h4 { color: var(--ink); }
+        [data-theme="dark"] .markdown-body table tr { border-color: var(--hairline); }
+        [data-theme="dark"] .markdown-body table tr:nth-child(2n) { background: var(--canvas-soft); }
+        [data-theme="dark"] .markdown-body strong { color: var(--ink); }
+        [data-theme="dark"] .markdown-body hr { border-color: var(--hairline); }
+        [data-theme="dark"] .copy-md-btn { background: var(--surface-card); color: var(--ink); border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        [data-theme="dark"] .copy-md-btn.copied { background: #166534; color: white; }
         @media (prefers-color-scheme: dark) {
             :root:not([data-theme]) {
                 --primary: #e7e5e4;
@@ -120,6 +140,48 @@
                 --surface-card: #1c1917;
                 --surface-strong: #292524;
             }
+        }
+        :root:not([data-theme]) .markdown-body { color: var(--body); }
+        :root:not([data-theme]) .markdown-body p,
+        :root:not([data-theme]) .markdown-body li,
+        :root:not([data-theme]) .markdown-body td { color: var(--body); }
+        :root:not([data-theme]) .markdown-body th { background: var(--surface-strong); color: var(--ink); }
+        :root:not([data-theme]) .markdown-body blockquote { color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }
+        :root:not([data-theme]) .markdown-body a { color: var(--primary); }
+        :root:not([data-theme]) .markdown-body code { background: var(--canvas-soft); color: var(--ink); }
+        :root:not([data-theme]) .markdown-body pre { background: var(--canvas-soft); }
+        :root:not([data-theme]) .markdown-body pre code { color: var(--ink); }
+        :root:not([data-theme]) .markdown-body h1,
+        :root:not([data-theme]) .markdown-body h2,
+        :root:not([data-theme]) .markdown-body h3,
+        :root:not([data-theme]) .markdown-body h4 { color: var(--ink); }
+        :root:not([data-theme]) .markdown-body table tr { border-color: var(--hairline); }
+        :root:not([data-theme]) .markdown-body table tr:nth-child(2n) { background: var(--canvas-soft); }
+        :root:not([data-theme]) .markdown-body strong { color: var(--ink); }
+        :root:not([data-theme]) .markdown-body hr { border-color: var(--hairline); }
+        :root:not([data-theme]) .copy-md-btn { background: var(--surface-card); color: var(--ink); border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        :root:not([data-theme]) .copy-md-btn.copied { background: #166534; color: white; }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme]) .markdown-body { color: var(--body); }
+            :root:not([data-theme]) .markdown-body p,
+            :root:not([data-theme]) .markdown-body li,
+            :root:not([data-theme]) .markdown-body td { color: var(--body); }
+            :root:not([data-theme]) .markdown-body th { background: var(--surface-strong); color: var(--ink); }
+            :root:not([data-theme]) .markdown-body blockquote { color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }
+            :root:not([data-theme]) .markdown-body a { color: var(--primary); }
+            :root:not([data-theme]) .markdown-body code { background: var(--canvas-soft); color: var(--ink); }
+            :root:not([data-theme]) .markdown-body pre { background: var(--canvas-soft); }
+            :root:not([data-theme]) .markdown-body pre code { color: var(--ink); }
+            :root:not([data-theme]) .markdown-body h1,
+            :root:not([data-theme]) .markdown-body h2,
+            :root:not([data-theme]) .markdown-body h3,
+            :root:not([data-theme]) .markdown-body h4 { color: var(--ink); }
+            :root:not([data-theme]) .markdown-body table tr { border-color: var(--hairline); }
+            :root:not([data-theme]) .markdown-body table tr:nth-child(2n) { background: var(--canvas-soft); }
+            :root:not([data-theme]) .markdown-body strong { color: var(--ink); }
+            :root:not([data-theme]) .markdown-body hr { border-color: var(--hairline); }
+            :root:not([data-theme]) .copy-md-btn { background: var(--surface-card); color: var(--ink); border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+            :root:not([data-theme]) .copy-md-btn.copied { background: #166534; color: white; }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -727,14 +789,14 @@
 <h3 id="break-even-analysis">Break-Even Analysis</h3>
 <p>When does Hermes pay for itself?</p>
 <div class="mermaid">flowchart TD
-    title["<b>Break-Even Points</b>"]
-    row1["<b>Content writer</b> | $20/mo (API) | $3,000/mo human → break-even: Day 1"]
-    row2["<b>Support agent</b> | $30/mo (API) | $2,500/mo human → break-even: Day 1"]
-    row3["<b>Data analyst</b> | $40/mo (API) | $4,500/mo human → break-even: Day 1"]
-    row4["<b>Monitoring tool</b> | $0 (scripts) | $150/mo SaaS → break-even: Day 1"]
-    row5["<b>Full-time dev</b> | $200/mo (API) | $8,000/mo human → break-even: Day 1"]
-    conclusion1["<b>Conclusion:</b> Hermes ALWAYS pays for itself."]
-    conclusion2["The question isn't \"should I?\" — it's \"how much should I spend?\""]
+    title["Break-Even Points"]
+    row1["Content writer — $20/mo API vs $3,000/mo human — Day 1"]
+    row2["Support agent — $30/mo API vs $2,500/mo human — Day 1"]
+    row3["Data analyst — $40/mo API vs $4,500/mo human — Day 1"]
+    row4["Monitoring tool — $0 scripts vs $150/mo SaaS — Day 1"]
+    row5["Full-time dev — $200/mo API vs $8,000/mo human — Day 1"]
+    conclusion1["Conclusion: Hermes ALWAYS pays for itself"]
+    conclusion2["The question is how much should I spend?"]
     title --> row1 --> row2 --> row3 --> row4 --> row5 --> conclusion1 --> conclusion2</div>
 <hr />
 <h2 id="102-pricing-your-ai-powered-services">10.2 Pricing Your AI-Powered Services</h2>
@@ -1484,14 +1546,14 @@ When does Hermes pay for itself?
 
 ```mermaid
 flowchart TD
-    title[&quot;&lt;b&gt;Break-Even Points&lt;/b&gt;&quot;]
-    row1[&quot;&lt;b&gt;Content writer&lt;/b&gt; | $20/mo (API) | $3,000/mo human → break-even: Day 1&quot;]
-    row2[&quot;&lt;b&gt;Support agent&lt;/b&gt; | $30/mo (API) | $2,500/mo human → break-even: Day 1&quot;]
-    row3[&quot;&lt;b&gt;Data analyst&lt;/b&gt; | $40/mo (API) | $4,500/mo human → break-even: Day 1&quot;]
-    row4[&quot;&lt;b&gt;Monitoring tool&lt;/b&gt; | $0 (scripts) | $150/mo SaaS → break-even: Day 1&quot;]
-    row5[&quot;&lt;b&gt;Full-time dev&lt;/b&gt; | $200/mo (API) | $8,000/mo human → break-even: Day 1&quot;]
-    conclusion1[&quot;&lt;b&gt;Conclusion:&lt;/b&gt; Hermes ALWAYS pays for itself.&quot;]
-    conclusion2[&quot;The question isn&#x27;t \&quot;should I?\&quot; — it&#x27;s \&quot;how much should I spend?\&quot;&quot;]
+    title[&quot;Break-Even Points&quot;]
+    row1[&quot;Content writer — $20/mo API vs $3,000/mo human — Day 1&quot;]
+    row2[&quot;Support agent — $30/mo API vs $2,500/mo human — Day 1&quot;]
+    row3[&quot;Data analyst — $40/mo API vs $4,500/mo human — Day 1&quot;]
+    row4[&quot;Monitoring tool — $0 scripts vs $150/mo SaaS — Day 1&quot;]
+    row5[&quot;Full-time dev — $200/mo API vs $8,000/mo human — Day 1&quot;]
+    conclusion1[&quot;Conclusion: Hermes ALWAYS pays for itself&quot;]
+    conclusion2[&quot;The question is how much should I spend?&quot;]
     title --&gt; row1 --&gt; row2 --&gt; row3 --&gt; row4 --&gt; row5 --&gt; conclusion1 --&gt; conclusion2
 ```
 
