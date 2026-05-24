@@ -128,6 +128,24 @@ def render_markdown(md_text: str) -> str:
         },
     )
 
+    # Add IDs to h2/h3 headings for search scroll targets
+    def add_heading_ids(html):
+        import hashlib
+        def replacer(match):
+            tag = match.group(1)
+            attrs = match.group(2) or ''
+            text = match.group(3)
+            # Generate slug from text
+            slug = re.sub(r'[^a-z0-9]+', '-', re.sub(r'<[^>]+>', '', text).lower()).strip('-')
+            if not slug:
+                slug = 'section-' + hashlib.md5(text.encode()).hexdigest()[:6]
+            if 'id=' not in attrs:
+                return f'<{tag}{attrs} id="{slug}">{text}'
+            return match.group(0)
+        return re.sub(r'<(h[1-3])(\s[^>]*)?>(.+?)</h[1-3]>', replacer, html)
+
+    html = add_heading_ids(html)
+
     # Restore mermaid blocks as divs
     for key, code in mermaid_blocks.items():
         html = html.replace(f"<p>{key}</p>", f'<div class="mermaid">{code}</div>')
@@ -294,6 +312,74 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             background: var(--primary); color: white;
         }}
 
+        /* Search */
+        .nav-search {{
+            margin-left: auto; position: relative;
+        }}
+        .nav-search-input {{
+            width: 0; padding: 6px 0; border: 2px solid transparent;
+            border-radius: 8px; font-size: 0.85rem; outline: none;
+            background: var(--bg); color: var(--text);
+            transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
+            font-family: inherit;
+        }}
+        .nav-search-input.open {{
+            width: 220px; padding: 6px 12px; border-color: var(--primary);
+        }}
+        .nav-search-btn {{
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 1.1rem; padding: 4px;
+            display: flex; align-items: center;
+        }}
+        .nav-search-btn:hover {{ color: var(--primary); }}
+
+        /* Search dropdown */
+        .search-dropdown {{
+            position: absolute; top: 44px; right: 0; width: 420px;
+            max-height: 480px; overflow-y: auto;
+            background: var(--surface); border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+            z-index: 200; display: none;
+        }}
+        .search-dropdown.open {{ display: block; }}
+        .search-dropdown .sr-label {{
+            padding: 10px 16px 6px; font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted); border-bottom: 1px solid var(--border);
+        }}
+        .search-dropdown .sr-item {{
+            display: block; padding: 10px 16px; text-decoration: none;
+            color: var(--text); transition: background 0.15s; cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }}
+        .search-dropdown .sr-item:hover, .search-dropdown .sr-item.active {{
+            background: #eef2ff;
+        }}
+        .search-dropdown .sr-item:last-child {{ border-bottom: none; }}
+        .sr-item-chapter {{
+            font-size: 0.72rem; font-weight: 600; color: var(--primary);
+            margin-bottom: 2px;
+        }}
+        .sr-item-heading {{
+            font-weight: 600; font-size: 0.9rem; margin-bottom: 2px;
+        }}
+        .sr-item-snippet {{
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;
+        }}
+        .sr-item-snippet mark {{
+            background: #fef08a; color: var(--text); padding: 0 2px;
+            border-radius: 2px;
+        }}
+        .sr-empty {{
+            padding: 24px 16px; text-align: center; color: var(--text-muted);
+            font-size: 0.85rem;
+        }}
+        .sr-kbd {{
+            display: inline-block; padding: 1px 6px; border-radius: 4px;
+            background: var(--bg); border: 1px solid var(--border);
+            font-size: 0.7rem; font-family: monospace; color: var(--text-muted);
+        }}
+
         .container {{
             max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
         }}
@@ -438,6 +524,11 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
     <nav class="nav">
         <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
         <div class="nav-links">{nav_links}</div>
+        <div class="nav-search">
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search">🔍</button>
+            <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
     </nav>
 
     <div class="container">
@@ -453,6 +544,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         </footer>
     </div>
 
+    <script src="search.js"></script>
     <script>
         mermaid.initialize({{
             startOnLoad: true,
@@ -561,6 +653,52 @@ def build_index() -> str:
         }}
         .nav-links a:hover {{ background: var(--primary); color: white; }}
 
+        /* Search */
+        .nav-search {{
+            margin-left: auto; position: relative;
+        }}
+        .nav-search-input {{
+            width: 0; padding: 6px 0; border: 2px solid transparent;
+            border-radius: 8px; font-size: 0.85rem; outline: none;
+            background: var(--bg); color: var(--text);
+            transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
+            font-family: inherit;
+        }}
+        .nav-search-input.open {{
+            width: 220px; padding: 6px 12px; border-color: var(--primary);
+        }}
+        .nav-search-btn {{
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 1.1rem; padding: 4px;
+            display: flex; align-items: center;
+        }}
+        .nav-search-btn:hover {{ color: var(--primary); }}
+        .search-dropdown {{
+            position: absolute; top: 44px; right: 0; width: 420px;
+            max-height: 480px; overflow-y: auto;
+            background: var(--surface); border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+            z-index: 200; display: none;
+        }}
+        .search-dropdown.open {{ display: block; }}
+        .search-dropdown .sr-label {{
+            padding: 10px 16px 6px; font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted); border-bottom: 1px solid var(--border);
+        }}
+        .search-dropdown .sr-item {{
+            display: block; padding: 10px 16px; text-decoration: none;
+            color: var(--text); transition: background 0.15s; cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }}
+        .search-dropdown .sr-item:hover {{ background: #eef2ff; }}
+        .search-dropdown .sr-item:last-child {{ border-bottom: none; }}
+        .sr-item-chapter {{ font-size: 0.72rem; font-weight: 600; color: var(--primary); margin-bottom: 2px; }}
+        .sr-item-heading {{ font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }}
+        .sr-item-snippet {{ font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }}
+        .sr-item-snippet mark {{ background: #fef08a; color: var(--text); padding: 0 2px; border-radius: 2px; }}
+        .sr-empty {{ padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }}
+
         .hero {{
             text-align: center; padding: 120px 20px 48px;
             max-width: 700px; margin: 0 auto;
@@ -617,6 +755,11 @@ def build_index() -> str:
     <nav class="nav">
         <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
         <div class="nav-links">{nav_links}</div>
+        <div class="nav-search">
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search">🔍</button>
+            <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
     </nav>
 
     <div class="hero">
@@ -641,8 +784,73 @@ def build_index() -> str:
             <a href="{AUTHOR_URL}">biotama.cv</a>
         </p>
     </div>
+    <script src="search.js"></script>
 </body>
 </html>"""
+
+
+def build_search_index() -> list:
+    """Build a search index JSON from all chapter markdown files."""
+    index = []
+    for ch in CHAPTERS:
+        md_path = BASE_DIR / ch["file"]
+        with open(md_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        current_heading = ch["title"]
+        current_id = None
+        buffer = []
+
+        for line in lines:
+            # Detect headings
+            heading_match = re.match(r"^(#{1,3})\s+(.+)$", line)
+            if heading_match:
+                # Flush previous section
+                if buffer:
+                    text = " ".join(buffer).strip()
+                    if len(text) > 10:
+                        index.append({
+                            "ch": ch["num"],
+                            "slug": ch["slug"],
+                            "chTitle": ch["title"],
+                            "heading": current_heading,
+                            "headingId": current_id,
+                            "text": text[:500],
+                        })
+                    buffer = []
+
+                level = len(heading_match.group(1))
+                current_heading = heading_match.group(2).strip()
+                # Generate a slug-like ID
+                current_id = re.sub(r"[^a-z0-9]+", "-", current_heading.lower()).strip("-")
+                if level == 1:
+                    current_id = "top"
+                continue
+
+            # Skip code blocks markers but include code content for search
+            stripped = line.strip()
+            if stripped.startswith("```"):
+                continue
+            if stripped.startswith("|") or stripped.startswith(">"):
+                buffer.append(stripped.lstrip(">|"))
+                continue
+            if stripped:
+                buffer.append(stripped)
+
+        # Flush last section
+        if buffer:
+            text = " ".join(buffer).strip()
+            if len(text) > 10:
+                index.append({
+                    "ch": ch["num"],
+                    "slug": ch["slug"],
+                    "chTitle": ch["title"],
+                    "heading": current_heading,
+                    "headingId": current_id,
+                    "text": text[:500],
+                })
+
+    return index
 
 
 def build_sitemap() -> str:
@@ -710,7 +918,14 @@ def main():
         f.write(robots)
     print(f"  ✓ robots.txt")
 
-    print(f"\nDone. {len(CHAPTERS) + 1} pages + sitemap + robots")
+    # Build search index
+    search_idx = build_search_index()
+    out = BASE_DIR / "search-index.json"
+    with open(out, "w", encoding="utf-8") as f:
+        json.dump(search_idx, f, ensure_ascii=False)
+    print(f"  ✓ search-index.json ({len(search_idx)} sections)")
+
+    print(f"\nDone. {len(CHAPTERS) + 1} pages + sitemap + robots + search")
 
 
 if __name__ == "__main__":

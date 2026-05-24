@@ -107,6 +107,74 @@
             background: var(--primary); color: white;
         }
 
+        /* Search */
+        .nav-search {
+            margin-left: auto; position: relative;
+        }
+        .nav-search-input {
+            width: 0; padding: 6px 0; border: 2px solid transparent;
+            border-radius: 8px; font-size: 0.85rem; outline: none;
+            background: var(--bg); color: var(--text);
+            transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
+            font-family: inherit;
+        }
+        .nav-search-input.open {
+            width: 220px; padding: 6px 12px; border-color: var(--primary);
+        }
+        .nav-search-btn {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 1.1rem; padding: 4px;
+            display: flex; align-items: center;
+        }
+        .nav-search-btn:hover { color: var(--primary); }
+
+        /* Search dropdown */
+        .search-dropdown {
+            position: absolute; top: 44px; right: 0; width: 420px;
+            max-height: 480px; overflow-y: auto;
+            background: var(--surface); border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+            z-index: 200; display: none;
+        }
+        .search-dropdown.open { display: block; }
+        .search-dropdown .sr-label {
+            padding: 10px 16px 6px; font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-muted); border-bottom: 1px solid var(--border);
+        }
+        .search-dropdown .sr-item {
+            display: block; padding: 10px 16px; text-decoration: none;
+            color: var(--text); transition: background 0.15s; cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .search-dropdown .sr-item:hover, .search-dropdown .sr-item.active {
+            background: #eef2ff;
+        }
+        .search-dropdown .sr-item:last-child { border-bottom: none; }
+        .sr-item-chapter {
+            font-size: 0.72rem; font-weight: 600; color: var(--primary);
+            margin-bottom: 2px;
+        }
+        .sr-item-heading {
+            font-weight: 600; font-size: 0.9rem; margin-bottom: 2px;
+        }
+        .sr-item-snippet {
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;
+        }
+        .sr-item-snippet mark {
+            background: #fef08a; color: var(--text); padding: 0 2px;
+            border-radius: 2px;
+        }
+        .sr-empty {
+            padding: 24px 16px; text-align: center; color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .sr-kbd {
+            display: inline-block; padding: 1px 6px; border-radius: 4px;
+            background: var(--bg); border: 1px solid var(--border);
+            font-size: 0.7rem; font-family: monospace; color: var(--text-muted);
+        }
+
         .container {
             max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
         }
@@ -251,6 +319,11 @@
     <nav class="nav">
         <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
         <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html" class="active">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+        <div class="nav-search">
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search">🔍</button>
+            <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
     </nav>
 
     <div class="container">
@@ -845,6 +918,7 @@ hermes -p work chat -q &quot;Check production logs&quot;
         </footer>
     </div>
 
+    <script src="search.js"></script>
     <script>
         mermaid.initialize({
             startOnLoad: true,
