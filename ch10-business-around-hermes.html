@@ -289,22 +289,28 @@
             cursor: zoom-in; position: relative;
             padding: 24px; background: var(--surface-card);
             border-radius: 16px; border: 1px solid var(--hairline);
-            overflow: hidden;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
         }
-        .mermaid svg { max-width: 100%; height: auto; min-width: 600px; }
+        .mermaid svg {
+            max-width: none; height: auto; min-width: 700px;
+            display: block; margin: 0 auto;
+        }
         .mermaid-zoom-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(12,10,9,0.6); backdrop-filter: blur(4px);
-            z-index: 1000; cursor: zoom-out; justify-content: center; align-items: center;
+            background: rgba(12,10,9,0.7); backdrop-filter: blur(6px);
+            z-index: 1000; justify-content: center; align-items: center;
         }
         .mermaid-zoom-overlay.active { display: flex; }
         .mermaid-zoom-overlay .mermaid-zoom-content {
             background: var(--surface-card); border-radius: 16px;
-            padding: 32px; max-width: 95vw; max-height: 90vh;
-            overflow: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            padding: 40px; max-width: 96vw; max-height: 92vh;
+            overflow: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.2);
             border: 1px solid var(--hairline); cursor: grab;
+            -webkit-overflow-scrolling: touch;
         }
-        .mermaid-zoom-overlay svg { width: 100%; height: auto; }
+        .mermaid-zoom-overlay svg {
+            min-width: 1200px; max-width: none; height: auto;
+        }
 
         /* Chapter nav */
         .chapter-nav {
