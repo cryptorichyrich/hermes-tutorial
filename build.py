@@ -329,29 +329,29 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             background: var(--primary); color: white;
         }}
 
-        /* Search */
-        .nav-search {{
-            margin-left: auto; position: relative;
-        }}
-        .nav-search-input {{
-            width: 0; padding: 6px 0; border: 1px solid var(--hairline);
-            border-radius: 9999px; font-size: 15px; outline: none;
-            background: var(--surface-card); color: var(--ink);
-            transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
-            font-family: inherit; letter-spacing: 0;
-        }}
-        .nav-search-input.open {{
-            width: 220px; padding: 6px 12px; border-color: var(--ink);
-        }}
-        .nav-search-btn {{
+        /* Search — integrated bar */
+        .nav-search {{ margin-left: auto; position: relative; }}
+        .nav-search-bar {{
+            display: flex; align-items: center; gap: 8px;
             background: var(--surface-card); border: 1px solid var(--hairline);
-            cursor: pointer; color: var(--muted); font-size: 15px;
-            padding: 6px 14px; border-radius: 9999px;
-            display: flex; align-items: center; gap: 6px; font-weight: 500;
-            font-family: inherit; letter-spacing: 0; transition: all 0.2s;
+            border-radius: 9999px; padding: 6px 14px;
+            cursor: pointer; transition: all 0.25s ease; min-width: 44px;
         }}
-        .nav-search-btn:hover {{ color: var(--ink); border-color: var(--ink); }}
-        .nav-search-btn svg {{ width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }}
+        .nav-search-bar:hover, .nav-search-bar.open {{ border-color: var(--ink); }}
+        .nav-search-bar.open {{ min-width: 260px; }}
+        .nav-search-bar svg {{
+            width: 16px; height: 16px; stroke: var(--muted); fill: none;
+            stroke-width: 2; flex-shrink: 0; transition: stroke 0.2s;
+        }}
+        .nav-search-bar:hover svg, .nav-search-bar.open svg {{ stroke: var(--ink); }}
+        .nav-search-bar input {{
+            border: none; outline: none; background: transparent;
+            color: var(--ink); font-size: 14px; font-family: inherit;
+            letter-spacing: 0; width: 0; padding: 0;
+            transition: width 0.25s ease;
+        }}
+        .nav-search-bar.open input {{ width: 200px; }}
+        .nav-search-bar input::placeholder {{ color: var(--muted); }}
 
         /* Search dropdown */
         .search-dropdown {{
@@ -507,7 +507,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             background: var(--surface-card); border-radius: 16px;
             padding: 32px; max-width: 95vw; max-height: 90vh;
             overflow: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
-            border: 1px solid var(--hairline);
+            border: 1px solid var(--hairline); cursor: grab;
         }}
         .mermaid-zoom-overlay svg {{ width: 100%; height: auto; }}
 
@@ -574,8 +574,10 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links">{nav_links}</div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
-            <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            <div class="nav-search-bar" id="searchToggle" role="button" tabindex="0" aria-label="Search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            </div>
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
     </nav>
@@ -620,7 +622,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
                 wrap.appendChild(t);
             }}
         }});
-        // Mermaid zoom on click
+        // Mermaid zoom with pan/drag
         document.querySelectorAll('.mermaid').forEach(function(m) {{
             m.addEventListener('click', function() {{
                 var overlay = document.createElement('div');
@@ -629,13 +631,38 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
                 content.className = 'mermaid-zoom-content';
                 content.innerHTML = m.innerHTML;
                 overlay.appendChild(content);
+                document.body.appendChild(overlay);
+
+                // Pan state
+                var isPanning = false, startX = 0, startY = 0, scrollL = 0, scrollT = 0;
+                content.addEventListener('mousedown', function(e) {{
+                    isPanning = true;
+                    startX = e.pageX - content.offsetLeft;
+                    startY = e.pageY - content.offsetTop;
+                    scrollL = content.scrollLeft;
+                    scrollT = content.scrollTop;
+                    content.style.cursor = 'grabbing';
+                    e.preventDefault();
+                }});
+                overlay.addEventListener('mousemove', function(e) {{
+                    if (!isPanning) return;
+                    var x = e.pageX - content.offsetLeft;
+                    var y = e.pageY - content.offsetTop;
+                    content.scrollLeft = scrollL - (x - startX);
+                    content.scrollTop = scrollT - (y - startY);
+                }});
+                overlay.addEventListener('mouseup', function() {{
+                    isPanning = false;
+                    content.style.cursor = 'grab';
+                }});
+
+                // Close on click outside content or Escape
                 overlay.addEventListener('click', function(e) {{
-                    if (e.target === overlay || e.target === content) overlay.remove();
+                    if (e.target === overlay) overlay.remove();
                 }});
                 document.addEventListener('keydown', function handler(e) {{
                     if (e.key === 'Escape') {{ overlay.remove(); document.removeEventListener('keydown', handler); }}
                 }});
-                document.body.appendChild(overlay);
             }});
         }});
     </script>
@@ -745,29 +772,29 @@ def build_index() -> str:
         }}
         .nav-links a:hover {{ background: var(--primary); color: white; }}
 
-        /* Search */
-        .nav-search {{
-            margin-left: auto; position: relative;
-        }}
-        .nav-search-input {{
-            width: 0; padding: 6px 0; border: 1px solid var(--hairline);
-            border-radius: 9999px; font-size: 15px; outline: none;
-            background: var(--surface-card); color: var(--ink);
-            transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
-            font-family: inherit; letter-spacing: 0;
-        }}
-        .nav-search-input.open {{
-            width: 220px; padding: 6px 12px; border-color: var(--ink);
-        }}
-        .nav-search-btn {{
+        /* Search — integrated bar */
+        .nav-search {{ margin-left: auto; position: relative; }}
+        .nav-search-bar {{
+            display: flex; align-items: center; gap: 8px;
             background: var(--surface-card); border: 1px solid var(--hairline);
-            cursor: pointer; color: var(--muted); font-size: 15px;
-            padding: 6px 14px; border-radius: 9999px;
-            display: flex; align-items: center; gap: 6px; font-weight: 500;
-            font-family: inherit; letter-spacing: 0; transition: all 0.2s;
+            border-radius: 9999px; padding: 6px 14px;
+            cursor: pointer; transition: all 0.25s ease; min-width: 44px;
         }}
-        .nav-search-btn:hover {{ color: var(--ink); border-color: var(--ink); }}
-        .nav-search-btn svg {{ width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }}
+        .nav-search-bar:hover, .nav-search-bar.open {{ border-color: var(--ink); }}
+        .nav-search-bar.open {{ min-width: 260px; }}
+        .nav-search-bar svg {{
+            width: 16px; height: 16px; stroke: var(--muted); fill: none;
+            stroke-width: 2; flex-shrink: 0; transition: stroke 0.2s;
+        }}
+        .nav-search-bar:hover svg, .nav-search-bar.open svg {{ stroke: var(--ink); }}
+        .nav-search-bar input {{
+            border: none; outline: none; background: transparent;
+            color: var(--ink); font-size: 14px; font-family: inherit;
+            letter-spacing: 0; width: 0; padding: 0;
+            transition: width 0.25s ease;
+        }}
+        .nav-search-bar.open input {{ width: 200px; }}
+        .nav-search-bar input::placeholder {{ color: var(--muted); }}
         .search-dropdown {{
             position: absolute; top: 44px; right: 0; width: 420px;
             max-height: 480px; overflow-y: auto;
@@ -879,8 +906,10 @@ def build_index() -> str:
         <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links">{nav_links}</div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
-            <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            <div class="nav-search-bar" id="searchToggle" role="button" tabindex="0" aria-label="Search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
+            </div>
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
     </nav>

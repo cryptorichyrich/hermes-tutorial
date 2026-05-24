@@ -6,11 +6,11 @@
     let searchData = null;
     let activeIdx = -1;
 
+    const bar = document.getElementById('searchToggle');
     const input = document.getElementById('searchInput');
-    const toggle = document.getElementById('searchToggle');
     const dropdown = document.getElementById('searchDropdown');
 
-    if (!input || !dropdown) return;
+    if (!bar || !input || !dropdown) return;
 
     // Load index on first focus
     async function loadIndex() {
@@ -26,25 +26,32 @@
 
     // Toggle search open/closed
     function openSearch() {
-        input.classList.add('open');
+        bar.classList.add('open');
         input.focus();
         loadIndex();
     }
 
     function closeSearch() {
-        input.classList.remove('open');
+        bar.classList.remove('open');
         input.value = '';
         dropdown.classList.remove('open');
         dropdown.innerHTML = '';
         activeIdx = -1;
     }
 
-    toggle.addEventListener('click', function() {
-        if (input.classList.contains('open')) {
+    bar.addEventListener('click', function(e) {
+        // If clicking the input itself, don't toggle closed
+        if (e.target === input) return;
+        if (bar.classList.contains('open')) {
             closeSearch();
         } else {
             openSearch();
         }
+    });
+
+    // Also open on direct input focus
+    input.addEventListener('focus', function() {
+        if (!bar.classList.contains('open')) openSearch();
     });
 
     // Keyboard shortcut: Ctrl+K or Cmd+K
@@ -78,65 +85,75 @@
         if (!searchData) return;
 
         const terms = query.split(/\s+/).filter(t => t.length > 0);
-        const results = [];
 
-        for (const entry of searchData) {
-            const text = (entry.heading + ' ' + entry.text).toLowerCase();
+        const scored = searchData.map(function(section) {
+            const text = (section.heading + ' ' + section.content).toLowerCase();
             let score = 0;
-            let allMatch = true;
+            terms.forEach(function(term) {
+                if (text.includes(term)) score += 1;
+                if (section.heading.toLowerCase().includes(term)) score += 3;
+            });
+            return { section: section, score: score };
+        }).filter(function(r) { return r.score > 0; })
+          .sort(function(a, b) { return b.score - a.score; })
+          .slice(0, 12);
 
-            for (const term of terms) {
-                if (text.includes(term)) {
-                    // Heading match scores higher
-                    if (entry.heading.toLowerCase().includes(term)) score += 10;
-                    // Count occurrences in text
-                    const matches = text.split(term).length - 1;
-                    score += matches;
-                } else {
-                    allMatch = false;
-                }
-            }
-
-            if (allMatch && score > 0) {
-                results.push({ ...entry, score });
-            }
-        }
-
-        // Sort by score descending
-        results.sort((a, b) => b.score - a.score);
-
-        // Take top 8
-        const top = results.slice(0, 8);
+        dropdown.innerHTML = '';
         activeIdx = -1;
 
-        if (top.length === 0) {
-            dropdown.innerHTML = '<div class="sr-empty">No results for "' + escapeHtml(query) + '"</div>';
+        if (scored.length === 0) {
+            dropdown.innerHTML = '<div class="sr-empty">No results found</div>';
             dropdown.classList.add('open');
             return;
         }
 
-        let html = '<div class="sr-label">Results</div>';
-        top.forEach((r, i) => {
-            const snippet = highlightSnippet(r.text, terms);
-            html += '<div class="sr-item" data-idx="' + i + '" data-url="' + r.slug + '.html#' + r.headingId + '">' +
-                '<div class="sr-item-chapter">Ch ' + r.ch + ' · ' + escapeHtml(r.chTitle.split('—')[0].trim()) + '</div>' +
-                '<div class="sr-item-heading">' + highlightText(r.heading, terms) + '</div>' +
-                '<div class="sr-item-snippet">' + snippet + '</div>' +
-            '</div>';
+        // Group by chapter
+        const groups = {};
+        scored.forEach(function(r) {
+            const ch = r.section.chapter;
+            if (!groups[ch]) groups[ch] = [];
+            groups[ch].push(r.section);
         });
 
-        dropdown.innerHTML = html;
-        dropdown.classList.add('open');
+        Object.keys(groups).forEach(function(ch) {
+            const label = document.createElement('div');
+            label.className = 'sr-label';
+            label.textContent = ch;
+            dropdown.appendChild(label);
 
-        // Click handler for results
-        dropdown.querySelectorAll('.sr-item').forEach(function(item) {
-            item.addEventListener('click', function() {
-                navigateTo(this.dataset.url);
+            groups[ch].forEach(function(section) {
+                const item = document.createElement('a');
+                item.className = 'sr-item';
+                item.href = section.url;
+
+                let html = '<div class="sr-item-heading">' + escHtml(section.heading) + '</div>';
+                if (section.content) {
+                    const snippet = getSnippet(section.content, terms[0]);
+                    html += '<div class="sr-item-snippet">' + highlightTerms(escHtml(snippet), terms) + '</div>';
+                }
+                item.innerHTML = html;
+
+                item.addEventListener('click', function(e) {
+                    // If same page, smooth scroll
+                    const hash = section.url.split('#')[1];
+                    if (hash && isSamePage(section.url)) {
+                        e.preventDefault();
+                        const target = document.getElementById(hash);
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            closeSearch();
+                        }
+                    }
+                });
+
+                dropdown.appendChild(item);
             });
         });
+
+        dropdown.classList.add('open');
     });
 
-    // Keyboard navigation within dropdown
+    // Keyboard navigation in dropdown
     input.addEventListener('keydown', function(e) {
         const items = dropdown.querySelectorAll('.sr-item');
         if (!items.length) return;
@@ -149,114 +166,46 @@
             e.preventDefault();
             activeIdx = Math.max(activeIdx - 1, 0);
             updateActive(items);
-        } else if (e.key === 'Enter' && activeIdx >= 0) {
+        } else if (e.key === 'Enter') {
             e.preventDefault();
-            navigateTo(items[activeIdx].dataset.url);
+            if (activeIdx >= 0 && items[activeIdx]) {
+                items[activeIdx].click();
+            }
         }
     });
 
     function updateActive(items) {
-        items.forEach(function(el, i) {
-            el.classList.toggle('active', i === activeIdx);
+        items.forEach(function(it, i) {
+            it.classList.toggle('active', i === activeIdx);
+            if (i === activeIdx) it.scrollIntoView({ block: 'nearest' });
         });
-        if (activeIdx >= 0 && items[activeIdx]) {
-            items[activeIdx].scrollIntoView({ block: 'nearest' });
-        }
     }
 
-    // Navigate to page and smooth-scroll to section
-    function navigateTo(url) {
-        const [page, hash] = url.split('#');
-        const currentPage = location.pathname.split('/').pop() || 'index.html';
-
-        if (page === currentPage) {
-            // Same page — scroll directly
-            scrollToHash(hash);
-            closeSearch();
-        } else {
-            // Different page — navigate with hash
-            location.href = url;
-        }
+    function escHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    function scrollToHash(hash) {
-        if (!hash || hash === 'top') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return;
-        }
-        // Try to find the heading by ID
-        let target = document.getElementById(hash);
-        if (!target) {
-            // Try matching heading text content
-            const headings = document.querySelectorAll('h1, h2, h3');
-            const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            for (const h of headings) {
-                if (slugify(h.textContent) === hash) {
-                    target = h;
-                    break;
-                }
-            }
-        }
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Flash highlight
-            target.style.transition = 'background 0.3s';
-            target.style.background = '#eef2ff';
-            target.style.borderRadius = '4px';
-            setTimeout(function() {
-                target.style.background = '';
-            }, 1500);
-        }
+    function getSnippet(text, term) {
+        const idx = text.toLowerCase().indexOf(term);
+        if (idx === -1) return text.slice(0, 120);
+        const start = Math.max(0, idx - 40);
+        const end = Math.min(text.length, idx + 80);
+        let s = text.slice(start, end);
+        if (start > 0) s = '…' + s;
+        if (end < text.length) s += '…';
+        return s;
     }
 
-    // On page load, if there's a hash, smooth scroll to it
-    if (location.hash) {
-        setTimeout(function() {
-            scrollToHash(location.hash.slice(1));
-        }, 300);
+    function highlightTerms(html, terms) {
+        terms.forEach(function(term) {
+            const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+            html = html.replace(re, '<mark>$1</mark>');
+        });
+        return html;
     }
 
-    // Highlight matching text
-    function highlightText(text, terms) {
-        let result = escapeHtml(text);
-        for (const term of terms) {
-            const re = new RegExp('(' + escapeRegex(term) + ')', 'gi');
-            result = result.replace(re, '<mark>$1</mark>');
-        }
-        return result;
-    }
-
-    function highlightSnippet(text, terms) {
-        // Find the best 120-char window containing the most terms
-        const lower = text.toLowerCase();
-        let bestPos = 0;
-        let bestCount = 0;
-
-        for (let i = 0; i < text.length - 40; i += 20) {
-            const window = lower.slice(i, i + 140);
-            let count = 0;
-            for (const t of terms) {
-                const idx = window.indexOf(t);
-                if (idx >= 0) count++;
-            }
-            if (count > bestCount) {
-                bestCount = count;
-                bestPos = i;
-            }
-        }
-
-        let snippet = text.slice(bestPos, bestPos + 140);
-        if (bestPos > 0) snippet = '…' + snippet;
-        if (bestPos + 140 < text.length) snippet += '…';
-
-        return highlightText(snippet, terms);
-    }
-
-    function escapeHtml(s) {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    function escapeRegex(s) {
-        return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    function isSamePage(url) {
+        const path = url.split('#')[0];
+        return path === '' || path === location.pathname.split('/').pop();
     }
 })();
