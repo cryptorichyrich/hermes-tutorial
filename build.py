@@ -410,7 +410,6 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
-            overflow: hidden;
         }}
         [data-theme="dark"] .nav {{
             background: rgba(28,25,23,0.95);
@@ -433,7 +432,9 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         .nav-links {{
             display: flex; gap: 2px; margin-left: 24px;
             overflow-x: auto; flex-shrink: 1; min-width: 0;
+            scrollbar-width: none;
         }}
+        .nav-links::-webkit-scrollbar {{ display: none; }}
         .nav-links a {{
             padding: 4px 12px; border-radius: 9999px; color: var(--muted);
             text-decoration: none; font-size: 15px; font-weight: 500;
@@ -468,8 +469,9 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
 
         /* Search dropdown */
         .search-dropdown {{
-            position: absolute; top: 44px; right: 0; width: 420px;
-            max-height: 480px; overflow-y: auto;
+            position: fixed; top: 68px; right: 20px;
+            width: min(420px, calc(100vw - 40px));
+            max-height: min(480px, calc(100vh - 90px)); overflow-y: auto;
             background: var(--surface-card); border-radius: 16px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 0 0 1px var(--hairline);
             z-index: 200; display: none;
@@ -1243,7 +1245,6 @@ def build_index() -> str:
             background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
-            overflow: hidden;
         }}
         [data-theme="dark"] .nav {{
             background: rgba(28,25,23,0.95);
@@ -1266,7 +1267,9 @@ def build_index() -> str:
         .nav-links {{
             display: flex; gap: 2px; margin-left: 24px;
             overflow-x: auto; flex-shrink: 1; min-width: 0;
+            scrollbar-width: none;
         }}
+        .nav-links::-webkit-scrollbar {{ display: none; }}
         .nav-links a {{
             padding: 4px 12px; border-radius: 9999px; color: var(--muted);
             text-decoration: none; font-size: 15px; font-weight: 500;
@@ -1297,8 +1300,9 @@ def build_index() -> str:
         .nav-search-bar.open input {{ width: 180px; opacity: 1; }}
         .nav-search-bar input::placeholder {{ color: var(--muted); }}
         .search-dropdown {{
-            position: absolute; top: 44px; right: 0; width: 420px;
-            max-height: 480px; overflow-y: auto;
+            position: fixed; top: 68px; right: 20px;
+            width: min(420px, calc(100vw - 40px));
+            max-height: min(480px, calc(100vh - 90px)); overflow-y: auto;
             background: var(--surface-card); border-radius: 16px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 0 0 1px var(--hairline);
             z-index: 200; display: none;
