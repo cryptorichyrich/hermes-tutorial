@@ -319,7 +319,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         [data-theme="dark"] .markdown-body p,
         [data-theme="dark"] .markdown-body li,
         [data-theme="dark"] .markdown-body td {{ color: var(--body); }}
-        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
         [data-theme="dark"] .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
         [data-theme="dark"] .markdown-body a {{ color: var(--primary); }}
         [data-theme="dark"] .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
@@ -787,7 +787,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         [data-theme="dark"] .markdown-body p,
         [data-theme="dark"] .markdown-body li,
         [data-theme="dark"] .markdown-body td {{ color: var(--body); }}
-        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
         [data-theme="dark"] .markdown-body blockquote {{
             color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft);
         }}
@@ -1159,7 +1159,7 @@ def build_index() -> str:
         [data-theme="dark"] .markdown-body p,
         [data-theme="dark"] .markdown-body li,
         [data-theme="dark"] .markdown-body td {{ color: var(--body); }}
-        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--hairline-strong); }}
         [data-theme="dark"] .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
         [data-theme="dark"] .markdown-body a {{ color: var(--primary); }}
         [data-theme="dark"] .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
