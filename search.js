@@ -40,7 +40,6 @@
     }
 
     bar.addEventListener('click', function(e) {
-        // If clicking the input itself, don't toggle closed
         if (e.target === input) return;
         if (bar.classList.contains('open')) {
             closeSearch();
@@ -49,28 +48,31 @@
         }
     });
 
-    // Also open on direct input focus
     input.addEventListener('focus', function() {
         if (!bar.classList.contains('open')) openSearch();
     });
 
-    // Keyboard shortcut: Ctrl+K or Cmd+K
+    // Ctrl+K / Cmd+K shortcut
     document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             openSearch();
         }
-        if (e.key === 'Escape') {
-            closeSearch();
-        }
+        if (e.key === 'Escape') closeSearch();
     });
 
-    // Close on outside click
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.nav-search')) {
-            closeSearch();
-        }
+        if (!e.target.closest('.nav-search')) closeSearch();
     });
+
+    // Build URL from search index entry
+    function buildUrl(section) {
+        var base = section.slug + '.html';
+        if (section.headingId && section.headingId !== 'top') {
+            base += '#' + section.headingId;
+        }
+        return base;
+    }
 
     // Search logic
     input.addEventListener('input', function() {
@@ -87,11 +89,12 @@
         const terms = query.split(/\s+/).filter(t => t.length > 0);
 
         const scored = searchData.map(function(section) {
-            const text = (section.heading + ' ' + section.content).toLowerCase();
+            const text = (section.heading + ' ' + section.chTitle + ' ' + section.text).toLowerCase();
             let score = 0;
             terms.forEach(function(term) {
                 if (text.includes(term)) score += 1;
                 if (section.heading.toLowerCase().includes(term)) score += 3;
+                if (section.chTitle.toLowerCase().includes(term)) score += 2;
             });
             return { section: section, score: score };
         }).filter(function(r) { return r.score > 0; })
@@ -110,33 +113,32 @@
         // Group by chapter
         const groups = {};
         scored.forEach(function(r) {
-            const ch = r.section.chapter;
+            const ch = r.section.chTitle;
             if (!groups[ch]) groups[ch] = [];
             groups[ch].push(r.section);
         });
 
-        Object.keys(groups).forEach(function(ch) {
+        Object.keys(groups).forEach(function(chTitle) {
             const label = document.createElement('div');
             label.className = 'sr-label';
-            label.textContent = ch;
+            label.textContent = chTitle;
             dropdown.appendChild(label);
 
-            groups[ch].forEach(function(section) {
+            groups[chTitle].forEach(function(section) {
                 const item = document.createElement('a');
                 item.className = 'sr-item';
-                item.href = section.url;
+                item.href = buildUrl(section);
 
                 let html = '<div class="sr-item-heading">' + escHtml(section.heading) + '</div>';
-                if (section.content) {
-                    const snippet = getSnippet(section.content, terms[0]);
+                if (section.text) {
+                    const snippet = getSnippet(section.text, terms[0]);
                     html += '<div class="sr-item-snippet">' + highlightTerms(escHtml(snippet), terms) + '</div>';
                 }
                 item.innerHTML = html;
 
                 item.addEventListener('click', function(e) {
-                    // If same page, smooth scroll
-                    const hash = section.url.split('#')[1];
-                    if (hash && isSamePage(section.url)) {
+                    const hash = section.headingId;
+                    if (hash && isSamePage(buildUrl(section))) {
                         e.preventDefault();
                         const target = document.getElementById(hash);
                         if (target) {
