@@ -10,23 +10,23 @@ The average business blog post costs $150-$500 when outsourced. A content schedu
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  CONTENT MARKETING ENGINE                             │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Cron    │───►│ Hermes   │───►│ Blog     │       │
-│  │ 7am WIB │    │ Agent    │    │ Platform │       │
-│  └─────────┘    │          │    └──────────┘       │
-│  ┌─────────┐    │ Skills:  │                       │
-│  │ Cron    │───►│ • blog   │    ┌──────────┐       │
-│  │ 7pm WIB │    │ • human- │───►│ Social   │       │
-│  └─────────┘    │   izer   │    │ cross-   │       │
-│                 │ • market-│    │ post     │       │
-│                 │   ing-   │    └──────────┘       │
-│                 │   copy   │                       │
-│                 └──────────┘                       │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Engine["Content Marketing Engine"]
+        subgraph Triggers["Scheduled Triggers"]
+            C1["Cron\n7am WIB"]
+            C2["Cron\n7pm WIB"]
+        end
+        subgraph Agent["Hermes Agent"]
+            S1["blog"]
+            S2["humanizer"]
+            S3["marketing-copy"]
+        end
+        C1 --> Agent
+        C2 --> Agent
+        Agent --> Blog["Blog Platform"]
+        Agent --> Social["Social cross-post"]
+    end
 ```
 
 ### Setup
@@ -79,30 +79,15 @@ Your customers ask questions at 2am. Your support team sleeps. Hermes doesn't.
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  CUSTOMER SUPPORT SYSTEM                             │
-│                                                      │
-│  Customer ──► Telegram/WhatsApp                      │
-│                  │                                   │
-│                  ▼                                   │
-│           ┌──────────┐                               │
-│           │ Gateway  │                               │
-│           │ (24/7)   │                               │
-│           └────┬─────┘                               │
-│                │                                     │
-│         ┌──────┴──────┐                              │
-│         ▼             ▼                              │
-│   ┌──────────┐  ┌──────────┐                        │
-│   │ FAQ Bot  │  │ Complex  │                        │
-│   │ (auto)   │  │ Escalate │──► Human agent         │
-│   │          │  │          │    (Telegram DM)        │
-│   │ Skills:  │  │ Skills:  │                        │
-│   │ • custom │  │ • browse │                        │
-│   │   faq-   │  │ • search │                        │
-│   │   router │  │ • doc    │                        │
-│   └──────────┘  └──────────┘                        │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph System["Customer Support System"]
+        Customer["Customer"] --> Channel["Telegram / WhatsApp"]
+        Channel --> Gateway["Gateway\n(24/7)"]
+        Gateway --> FAQ["FAQ Bot\n(auto)\n\nSkills:\n• custom-faq-router"]
+        Gateway --> Escalate["Complex Escalate\n\nSkills:\n• browse\n• search\n• doc"]
+        Escalate --> Human["Human Agent\n(Telegram DM)"]
+    end
 ```
 
 ### Setup
@@ -174,34 +159,16 @@ A production bug costs an average of $10,000-$50,000 in lost revenue, customer t
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  AUTOMATED CODE REVIEW PIPELINE                      │
-│                                                      │
-│  Developer pushes PR                                 │
-│         │                                            │
-│         ▼                                            │
-│  ┌──────────┐                                        │
-│  │ GitHub   │──── Webhook ────► Hermes               │
-│  │ PR Event │                  │                     │
-│  └──────────┘                  │                     │
-│                         ┌──────┴──────┐              │
-│                         ▼             ▼              │
-│                  ┌──────────┐  ┌──────────┐         │
-│                  │ Security │  │ Quality  │         │
-│                  │ Scan     │  │ Review   │         │
-│                  │          │  │          │         │
-│                  │ • secrets│  │ • style  │         │
-│                  │ • vulns  │  │ • logic  │         │
-│                  │ • deps   │  │ • tests  │         │
-│                  └────┬─────┘  └────┬─────┘         │
-│                       │            │                 │
-│                       ▼            ▼                 │
-│                  ┌─────────────────────┐             │
-│                  │ PR Comment           │             │
-│                  │ (inline review)      │             │
-│                  └─────────────────────┘             │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Pipeline["Automated Code Review Pipeline"]
+        Dev["Developer pushes PR"] --> GitHub["GitHub PR Event"]
+        GitHub -- "Webhook" --> Hermes["Hermes"]
+        Hermes --> Security["Security Scan\n\n• secrets\n• vulns\n• deps"]
+        Hermes --> Quality["Quality Review\n\n• style\n• logic\n• tests"]
+        Security --> Comment["PR Comment\n(inline review)"]
+        Quality --> Comment
+    end
 ```
 
 ### Setup
@@ -262,26 +229,19 @@ Missed restocks cost sales. Wrong pricing loses margin. Manual monitoring eats h
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  E-COMMERCE OPS ENGINE                               │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Cron    │──► Check inventory levels               │
-│  │ 6am     │    │                                    │
-│  └─────────┘    ├── Low stock? ──► Alert + auto-     │
-│                 │               reorder suggestion    │
-│  ┌─────────┐    │                                    │
-│  │ Cron    │──► ├── Out of stock? ──► Urgent alert   │
-│  │ hourly  │    │                                   │
-│  └─────────┘    └── Price change? ─► Competitor     │
-│                      comparison alert                │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Cron    │──► Daily sales report → Telegram        │
-│  │ 9pm     │                                         │
-│  └─────────┘                                         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["E-Commerce Ops Engine"]
+        Cron1["Cron 6am"] --> Check["Check inventory levels"]
+        Check --> Low{"Low stock?"}
+        Low -->|"Yes"| Alert1["Alert + auto-reorder suggestion"]
+        Cron2["Cron hourly"] --> Check
+        Check --> OOS{"Out of stock?"}
+        OOS -->|"Yes"| Alert2["Urgent alert"]
+        Check --> Price{"Price change?"}
+        Price -->|"Yes"| Alert3["Competitor comparison alert"]
+        Cron3["Cron 9pm"] --> Report["Daily sales report → Telegram"]
+    end
 ```
 
 ### Setup
@@ -357,26 +317,14 @@ Your competitors publish, patent, and launch while you sleep. A daily digest of 
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  COMPETITIVE INTELLIGENCE ENGINE                     │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Cron    │───►│ Collect  │───►│ Analyze  │       │
-│  │ 8am     │    │          │    │          │       │
-│  └─────────┘    │ Sources: │    │ Skills:  │       │
-│                 │ • blogs  │    │ • blog-  │       │
-│  ┌─────────┐    │ • arxiv  │    │   watcher│       │
-│  │ Cron    │───►│ • news   │    │ • arxiv  │       │
-│  │ weekly  │    │ • Reddit │    │          │       │
-│  └─────────┘    └──────────┘    └────┬─────┘       │
-│                                      │              │
-│                                      ▼              │
-│                               ┌──────────┐         │
-│                               │ Digest   │         │
-│                               │ Telegram │         │
-│                               └──────────┘         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Competitive Intelligence Engine"]
+        Cron1["Cron 8am"] --> Collect["Collect\n\nSources:\n• blogs\n• arxiv\n• news\n• Reddit"]
+        Cron2["Cron weekly"] --> Collect
+        Collect --> Analyze["Analyze\n\nSkills:\n• blog-watcher\n• arxiv"]
+        Analyze --> Digest["Digest → Telegram"]
+    end
 ```
 
 ### Setup
@@ -433,29 +381,22 @@ You're a solo freelancer with 3 active clients. Each wants daily progress. You'r
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  FREELANCER ACCELERATION                             │
-│                                                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
-│  │ Client A │  │ Client B │  │ Client C │          │
-│  │ Profile  │  │ Profile  │  │ Profile  │          │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘          │
-│       │              │              │                │
-│       ▼              ▼              ▼                │
-│  ┌────────────────────────────────────────────┐     │
-│  │  Parallel Subagents (delegate_task)        │     │
-│  │                                            │     │
-│  │  Agent A ──► Build feature    (leaf)       │     │
-│  │  Agent B ──► Write tests     (leaf)        │     │
-│  │  Agent C ──► Deploy staging   (leaf)       │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  ┌──────────┐                                        │
-│  │ Cron     │──► Daily client update → Telegram      │
-│  │ 6pm      │   (auto-generated progress report)    │
-│  └──────────┘                                        │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Accel["Freelancer Acceleration"]
+        subgraph Clients["Client Profiles"]
+            A["Client A\nProfile"]
+            B["Client B\nProfile"]
+            C["Client C\nProfile"]
+        end
+        Clients --> Subagents["Parallel Subagents\n(delegate_task)"]
+        subgraph Subagents
+            SA["Agent A → Build feature\n(leaf)"]
+            SB["Agent B → Write tests\n(leaf)"]
+            SC["Agent C → Deploy staging\n(leaf)"]
+        end
+        Cron["Cron 6pm"] --> Update["Daily client update → Telegram\n(auto-generated progress report)"]
+    end
 ```
 
 ### Setup
@@ -525,27 +466,19 @@ Your SaaS goes down at 3am. Your customers notice at 3:05am. By morning, you've 
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  SaaS MONITORING SYSTEM                              │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Script  │──► curl health endpoint                 │
-│  │ (1 min) │    │                                    │
-│  └─────────┘    ├── 200 OK → silent (no output)      │
-│                 ├── 500   → alert + auto-restart      │
-│                 └── timeout → urgent alert            │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Script  │──► Check disk/memory/CPU                │
-│  │ (5 min) │    │                                    │
-│  └─────────┘    └── threshold breach → alert         │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Cron    │──► Weekly metrics summary               │
-│  │ Monday  │    (uses LLM for analysis)              │
-│  └─────────┘                                         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Monitor["SaaS Monitoring System"]
+        Script1["Script\n(every 1 min)"] --> Curl["curl health endpoint"]
+        Curl --> OK{"200 OK?"}
+        OK -->|"Yes"| Silent["Silent — no output"]
+        OK -->|"500"| Alert1["Alert + auto-restart"]
+        OK -->|"Timeout"| Alert2["Urgent alert"]
+        Script2["Script\n(every 5 min)"] --> Resources["Check disk / memory / CPU"]
+        Resources --> Breach{"Threshold\nbreach?"}
+        Breach -->|"Yes"| Alert3["Alert"]
+        Cron["Cron Monday"] --> Summary["Weekly metrics summary\n(uses LLM for analysis)"]
+    end
 ```
 
 ### Setup
@@ -621,27 +554,14 @@ Your analytics dashboard shows numbers. It doesn't tell you *why* revenue droppe
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  DATA ANALYSIS ENGINE                                │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Cron    │───►│ Fetch    │───►│ Analyze  │       │
-│  │ weekly  │    │ Data     │    │          │       │
-│  └─────────┘    │          │    │ Skills:  │       │
-│                 │ Sources: │    │ • jupyter│       │
-│  ┌─────────┐    │ • DB     │    │ • term-  │       │
-│  │ Cron    │───►│ • API    │    │   inal   │       │
-│  │ ad-hoc  │    │ • CSV    │    │          │       │
-│  └─────────┘    └──────────┘    └────┬─────┘       │
-│                                      │              │
-│                                      ▼              │
-│                               ┌──────────┐         │
-│                               │ Report   │         │
-│                               │ + Charts │         │
-│                               │ Telegram │         │
-│                               └──────────┘         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Data Analysis Engine"]
+        Cron1["Cron weekly"] --> Fetch["Fetch Data\n\nSources:\n• DB\n• API\n• CSV"]
+        Cron2["Cron ad-hoc"] --> Fetch
+        Fetch --> Analyze["Analyze\n\nSkills:\n• jupyter\n• terminal"]
+        Analyze --> Report["Report + Charts\n→ Telegram"]
+    end
 ```
 
 ### Setup
@@ -697,29 +617,13 @@ You get 150 emails a day. 120 are noise. 25 need replies. 5 are urgent. Hermes s
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  EMAIL TRIAGE ENGINE                                 │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐                        │
-│  │ Cron    │───►│ Fetch    │                        │
-│  │ 7am     │    │ Email    │                        │
-│  └─────────┘    │ (IMAP)   │                        │
-│                 └────┬─────┘                        │
-│                      │                              │
-│              ┌───────┴───────┐                      │
-│              ▼               ▼                      │
-│       ┌──────────┐   ┌──────────┐                  │
-│       │ Categorize│   │ Draft    │                  │
-│       │          │   │ Replies  │                  │
-│       │ • urgent │   │          │                  │
-│       │ • reply  │   │ Skills:  │                  │
-│       │ • FYI    │   │ • hima-  │                  │
-│       │ • spam   │   │   laya   │                  │
-│       │ • action │   │ • term-  │                  │
-│       └──────────┘   │   inal   │                  │
-│                      └──────────┘                  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Email Triage Engine"]
+        Cron["Cron 7am"] --> Fetch["Fetch Email\n(IMAP)"]
+        Fetch --> Categorize["Categorize\n\n• urgent\n• reply\n• FYI\n• spam\n• action"]
+        Fetch --> Drafts["Draft Replies\n\nSkills:\n• himalaya\n• terminal"]
+    end
 ```
 
 ### Setup
@@ -772,25 +676,14 @@ Speed-to-lead is the #1 predictor of conversion. A lead responded to in 5 minute
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  LEAD GENERATION ENGINE                              │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Browser │───►│ Scrape   │───►│ Qualify  │       │
-│  │ Cron    │    │ Leads    │    │          │       │
-│  └─────────┘    │          │    │ • Score  │       │
-│                 │ Skills:  │    │ • Enrich │       │
-│  ┌─────────┐    │ • browse │    │ • Route  │       │
-│  │ Webhook │───►│ • search │    └────┬─────┘       │
-│  │ (form)  │    └──────────┘         │              │
-│  └─────────┘                         ▼              │
-│                               ┌──────────┐         │
-│                               │ Auto-    │         │
-│                               │ respond  │         │
-│                               │ Telegram │         │
-│                               └──────────┘         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Lead Generation Engine"]
+        Browser["Browser Cron"] --> Scrape["Scrape Leads\n\nSkills:\n• browse\n• search"]
+        Webhook["Webhook\n(form)"] --> Scrape
+        Scrape --> Qualify["Qualify\n\n• Score\n• Enrich\n• Route"]
+        Qualify --> Respond["Auto-respond\n→ Telegram"]
+    end
 ```
 
 ### Setup
@@ -847,29 +740,28 @@ hermes webhook subscribe lead-form \
 
 ## Master ROI Summary — All 10 Scenarios
 
-```
-┌──────────────────────────────────────────────────────┐
-│  TOTAL IMPACT: 10 HERMES BUSINESS USE CASES          │
-│                                                      │
-│  #  Scenario              Monthly Savings            │
-│  ─  ───────────────────   ────────────────           │
-│  1  Content Marketing      $21,000                   │
-│  2  Customer Support        $5,000                   │
-│  3  Code Review             $6,200                   │
-│  4  E-Commerce Ops          $5,950                   │
-│  5  Competitive Intel       $4,200                   │
-│  6  Freelancer Accel.      $15,000 (revenue gain)    │
-│  7  SaaS Monitoring        $14,650                   │
-│  8  Data Analysis           $4,500                   │
-│  9  Email Management        $3,000                   │
-│  10 Lead Generation        +150% pipeline             │
-│  ────────────────────────────────────────            │
-│  TOTAL ESTIMATED VALUE   ~$79,500/month              │
-│                                                      │
-│  Hermes API cost:       ~$20-50/month                │
-│                                                      │
-│  ROI: 1,590x – 3,975x                               │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Total Impact: 10 Hermes Business Use Cases"]:1
+    block:stats
+        columns 2
+        "1. Content Marketing" "$21,000"
+        "2. Customer Support" "$5,000"
+        "3. Code Review" "$6,200"
+        "4. E-Commerce Ops" "$5,950"
+        "5. Competitive Intel" "$4,200"
+        "6. Freelancer Accel." "$15,000 (revenue gain)"
+        "7. SaaS Monitoring" "$14,650"
+        "8. Data Analysis" "$4,500"
+        "9. Email Management" "$3,000"
+        "10. Lead Generation" "+150% pipeline"
+    end
+    block:totals
+        "Total Estimated Value: ~$79,500/month"
+        "Hermes API Cost: ~$20–50/month"
+        "ROI: 1,590x – 3,975x"
+    end
 ```
 
 ### Hermes Cost Breakdown

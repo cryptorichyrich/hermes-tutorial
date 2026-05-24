@@ -71,30 +71,31 @@ hermes --yolo chat -q "Clean up temp files"
 
 ### Security Quick Reference
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              SECURITY LAYERS                                │
-│                                                            │
-│  Layer 1: Secret Redaction                                 │
-│  ├── Masks API keys, tokens in tool output                 │
-│  ├── Config: security.redact_secrets                       │
-│  └── Restart required                                      │
-│                                                            │
-│  Layer 2: PII Redaction                                    │
-│  ├── Hashes user IDs, strips phone numbers                 │
-│  ├── Config: privacy.redact_pii                            │
-│  └── Gateway-only (messaging platforms)                    │
-│                                                            │
-│  Layer 3: Command Approval                                 │
-│  ├── Prompts before destructive commands                   │
-│  ├── Config: approvals.mode (manual/smart/off)             │
-│  └── Per-session: /yolo or --yolo flag                     │
-│                                                            │
-│  Layer 4: Environment Filtering                            │
-│  ├── MCP subprocesses get only safe env vars               │
-│  └── API keys only passed when explicitly configured       │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph security["🔒 SECURITY LAYERS"]
+        direction TB
+        subgraph L1["Layer 1: Secret Redaction"]
+            L1A["Masks API keys, tokens in tool output"]
+            L1B["Config: security.redact_secrets"]
+            L1C["Restart required"]
+        end
+        subgraph L2["Layer 2: PII Redaction"]
+            L2A["Hashes user IDs, strips phone numbers"]
+            L2B["Config: privacy.redact_pii"]
+            L2C["Gateway-only (messaging platforms)"]
+        end
+        subgraph L3["Layer 3: Command Approval"]
+            L3A["Prompts before destructive commands"]
+            L3B["Config: approvals.mode (manual/smart/off)"]
+            L3C["Per-session: /yolo or --yolo flag"]
+        end
+        subgraph L4["Layer 4: Environment Filtering"]
+            L4A["MCP subprocesses get only safe env vars"]
+            L4B["API keys only passed when explicitly configured"]
+        end
+        L1 --> L2 --> L3 --> L4
+    end
 ```
 
 ---
@@ -107,28 +108,18 @@ Hermes has 20+ built-in toolsets. But what if you need something it doesn't have
 
 ### How It Works
 
-```
-┌──────────────────────────────────────────────────────────┐
-│           MCP ARCHITECTURE                                │
-│                                                          │
-│  ┌─────────┐    stdio     ┌──────────────┐              │
-│  │         │──────────────│ MCP Server A │              │
-│  │         │              │ (GitHub)     │              │
-│  │         │              └──────────────┘              │
-│  │         │                                            │
-│  │ HERMES  │    HTTP     ┌──────────────┐              │
-│  │  AGENT  │──────────────│ MCP Server B │              │
-│  │         │              │ (Company API)│              │
-│  │         │              └──────────────┘              │
-│  │         │                                            │
-│  │         │    stdio    ┌──────────────┐               │
-│  │         │──────────────│ MCP Server C │              │
-│  └─────────┘              │ (GitNexus)   │              │
-│                           └──────────────┘              │
-│                                                          │
-│  Tools appear as: mcp_github_*, mcp_company_*, etc.     │
-│  Auto-injected into all platform toolsets                │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph hermes["HERMES AGENT"]
+        H["Hermes Agent"]
+    end
+    H -- "stdio" --> A["MCP Server A\n(GitHub)"]
+    H -- "HTTP" --> B["MCP Server B\n(Company API)"]
+    H -- "stdio" --> C["MCP Server C\n(GitNexus)"]
+    
+    subgraph note["Tool Naming"]
+        N["Tools appear as:\nmcp_github_*, mcp_company_*, etc.\nAuto-injected into all platform toolsets"]
+    end
 ```
 
 1. You declare MCP servers in `config.yaml`
@@ -315,35 +306,39 @@ Profiles give you completely separate Hermes environments — each with its own 
 
 ### Why Profiles?
 
-```
-┌────────────────────────────────────────────────────────┐
-│           WITHOUT PROFILES                              │
-│                                                        │
-│  ~/.hermes/                                            │
-│  ├── config.yaml    ← One config for everything       │
-│  ├── .env           ← All keys mixed together         │
-│  ├── sessions/      ← Work + personal sessions merged │
-│  ├── skills/        ← All skills in one pool          │
-│  └── state.db       ← One session database            │
-│                                                        │
-│           WITH PROFILES                                 │
-│                                                        │
-│  ~/.hermes/                                            │
-│  ├── config.yaml        ← Default profile             │
-│  ├── profiles/                                         │
-│  │   ├── work/                                         │
-│  │   │   ├── config.yaml  ← Work config, models, keys │
-│  │   │   ├── .env                                         │
-│  │   │   ├── sessions/     ← Work sessions only       │
-│  │   │   ├── skills/       ← Work-specific skills     │
-│  │   │   └── state.db      ← Work session database    │
-│  │   └── client-acme/                                  │
-│  │       ├── config.yaml  ← Client-specific config     │
-│  │       ├── .env                                         │
-│  │       └── ...                                        │
-│  └── ...                                               │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph without["WITHOUT PROFILES"]
+        direction TB
+        W1["~/.hermes/"]
+        W2["config.yaml ← One config for everything"]
+        W3[".env ← All keys mixed together"]
+        W4["sessions/ ← Work + personal sessions merged"]
+        W5["skills/ ← All skills in one pool"]
+        W6["state.db ← One session database"]
+        W1 --> W2 & W3 & W4 & W5 & W6
+    end
+
+    subgraph with["WITH PROFILES"]
+        direction TB
+        P1["~/.hermes/"]
+        P2["config.yaml ← Default profile"]
+        P3["profiles/"]
+        P1 --> P2 & P3
+        subgraph work["work/"]
+            W7["config.yaml ← Work config, models, keys"]
+            W8[".env"]
+            W9["sessions/ ← Work sessions only"]
+            W10["skills/ ← Work-specific skills"]
+            W11["state.db ← Work session database"]
+        end
+        subgraph acme["client-acme/"]
+            A1["config.yaml ← Client-specific config"]
+            A2[".env"]
+            A3["..."]
+        end
+        P3 --> work & acme
+    end
 ```
 
 **Use cases:**
@@ -441,33 +436,25 @@ hermes auth reset openrouter
 
 ### How Rotation Works
 
-```
-┌────────────────────────────────────────────────────────┐
-│           CREDENTIAL ROTATION                           │
-│                                                        │
-│  Request arrives for OpenRouter                        │
-│       │                                                │
-│       ▼                                                │
-│  ┌─────────────┐                                      │
-│  │ Key pool:   │                                      │
-│  │ ├── Key 1   │ ← Last used: 2 min ago  ✅ USE THIS │
-│  │ ├── Key 2   │ ← Last used: 30s ago   ⏳ Backoff   │
-│  │ └── Key 3   │ ← Last used: 5 min ago ✅ Available │
-│  └─────────────┘                                      │
-│       │                                                │
-│       ▼                                                │
-│  Pick least-recently-used non-exhausted key            │
-│  Mark used, attach to request                          │
-│       │                                                │
-│       ▼                                                │
-│  If 429 (rate limited):                                │
-│  ├── Mark key as exhausted (cooldown period)           │
-│  └── Retry with next available key                     │
-│                                                        │
-│  If all keys exhausted:                                │
-│  └── Wait for shortest cooldown, then retry            │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Request arrives for OpenRouter"] --> B{"Key pool lookup"}
+    
+    B --> K1["Key 1\nLast used: 2 min ago\n✅ USE THIS"]
+    B --> K2["Key 2\nLast used: 30s ago\n⏳ Backoff"]
+    B --> K3["Key 3\nLast used: 5 min ago\n✅ Available"]
+    
+    K1 --> C["Pick least-recently-used non-exhausted key"]
+    K3 --> C
+    C --> D["Mark used, attach to request"]
+    
+    D --> E{"Response?"}
+    E -- "200 OK" --> F["Request succeeds"]
+    E -- "429 Rate Limited" --> G["Mark key as exhausted\n(cooldown period)"]
+    G --> H{"Retry with next available key"}
+    H -- "Keys available" --> C
+    H -- "All keys exhausted" --> I["Wait for shortest cooldown\nthen retry"]
+    I --> C
 ```
 
 **Key insight:** You don't need to manage rotation manually. Just register multiple keys and Hermes handles the rest — picking the least-recently-used key, respecting cooldowns, and spreading load evenly.
@@ -781,34 +768,18 @@ Cloud APIs are great until they're not. Rate limits, outages, pricing changes, d
 
 ### The Hardware Reality
 
-```
-┌──────────────────────────────────────────────────────┐
-│  LOCAL LLM HARDWARE GUIDE                            │
-│                                                      │
-│  Specs            What you can run                   │
-│  ─────────────    ─────────────────                  │
-│  4 GB RAM         1-3B params (Q4)                   │
-│                   → basic chat, formatting            │
-│                   → 15-30 tok/s                      │
-│                                                      │
-│  8 GB RAM         7-8B params (Q4_K_M)              │
-│                   → solid daily assistant             │
-│                   → 8-20 tok/s                       │
-│                                                      │
-│  16 GB RAM        8-14B params (Q4_K_M)             │
-│                   → quality code, analysis            │
-│                   → 5-15 tok/s                       │
-│                                                      │
-│  32 GB RAM        14-32B params (Q4_K_M)            │
-│                   → near-cloud quality                │
-│                   → 3-8 tok/s                        │
-│                                                      │
-│  GPU (8GB VRAM)   7-8B params (Q8)                  │
-│                   → 50-100 tok/s (fast!)              │
-│                                                      │
-│  No GPU? No problem. CPU inference works.            │
-│  Slower, but perfectly usable for batch tasks.       │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph hw["LOCAL LLM HARDWARE GUIDE"]
+        direction TB
+        S4["4 GB RAM\n1-3B params (Q4)\nbasic chat, formatting\n15-30 tok/s"]
+        S8["8 GB RAM\n7-8B params (Q4_K_M)\nsolid daily assistant\n8-20 tok/s"]
+        S16["16 GB RAM\n8-14B params (Q4_K_M)\nquality code, analysis\n5-15 tok/s"]
+        S32["32 GB RAM\n14-32B params (Q4_K_M)\nnear-cloud quality\n3-8 tok/s"]
+        GPU["GPU (8GB VRAM)\n7-8B params (Q8)\n50-100 tok/s (fast!)"]
+        NOTE["No GPU? No problem.\nCPU inference works.\nSlower, but perfectly usable for batch tasks."]
+        S4 --> S8 --> S16 --> S32
+    end
 ```
 
 ### Setup: llama.cpp (Recommended)
@@ -878,29 +849,24 @@ hermes -m ollama/llama3.1:8b "Write a Python script to parse CSV files"
 
 ### Hybrid Strategy — Best of Both Worlds
 
-```
-┌──────────────────────────────────────────────────────┐
-│  WHEN TO USE LOCAL vs CLOUD                          │
-│                                                      │
-│  LOCAL (free, private):                              │
-│  ✓ Email triage / categorization                     │
-│  ✓ Document summarization                            │
-│  ✓ Data extraction & formatting                      │
-│  ✓ PII-sensitive tasks                               │
-│  ✓ Bulk batch processing                             │
-│  ✓ Late-night crons (when speed doesn't matter)      │
-│                                                      │
-│  CLOUD (paid, smarter):                              │
-│  ✓ Client-facing content                             │
-│  ✓ Architecture & design decisions                   │
-│  ✓ Code review (needs deep reasoning)                │
-│  ✓ Complex debugging                                 │
-│  ✓ Real-time interactive chat                        │
-│                                                      │
-│  Rule of thumb:                                      │
-│  If nobody sees the output → local                   │
-│  If a human reads the output → cloud                 │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph local["LOCAL (free, private)"]
+        L1["✓ Email triage / categorization"]
+        L2["✓ Document summarization"]
+        L3["✓ Data extraction & formatting"]
+        L4["✓ PII-sensitive tasks"]
+        L5["✓ Bulk batch processing"]
+        L6["✓ Late-night crons (when speed doesn't matter)"]
+    end
+    subgraph cloud["CLOUD (paid, smarter)"]
+        C1["✓ Client-facing content"]
+        C2["✓ Architecture & design decisions"]
+        C3["✓ Code review (needs deep reasoning)"]
+        C4["✓ Complex debugging"]
+        C5["✓ Real-time interactive chat"]
+    end
+    RULE["Rule of thumb:\nIf nobody sees the output → local\nIf a human reads the output → cloud"]
 ```
 
 ### The Cost Difference
@@ -925,28 +891,27 @@ Your phone is always with you. Your laptop isn't. Running a local LLM on Android
 
 ### Hardware Requirements
 
-```
-┌──────────────────────────────────────────────────────┐
-│  ANDROID LLM — WHAT YOUR PHONE CAN RUN               │
-│                                                      │
-│  Phone RAM         Model Size         Speed          │
-│  ─────────         ──────────         ─────          │
-│  4 GB              1-1.5B (Q4)        10-20 tok/s    │
-│  6 GB              1.5-3B (Q4)        8-18 tok/s     │
-│  8 GB              3B (Q4_K_M)        10-20 tok/s    │
-│  12 GB             3-7B (Q4_K_M)      5-15 tok/s     │
-│  16 GB             7-8B (Q4_K_M)      3-10 tok/s     │
-│                                                      │
-│  Chipset matters too:                                │
-│  • Snapdragon 8 Gen 2/3 — fastest                   │
-│  • Exynos 1580+ — good                               │
-│  • Older chips — subtract 30-50% speed               │
-│                                                      │
-│  Example: Samsung A56 (12GB, Exynos 1580)            │
-│  → Gemma 2 2B at Q4: ~18-25 tok/s                   │
-│  → Llama 3.1 8B at Q4: ~3-6 tok/s                   │
-│  → Qwen 2.5 3B at Q4: ~12-18 tok/s                  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph android["ANDROID LLM — WHAT YOUR PHONE CAN RUN"]
+        direction TB
+        P4["4 GB RAM\n1-1.5B (Q4)\n10-20 tok/s"]
+        P6["6 GB RAM\n1.5-3B (Q4)\n8-18 tok/s"]
+        P8["8 GB RAM\n3B (Q4_K_M)\n10-20 tok/s"]
+        P12["12 GB RAM\n3-7B (Q4_K_M)\n5-15 tok/s"]
+        P16["16 GB RAM\n7-8B (Q4_K_M)\n3-10 tok/s"]
+        P4 --> P6 --> P8 --> P12 --> P16
+    end
+    subgraph chips["Chipset matters too"]
+        CS1["Snapdragon 8 Gen 2/3 — fastest"]
+        CS2["Exynos 1580+ — good"]
+        CS3["Older chips — subtract 30-50% speed"]
+    end
+    subgraph example["Example: Samsung A56 (12GB, Exynos 1580)"]
+        E1["Gemma 2 2B at Q4: ~18-25 tok/s"]
+        E2["Llama 3.1 8B at Q4: ~3-6 tok/s"]
+        E3["Qwen 2.5 3B at Q4: ~12-18 tok/s"]
+    end
 ```
 
 ### Setup: Termux + llama.cpp
@@ -1008,28 +973,31 @@ hermes gateway run
 
 ### The Mobile Workflow
 
-```
-┌──────────────────────────────────────────────────────┐
-│  MOBILE HERMES — DAILY WORKFLOW                      │
-│                                                      │
-│  Morning (offline, on train):                        │
-│  → "Summarize my unread emails"                      │
-│  → "Draft replies to the 3 urgent ones"              │
-│  → Local model handles it, no internet needed        │
-│                                                      │
-│  At work (WiFi):                                     │
-│  → Switch to cloud model for quality work            │
-│  → /model anthropic/claude-sonnet-4                  │
-│                                                      │
-│  Evening (offline, at home):                         │
-│  → "Write tomorrow's blog draft"                     │
-│  → Local model drafts it, you refine later           │
-│                                                      │
-│  Travel (no WiFi at all):                            │
-│  → Full Hermes works on phone data                   │
-│  → Local model = zero data usage                     │
-│  → Only Telegram API uses data (minimal)             │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph morning["🌅 Morning (offline, on train)"]
+        M1["→ Summarize my unread emails"]
+        M2["→ Draft replies to the 3 urgent ones"]
+        M3["→ Local model handles it, no internet needed"]
+        M1 --> M2 --> M3
+    end
+    subgraph work["🏢 At work (WiFi)"]
+        W1["→ Switch to cloud model for quality work"]
+        W2["→ /model anthropic/claude-sonnet-4"]
+        W1 --> W2
+    end
+    subgraph evening["🌙 Evening (offline, at home)"]
+        E1["→ Write tomorrow's blog draft"]
+        E2["→ Local model drafts it, you refine later"]
+        E1 --> E2
+    end
+    subgraph travel["✈️ Travel (no WiFi at all)"]
+        T1["→ Full Hermes works on phone data"]
+        T2["→ Local model = zero data usage"]
+        T3["→ Only Telegram API uses data (minimal)"]
+        T1 --> T2 --> T3
+    end
+    morning --> work --> evening --> travel
 ```
 
 ### Tips for Mobile Performance

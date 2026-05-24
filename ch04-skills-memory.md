@@ -8,40 +8,21 @@
 
 The most surprising thing about Hermes isn't what it can do — it's that **it changes**. The more you use it, the better it gets. This isn't marketing. It's an observable, verifiable closed loop.
 
+```mermaid
+flowchart TD
+    A["1️⃣ CURATE MEMORY<br/>After each task, decide what's worth<br/>remembering → save to persistent store"]
+    B["2️⃣ CREATE SKILL<br/>If the solution is reusable, distill it<br/>into a SKILL.md with steps + pitfalls"]
+    C["3️⃣ IMPROVE SKILL<br/>When a Skill fails or gets corrected,<br/>patch it — it never makes the same mistake twice"]
+    D["4️⃣ RECALL via FTS5<br/>FTS5 full-text search finds the right<br/>skill/memory instantly on next task"]
+    E["5️⃣ USER MODEL<br/>Over time, Hermes builds a model of<br/>who you are, what you prefer, how you work"]
+
+    A --> B --> C --> D --> E
+
+    classDef step fill:#3498db,color:#fff,stroke:#2980b9,rx:8,ry:8
+    class A,B,C,D,E step
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   THE LEARNING LOOP                          │
-│                                                            │
-│  ┌──────────────┐                                          │
-│  │ 1. CURATE    │  After each task, decide what's worth    │
-│  │    MEMORY    │  remembering → save to persistent store   │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 2. CREATE    │  If the solution is reusable, distill it │
-│  │    SKILL     │  into a SKILL.md with steps + pitfalls   │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 3. IMPROVE   │  When a Skill fails or gets corrected,   │
-│  │    SKILL     │  patch it — it never makes the same       │
-│  │              │  mistake twice                            │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 4. RECALL    │  FTS5 full-text search finds the right   │
-│  │    (FTS5)    │  skill/memory instantly on next task      │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 5. USER      │  Over time, Hermes builds a model of     │
-│  │    MODEL     │  who you are, what you prefer, how you   │
-│  │              │  work → injected into every session       │
-│  └──────────────┘                                          │
-│                                                            │
-│  Nobody teaches it any of this. It figures it out alone.   │
-└────────────────────────────────────────────────────────────┘
-```
+
+*Nobody teaches it any of this. It figures it out alone.*
 
 **Step 1: Memory Curation** — After each conversation, Hermes actively decides what's worth remembering. Not brute-force chat history dumps — selective, indexed saves to a SQLite database with FTS5 full-text search. (Covered in §4.3)
 
@@ -65,37 +46,22 @@ A **skill** is a structured document that teaches Hermes how to handle a specifi
 
 Every skill is a `SKILL.md` file with YAML frontmatter and a markdown body:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                   SKILL STRUCTURE                           │
-│                                                            │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │  --- (YAML frontmatter)                          │      │
-│  │  name: my-skill                                  │      │
-│  │  description: "What this skill does"             │      │
-│  │  version: 1.0.0                                  │      │
-│  │  author: Your Name                               │      │
-│  │  metadata:                                       │      │
-│  │    hermes:                                       │      │
-│  │      tags: [tag1, tag2]                          │      │
-│  │  ---                                             │      │
-│  ├──────────────────────────────────────────────────┤      │
-│  │  # Skill Name                                    │      │
-│  │                                                  │      │
-│  │  ## When to Use                                  │      │
-│  │  Trigger conditions...                           │      │
-│  │                                                  │      │
-│  │  ## Steps                                        │      │
-│  │  1. Do this with `exact-command`                 │      │
-│  │  2. Then check that                              │      │
-│  │  3. Pitfall: don't forget X                     │      │
-│  │                                                  │      │
-│  │  ## Verification                                 │      │
-│  │  How to confirm it worked...                     │      │
-│  └──────────────────────────────────────────────────┘      │
-│                                                            │
-│  Optional: references/, templates/, scripts/               │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph skill["SKILL STRUCTURE"]
+        FM["📋 YAML frontmatter<br/>name · description · version · author<br/>metadata → tags"]
+        BODY["📝 Markdown Body<br/><br/># Skill Name<br/>## When to Use — trigger conditions<br/>## Steps — numbered with exact commands<br/>## Verification — confirm it worked"]
+        OPT["📁 Optional Extras<br/>references/ · templates/ · scripts/"]
+    end
+
+    FM --> BODY --> OPT
+
+    classDef yaml fill:#f39c12,color:#fff,stroke:#d68910
+    classDef md fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef opt fill:#95a5a6,color:#fff,stroke:#7f8c8d
+    class FM yaml
+    class BODY md
+    class OPT opt
 ```
 
 The YAML frontmatter provides metadata (name, description, tags, version). The markdown body is the actual knowledge — step-by-step procedures, commands, pitfalls, and verification steps.
@@ -123,36 +89,53 @@ hermes skills install https://raw.githubusercontent.com/user/repo/main/SKILL.md
 
 **Category highlights:**
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                 SKILL CATEGORIES (88+ skills)             │
-│                                                          │
-│  🔧 Software Dev        🎨 Creative        🌐 Web Dev    │
-│  • debugging             • ascii-art         • blog       │
-│  • test-driven-dev       • design-md         • fullstack  │
-│  • writing-plans         • excalidraw        • devcard    │
-│  • spike                 • sketch            • web-dkc    │
-│                                                          │
-│  🤖 AI Agents            📊 Data Science     📝 Productivity│
-│  • claude-code           • jupyter-live      • notion     │
-│  • codex                 •                    • linear     │
-│  • kilocode              •                    • google-ws  │
-│  • opencode              •                    • powerpoint │
-│                                                          │
-│  🎮 Gaming & Media       🔬 Research         🏠 Smart Home│
-│  • youtube-content       • arxiv             • openhue    │
-│  • gif-search            • blogwatcher       •            │
-│  • spotify               • polymarket        •            │
-│  • songsee               • llm-wiki          •            │
-│                                                          │
-│  🔒 Red Teaming          🛠 DevOps           📧 Email     │
-│  • godmode               • webhook-subs      • himalaya   │
-│                          • kanban                          │
-│                                                          │
-│  🚀 Autonomous Agents                                     │
-│  • hermes-agent (you're using it now!)                    │
-│  • kanban-worker, kanban-orchestrator                     │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph cats["SKILL CATEGORIES — 88+ skills"]
+        direction TB
+        subgraph sw["🔧 Software Dev"]
+            SW1["debugging · test-driven-dev<br/>writing-plans · spike"]
+        end
+        subgraph cr["🎨 Creative"]
+            CR1["ascii-art · design-md<br/>excalidraw · sketch"]
+        end
+        subgraph wd["🌐 Web Dev"]
+            WD1["blog · fullstack<br/>devcard · web-dkc"]
+        end
+        subgraph ai["🤖 AI Agents"]
+            AI1["claude-code · codex<br/>kilocode · opencode"]
+        end
+        subgraph ds["📊 Data Science"]
+            DS1["jupyter-live"]
+        end
+        subgraph pr["📝 Productivity"]
+            PR1["notion · linear<br/>google-ws · powerpoint"]
+        end
+        subgraph gm["🎮 Gaming & Media"]
+            GM1["youtube-content · gif-search<br/>spotify · songsee"]
+        end
+        subgraph rs["🔬 Research"]
+            RS1["arxiv · blogwatcher<br/>polymarket · llm-wiki"]
+        end
+        subgraph sh["🏠 Smart Home"]
+            SH1["openhue"]
+        end
+        subgraph rt["🔒 Red Teaming"]
+            RT1["godmode"]
+        end
+        subgraph dv["🛠 DevOps"]
+            DV1["webhook-subs · kanban"]
+        end
+        subgraph em["📧 Email"]
+            EM1["himalaya"]
+        end
+        subgraph aa["🚀 Autonomous Agents"]
+            AA1["hermes-agent<br/>kanban-worker · kanban-orchestrator"]
+        end
+    end
+
+    classDef cat fill:#3498db,color:#fff,stroke:#2980b9
+    class SW1,CR1,WD1,AI1,DS1,PR1,GM1,RS1,SH1,RT1,DV1,EM1,AA1 cat
 ```
 
 ### Loading Skills into a Session
@@ -211,25 +194,23 @@ Hermes: ✓ Skill saved as "systematic-debugging"
 
 Hermes has a built-in **curator** that automatically maintains skills over time:
 
+```mermaid
+flowchart LR
+    ACTIVE["✅ ACTIVE<br/><i>in use</i>"] -->|"idle over time"| STALE["⏳ STALE<br/><i>idle</i>"]
+    STALE -->|"further idle"| ARCHIVED["📦 ARCHIVED<br/><i>backed up</i>"]
+
+    classDef active fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef stale fill:#f39c12,color:#fff,stroke:#d68910
+    classDef archived fill:#95a5a6,color:#fff,stroke:#7f8c8d
+    class ACTIVE active
+    class STALE stale
+    class ARCHIVED archived
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   CURATOR LIFECYCLE                         │
-│                                                            │
-│  ┌─────────┐     ┌─────────┐     ┌─────────┐             │
-│  │  ACTIVE  │────►│  STALE  │────►│ ARCHIVED│             │
-│  │  (in use)│     │ (idle)  │     │ (backed  │             │
-│  │          │     │         │     │  up)     │             │
-│  └─────────┘     └─────────┘     └─────────┘             │
-│       │               │                                    │
-│       │          Usage tracked via                          │
-│       │          .usage.json                                │
-│       │                                                    │
-│  Pinned skills are exempt from all auto-transitions.       │
-│  Only agent-created skills are touched.                    │
-│  Hub/bundled skills are never modified.                    │
-│  Nothing is ever deleted — max action is archive.          │
-└────────────────────────────────────────────────────────────┘
-```
+
+- Usage tracked via `.usage.json`
+- Pinned skills are exempt from all auto-transitions
+- Only agent-created skills are touched; hub/bundled skills are never modified
+- Nothing is ever deleted — max action is archive
 
 ```bash
 # Check curator status
@@ -256,39 +237,24 @@ While skills store *procedures*, **memory** stores *facts*. Memory survives acro
 
 ### Two Memory Stores
 
+```mermaid
+flowchart TD
+    subgraph memory["MEMORY ARCHITECTURE"]
+        UP["👤 USER PROFILE<br/><b>Who you are:</b><br/>• Name, role, timezone<br/>• Tech stack preferences<br/>• Communication style<br/>• Device info<br/><br/><i>\"Bio is a senior fullstack<br/>architect using React,<br/>TypeScript, Flutter...\"</i>"]
+        AN["🤖 AGENT NOTES<br/><b>What Hermes has learned:</b><br/>• Environment facts<br/>• Project conventions<br/>• Tool quirks discovered<br/>• Lessons from mistakes<br/><br/><i>\"Hermes home is at<br/>C:\\Users\\bio\\AppData...\"</i>"]
+    end
+
+    UP & AN -->|"injected into<br/>every session"| SESSION["💬 Every Session"]
+
+    classDef profile fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef notes fill:#e74c3c,color:#fff,stroke:#c0392b
+    classDef session fill:#2ecc71,color:#fff,stroke:#25a25a
+    class UP profile
+    class AN notes
+    class SESSION session
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   MEMORY ARCHITECTURE                       │
-│                                                            │
-│  ┌──────────────────────────────┐                          │
-│  │       USER PROFILE           │                          │
-│  │  Who you are:                │                          │
-│  │  • Name, role, timezone      │                          │
-│  │  • Tech stack preferences    │                          │
-│  │  • Communication style       │                          │
-│  │  • Device info               │                          │
-│  │                              │                          │
-│  │  "Bio is a senior fullstack  │                          │
-│  │   architect using React,     │                          │
-│  │   TypeScript, Flutter..."    │                          │
-│  └──────────────────────────────┘                          │
-│                                                            │
-│  ┌──────────────────────────────┐                          │
-│  │       AGENT NOTES            │                          │
-│  │  What Hermes has learned:    │                          │
-│  │  • Environment facts         │                          │
-│  │  • Project conventions       │                          │
-│  │  • Tool quirks discovered    │                          │
-│  │  • Lessons from mistakes     │                          │
-│  │                              │                          │
-│  │  "Hermes home is at          │                          │
-│  │   C:\Users\bio\AppData..."   │                          │
-│  └──────────────────────────────┘                          │
-│                                                            │
-│  Both are injected into every session automatically.       │
-│  Memory is compact — only facts that persist.              │
-└────────────────────────────────────────────────────────────┘
-```
+
+*Both are injected into every session automatically. Memory is compact — only facts that persist.*
 
 ### How Memory Gets Saved
 
@@ -356,22 +322,16 @@ Hermes: [searches session history]
 
 **Three search modes:**
 
-```
-┌────────────────────────────────────────────────────────┐
-│              SESSION SEARCH MODES                       │
-│                                                        │
-│  1. DISCOVERY — search by keyword                      │
-│     session_search(query="docker networking")          │
-│     Returns: matching sessions + context windows       │
-│                                                        │
-│  2. SCROLL — read inside a found session               │
-│     session_search(session_id="...", around_msg=42)    │
-│     Returns: ±5 messages around the match              │
-│                                                        │
-│  3. BROWSE — recent sessions chronologically           │
-│     session_search()                                   │
-│     Returns: latest sessions with previews             │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph modes["SESSION SEARCH MODES"]
+        M1["1️⃣ DISCOVERY — search by keyword<br/><code>session_search(query='docker networking')</code><br/>→ matching sessions + context windows"]
+        M2["2️⃣ SCROLL — read inside a found session<br/><code>session_search(session_id='...', around_msg=42)</code><br/>→ ±5 messages around the match"]
+        M3["3️⃣ BROWSE — recent sessions chronologically<br/><code>session_search()</code><br/>→ latest sessions with previews"]
+    end
+
+    classDef mode fill:#9b59b6,color:#fff,stroke:#7d3c98
+    class M1,M2,M3 mode
 ```
 
 ### Memory Backends
@@ -401,28 +361,36 @@ hermes memory off
 
 Profiles let you run multiple independent Hermes configurations on the same machine:
 
-```
-┌────────────────────────────────────────────────────────┐
-│                  PROFILE ARCHITECTURE                   │
-│                                                        │
-│  ~/.hermes/                                            │
-│  ├── config.yaml           ← Default profile           │
-│  ├── .env                                             │
-│  ├── skills/                                          │
-│  ├── sessions/                                        │
-│  ├── profiles/                                        │
-│  │   ├── work/              ← Work profile             │
-│  │   │   ├── config.yaml    (separate model, tools)    │
-│  │   │   ├── .env           (separate API keys)        │
-│  │   │   ├── skills/        (separate skills)          │
-│  │   │   └── sessions/      (separate history)         │
-│  │   └── personal/          ← Personal profile         │
-│  │       ├── config.yaml                               │
-│  │       ├── .env                                      │
-│  │       ├── skills/                                   │
-│  │       └── sessions/                                 │
-│  └── state.db              ← Shared session store      │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph hermes["~/.hermes/"]
+        CFG["📄 config.yaml<br/><i>← Default profile</i>"]
+        ENV["🔐 .env"]
+        SKILLS["📁 skills/"]
+        SESSIONS["📁 sessions/"]
+        STATE["🗄️ state.db<br/><i>← Shared session store</i>"]
+        subgraph profiles["📁 profiles/"]
+            subgraph work["🏢 work/ — Work profile"]
+                WCFG["📄 config.yaml<br/><i>separate model, tools</i>"]
+                WENV["🔐 .env<br/><i>separate API keys</i>"]
+                WSKILLS["📁 skills/<br/><i>separate skills</i>"]
+                WSESSIONS["📁 sessions/<br/><i>separate history</i>"]
+            end
+            subgraph personal["🏠 personal/ — Personal profile"]
+                PCFG["📄 config.yaml"]
+                PENV["🔐 .env"]
+                PSKILLS["📁 skills/"]
+                PSESSIONS["📁 sessions/"]
+            end
+        end
+    end
+
+    classDef file fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef dir fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef profile fill:#e74c3c,color:#fff,stroke:#c0392b
+    class CFG,ENV,STATE,WCFG,WENV,PCFG,PENV file
+    class SKILLS,SESSIONS,WSKILLS,WSESSIONS,PSKILLS,PSESSIONS dir
+    class profiles,work,personal profile
 ```
 
 **Each profile gets its own:** config, API keys, skills, sessions, and memory.
@@ -474,17 +442,24 @@ hermes auth remove openrouter 2
 hermes auth reset openrouter
 ```
 
+```mermaid
+flowchart LR
+    K1["🔑 Key 1"] -->|"Rate limited?"| R1["🔄 Rotate"]
+    K2["🔑 Key 2"] -->|"Rate limited?"| R2["🔄 Rotate"]
+    K3["🔑 Key 3"] -->|"Available!"| USE["✅ Use this"]
+
+    R1 --> K2
+    R2 --> K3
+
+    classDef key fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef rotate fill:#f39c12,color:#fff,stroke:#d68910
+    classDef use fill:#2ecc71,color:#fff,stroke:#25a25a
+    class K1,K2,K3 key
+    class R1,R2 rotate
+    class USE use
 ```
-┌────────────────────────────────────────────────────────┐
-│              CREDENTIAL ROTATION                        │
-│                                                        │
-│  Key 1: sk-or-v1-aaaa  ──►  Rate limited? ──► Rotate  │
-│  Key 2: sk-or-v1-bbbb  ──►  Rate limited? ──► Rotate  │
-│  Key 3: sk-or-v1-cccc  ──►  Available! ──► Use this   │
-│                                                        │
-│  Automatic, silent, zero interruption.                 │
-└────────────────────────────────────────────────────────┘
-```
+
+*Automatic, silent, zero interruption.*
 
 **When this matters:**
 - Heavy cron job schedules hitting the same provider
@@ -506,29 +481,35 @@ compression:
   target_ratio: 0.20  # Compress down to 20% of original
 ```
 
+```mermaid
+flowchart TD
+    subgraph lifecycle["CONTEXT LIFECYCLE"]
+        direction LR
+        NEW["📄 New session<br/><i>empty</i>"] -->|"messages arrive"| GROW["📈 Growing<br/><i>messages accumulating</i>"]
+        GROW -->|"50% full"| NEAR["⚠️ Near limit"]
+        NEAR -->|"auto-trigger"| COMP["📦 Compressed<br/><i>summarized</i>"]
+    end
+
+    subgraph before["Before compression"]
+        B1["msg 1"] --- B2["msg 2"] --- BD["..."] --- B48["msg 48"] --- B49["msg 49"] --- BN["new"]
+    end
+
+    subgraph after["After compression"]
+        SUM["📝 Summary of<br/>msgs 1-47"] --- A48["msg 48"] --- A49["msg 49"] --- AN["new"] --- AD["..."]
+    end
+
+    NEAR -.->|"shows"| before
+    COMP -.->|"becomes"| after
+
+    classDef phase fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef old fill:#e74c3c,color:#fff,stroke:#c0392b
+    classDef sum fill:#2ecc71,color:#fff,stroke:#25a25a
+    class NEW,GROW,NEAR,COMP phase
+    class B1,B2,BD,B48,B49,BN old
+    class SUM,A48,A49,AN,AD sum
 ```
-┌────────────────────────────────────────────────────────┐
-│              CONTEXT LIFECYCLE                          │
-│                                                        │
-│  New session ─► Growing ─► Near limit ─► Compressed    │
-│  [empty]       [messages]  [50% full]   [summarized]   │
-│                                                        │
-│  Before compression:                                   │
-│  ╔══════════════════════════════════════════════╗      │
-│  ║ msg 1 ║ msg 2 ║ ... ║ msg 48 ║ msg 49 ║ new ║      │
-│  ╚══════════════════════════════════════════════╝      │
-│                                                        │
-│  After compression:                                    │
-│  ╔════════════════╤══════════════════════════════╗     │
-│  ║ [summary of    │ msg 48 ║ msg 49 ║ new ║ ... ║     │
-│  ║  msgs 1-47]    │                              ║     │
-│  ╚════════════════╧══════════════════════════════╝     │
-│                                                        │
-│  Recent messages preserved verbatim.                   │
-│  Older messages become a summary.                      │
-│  You can also trigger manually: /compress              │
-└────────────────────────────────────────────────────────┘
-```
+
+*Recent messages preserved verbatim. Older messages become a summary. You can also trigger manually: `/compress`*
 
 ---
 

@@ -12,25 +12,15 @@ Before you price your services, you need to know your costs. Every Hermes invoca
 
 Every time Hermes thinks, it consumes tokens. Here's what that means in dollars:
 
-```
-┌──────────────────────────────────────────────────────┐
-│  TOKEN FLOW — EVERY HERMES TURN                      │
-│                                                      │
-│  System prompt  ──►  ~2,000-8,000 tokens (input)     │
-│  + User message                      (input)         │
-│  + Tool definitions                  (input)         │
-│  + Skill content                     (input)         │
-│  + Memory                            (input)         │
-│  ════════════════════════════════════                │
-│  = Total input tokens                                │
-│                                                      │
-│  LLM processes ──►  reasoning tokens (hidden)        │
-│                                                      │
-│  Response       ──►  ~500-3,000 tokens (output)      │
-│  + Tool calls                        (output)        │
-│                                                      │
-│  Cost = (input × $in) + (output × $out)              │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph TokenFlow["Token Flow — Every Hermes Turn"]
+        Input["System prompt → ~2,000–8,000 tokens (input)\n+ User message (input)\n+ Tool definitions (input)\n+ Skill content (input)\n+ Memory (input)"]
+        Input --> Total["= Total input tokens"]
+        Total --> LLM["LLM processes → reasoning tokens (hidden)"]
+        LLM --> Output["Response → ~500–3,000 tokens (output)\n+ Tool calls (output)"]
+        Output --> Cost["Cost = (input × $in) + (output × $out)"]
+    end
 ```
 
 ### Model Pricing Comparison
@@ -64,31 +54,22 @@ Every time Hermes thinks, it consumes tokens. Here's what that means in dollars:
 
 When does Hermes pay for itself?
 
-```
-┌──────────────────────────────────────────────────────┐
-│  BREAK-EVEN POINTS                                   │
-│                                                      │
-│  Scenario          Monthly Cost    Replaces          │
-│  ──────────────    ────────────    ─────────────     │
-│  Content writer    $20/mo (API)    $3,000/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Support agent     $30/mo (API)    $2,500/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Data analyst      $40/mo (API)    $4,500/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Monitoring tool   $0 (scripts)    $150/mo SaaS      │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Full-time dev     $200/mo (API)   $8,000/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Conclusion: Hermes ALWAYS pays for itself.          │
-│  The question isn't "should I?"                      │
-│  The question is "how much should I spend?"          │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Break-Even Points"]:1
+    block:rows
+        columns 3
+        "Content writer" "$20/mo (API)" "$3,000/mo human → break-even: Day 1"
+        "Support agent" "$30/mo (API)" "$2,500/mo human → break-even: Day 1"
+        "Data analyst" "$40/mo (API)" "$4,500/mo human → break-even: Day 1"
+        "Monitoring tool" "$0 (scripts)" "$150/mo SaaS → break-even: Day 1"
+        "Full-time dev" "$200/mo (API)" "$8,000/mo human → break-even: Day 1"
+    end
+    block:conclusion
+        "Conclusion: Hermes ALWAYS pays for itself."
+        "The question isn't \"should I?\" — it's \"how much should I spend?\""
+    end
 ```
 
 ---
@@ -99,30 +80,26 @@ You've automated your workflow. Now sell it. Here's how to price AI-powered serv
 
 ### Pricing Models
 
-```
-┌──────────────────────────────────────────────────────┐
-│  FOUR PRICING MODELS                                 │
-│                                                      │
-│  1. RETAINER          2. PER-DELIVERABLE             │
-│  ┌──────────────┐     ┌──────────────┐              │
-│  │ $2-5K/mo     │     │ $200-500 ea  │              │
-│  │              │     │              │              │
-│  │ Ongoing      │     │ Per article  │              │
-│  │ monitoring,  │     │ Per review   │              │
-│  │ reports,     │     │ Per audit    │              │
-│  │ support      │     │ Per analysis │              │
-│  └──────────────┘     └──────────────┘              │
-│                                                      │
-│  3. VALUE-BASED       4. WHITE-LABEL                 │
-│  ┌──────────────┐     ┌──────────────┐              │
-│  │ % of savings │     │ $500-2K/mo   │              │
-│  │              │     │              │              │
-│  │ "I saved you │     │ Hermes as    │              │
-│  │  $10K/mo,    │     │ your company │              │
-│  │  my fee is   │     │ AI assistant │              │
-│  │  $2K/mo"     │     │ (hosted)     │              │
-│  └──────────────┘     └──────────────┘              │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Pricing["Four Pricing Models"]
+        subgraph M1["1. Retainer"]
+            R1["$2–5K/mo"]
+            R2["Ongoing monitoring,\nreports, support"]
+        end
+        subgraph M2["2. Per-Deliverable"]
+            P1["$200–500 ea"]
+            P2["Per article\nPer review\nPer audit\nPer analysis"]
+        end
+        subgraph M3["3. Value-Based"]
+            V1["% of savings"]
+            V2["\"I saved you $10K/mo,\nmy fee is $2K/mo\""]
+        end
+        subgraph M4["4. White-Label"]
+            W1["$500–2K/mo"]
+            W2["Hermes as your\ncompany AI assistant\n(hosted)"]
+        end
+    end
 ```
 
 ### Pricing by Service Type
@@ -164,22 +141,24 @@ Skills aren't just for your own use. Package them as products.
 
 A sellable skill solves a specific, painful, expensive problem:
 
-```
-┌──────────────────────────────────────────────────────┐
-│  SELLABLE SKILL CHECKLIST                            │
-│                                                      │
-│  ✅ Solves a specific pain point                     │
-│  ✅ Saves 5+ hours per week                          │
-│  ✅ Works out of the box (minimal config)            │
-│  ✅ Has clear ROI the client can measure             │
-│  ✅ Doesn't require technical knowledge to use       │
-│  ✅ Can be demonstrated in 5 minutes                 │
-│                                                      │
-│  ❌ Generic (e.g., "write better code")              │
-│  ❌ Requires custom setup per client                 │
-│  ❌ Vague ROI ("saves time")                         │
-│  ❌ Needs a developer to operate                     │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Sellable Skill Checklist"]:1
+    block:good["✅ Must Have"]
+        "✅ Solves a specific pain point"
+        "✅ Saves 5+ hours per week"
+        "✅ Works out of the box (minimal config)"
+        "✅ Has clear ROI the client can measure"
+        "✅ Doesn't require technical knowledge to use"
+        "✅ Can be demonstrated in 5 minutes"
+    end
+    block:bad["❌ Red Flags"]
+        "❌ Generic (e.g., \"write better code\")"
+        "❌ Requires custom setup per client"
+        "❌ Vague ROI (\"saves time\")"
+        "❌ Needs a developer to operate"
+    end
 ```
 
 ### Example: The "Auto-SEO Blog" Skill Package
@@ -239,32 +218,19 @@ You don't sell "Hermes." You sell "Your AI Assistant." The client never needs to
 
 ### The White-Label Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  WHITE-LABEL SETUP                                   │
-│                                                      │
-│  Client sees:                                        │
-│  ┌──────────────────────────────┐                   │
-│  │  "Acme Corp AI Assistant"    │                   │
-│  │  (Telegram bot with their    │                   │
-│  │   branding, name, avatar)    │                   │
-│  └──────────────┬───────────────┘                   │
-│                 │                                    │
-│                 ▼                                    │
-│  You manage:                                         │
-│  ┌──────────────────────────────┐                   │
-│  │  Hermes Profile: acme-corp   │                   │
-│  │  • Custom skills (FAQ, etc.) │                   │
-│  │  • Company knowledge base    │                   │
-│  │  • Approved actions only     │                   │
-│  │  • Memory scoped to Acme     │                   │
-│  │  • Your API key (not theirs) │                   │
-│  └──────────────────────────────┘                   │
-│                                                      │
-│  Client pays: $1,000-3,000/mo                       │
-│  Your cost:  $30-100/mo (API)                       │
-│  Your margin: 90-97%                                │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph WhiteLabel["White-Label Setup"]
+        subgraph ClientView["Client Sees"]
+            Bot["\"Acme Corp AI Assistant\"\n(Telegram bot with their\nbranding, name, avatar)"]
+        end
+        Bot --> Managed["You Manage"]
+        subgraph Managed["You Manage"]
+            Profile["Hermes Profile: acme-corp\n• Custom skills (FAQ, etc.)\n• Company knowledge base\n• Approved actions only\n• Memory scoped to Acme\n• Your API key (not theirs)"]
+        end
+    end
+
+    Finances["Client pays: $1,000–3,000/mo\nYour cost: $30–100/mo (API)\nYour margin: 90–97%"]
 ```
 
 ### Setup Steps
@@ -328,35 +294,22 @@ When you handle client data, compliance isn't optional. Here's how to stay safe.
 
 ### The Privacy Stack
 
-```
-┌──────────────────────────────────────────────────────┐
-│  PRIVACY LAYERS                                      │
-│                                                      │
-│  Layer 1: PII Redaction (automatic)                  │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Hermes strips: emails, phones, SSNs,       │     │
-│  │ credit cards, addresses BEFORE sending     │     │
-│  │ to the LLM API                            │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  Layer 2: Memory Scoping (per-profile)               │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Client A's data stays in Client A's        │     │
-│  │ profile memory. Never shared.              │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  Layer 3: Local Models (for sensitive data)           │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Run llama.cpp locally. Zero data leaves    │     │
-│  │ your machine. Full GDPR compliance.        │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  Layer 4: Approval Mode (human-in-the-loop)          │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Sensitive actions require your approval    │     │
-│  │ before execution.                          │     │
-│  └────────────────────────────────────────────┘     │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Privacy["Privacy Layers"]
+        subgraph L1["Layer 1: PII Redaction (automatic)"]
+            P1["Hermes strips: emails, phones, SSNs,\ncredit cards, addresses BEFORE sending\nto the LLM API"]
+        end
+        subgraph L2["Layer 2: Memory Scoping (per-profile)"]
+            P2["Client A's data stays in Client A's\nprofile memory. Never shared."]
+        end
+        subgraph L3["Layer 3: Local Models (for sensitive data)"]
+            P3["Run llama.cpp locally. Zero data leaves\nyour machine. Full GDPR compliance."]
+        end
+        subgraph L4["Layer 4: Approval Mode (human-in-the-loop)"]
+            P4["Sensitive actions require your approval\nbefore execution."]
+        end
+    end
 ```
 
 ### Configuration
@@ -412,40 +365,36 @@ You have 10 clients. Each has their own Hermes profile, skills, and crons. You n
 
 ### The Agency Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  AGENCY SETUP — MANAGING 10+ CLIENTS                │
-│                                                      │
-│  ┌─────────────────────────────────────────────┐    │
-│  │  MASTER PROFILE (you)                        │    │
-│  │  • Monitors all client profiles              │    │
-│  │  • Weekly agency dashboard cron              │    │
-│  │  • Cost tracking across profiles             │    │
-│  └──────────────┬──────────────────────────────┘    │
-│                  │                                    │
-│       ┌──────────┼──────────┐                       │
-│       ▼          ▼          ▼                       │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐              │
-│  │Client A │ │Client B │ │Client C │  × 10        │
-│  │ Profile │ │ Profile │ │ Profile │              │
-│  │         │ │         │ │         │              │
-│  │ Skills: │ │ Skills: │ │ Skills: │              │
-│  │ support │ │ blog    │ │ monitor │              │
-│  │ faq-a   │ │ seo     │ │ health  │              │
-│  │         │ │         │ │         │              │
-│  │ Cron:   │ │ Cron:   │ │ Cron:   │              │
-│  │ 24/7    │ │ 2x/day  │ │ 1/min   │              │
-│  │ support │ │ article │ │ watchdog│              │
-│  └─────────┘ └─────────┘ └─────────┘              │
-│                                                      │
-│  ┌─────────────────────────────────────────────┐    │
-│  │  WEEKLY AGENCY REPORT (cron)                 │    │
-│  │  • Total API cost per client                 │    │
-│  │  • Issues/escalations per client             │    │
-│  │  • Uptime stats                              │    │
-│  │  • Revenue vs cost per client                │    │
-│  └─────────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Agency["Agency Setup — Managing 10+ Clients"]
+        subgraph Master["Master Profile (you)"]
+            M1["• Monitors all client profiles"]
+            M2["• Weekly agency dashboard cron"]
+            M3["• Cost tracking across profiles"]
+        end
+        Master --> A
+        Master --> B
+        Master --> C
+        subgraph A["Client A Profile"]
+            A1["Skills: support, faq-a"]
+            A2["Cron: 24/7 support"]
+        end
+        subgraph B["Client B Profile"]
+            B1["Skills: blog, seo"]
+            B2["Cron: 2x/day article"]
+        end
+        subgraph C["Client C Profile × 10"]
+            C1["Skills: monitor, health"]
+            C2["Cron: 1/min watchdog"]
+        end
+        subgraph Report["Weekly Agency Report (cron)"]
+            R1["• Total API cost per client"]
+            R2["• Issues/escalations per client"]
+            R3["• Uptime stats"]
+            R4["• Revenue vs cost per client"]
+        end
+    end
 ```
 
 ### Setup Script
@@ -533,32 +482,26 @@ API costs will fluctuate. Providers will change pricing. The only hedge? Local m
 
 ### The Local Model Stack
 
-```
-┌──────────────────────────────────────────────────────┐
-│  LOCAL MODEL OPTIONS                                 │
-│                                                      │
-│  ┌──────────────────────────────────────────┐       │
-│  │  llama.cpp (recommended)                  │       │
-│  │  • Runs on CPU, no GPU needed             │       │
-│  │  • Supports GGUF format                   │       │
-│  │  • 2-50 tok/s depending on model size     │       │
-│  │  • Full offline capability                │       │
-│  └──────────────────────────────────────────┘       │
-│                                                      │
-│  ┌──────────────────────────────────────────┐       │
-│  │  Ollama (easiest setup)                   │       │
-│  │  • One-command install                    │       │
-│  │  • Automatic model management             │       │
-│  │  • OpenAI-compatible API server           │       │
-│  └──────────────────────────────────────────┘       │
-│                                                      │
-│  ┌──────────────────────────────────────────┐       │
-│  │  vLLM (highest performance)               │       │
-│  │  • Requires GPU                           │       │
-│  │  • Production-grade serving               │       │
-│  │  • Best for high-throughput agency use    │       │
-│  └──────────────────────────────────────────┘       │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Local Model Options"]:1
+    block:opt1["llama.cpp (recommended)"]
+        "• Runs on CPU, no GPU needed"
+        "• Supports GGUF format"
+        "• 2–50 tok/s depending on model size"
+        "• Full offline capability"
+    end
+    block:opt2["Ollama (easiest setup)"]
+        "• One-command install"
+        "• Automatic model management"
+        "• OpenAI-compatible API server"
+    end
+    block:opt3["vLLM (highest performance)"]
+        "• Requires GPU"
+        "• Production-grade serving"
+        "• Best for high-throughput agency use"
+    end
 ```
 
 ### Setting Up llama.cpp with Hermes
@@ -584,27 +527,26 @@ hermes -m deepseek/deepseek-chat "..."       # Cloud, smarter
 
 ### Hybrid Strategy: Cloud + Local
 
-```
-┌──────────────────────────────────────────────────────┐
-│  HYBRID MODEL STRATEGY                               │
-│                                                      │
-│  LOCAL (free, private, slower):                      │
-│  • Email triage and categorization                   │
-│  • Document summarization                            │
-│  • Data extraction and formatting                    │
-│  • Watchdog alert evaluation                        │
-│  • PII-heavy tasks                                   │
-│                                                      │
-│  CLOUD (paid, smart, fast):                          │
-│  • Content creation (needs quality)                  │
-│  • Architecture decisions                            │
-│  • Code review (needs reasoning)                     │
-│  • Client-facing responses                           │
-│  • Complex data analysis                             │
-│                                                      │
-│  Rule: If it touches client output → cloud.          │
-│        If it's internal processing → local.          │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 2
+    block:local["LOCAL (free, private, slower)"]
+        "• Email triage and categorization"
+        "• Document summarization"
+        "• Data extraction and formatting"
+        "• Watchdog alert evaluation"
+        "• PII-heavy tasks"
+    end
+    block:cloud["CLOUD (paid, smart, fast)"]
+        "• Content creation (needs quality)"
+        "• Architecture decisions"
+        "• Code review (needs reasoning)"
+        "• Client-facing responses"
+        "• Complex data analysis"
+    end
+    block:rule["Rule"]:2
+        "If it touches client output → cloud.\nIf it's internal processing → local."
+    end
 ```
 
 ### Edge Deployment — Hermes on a Phone
@@ -628,32 +570,32 @@ hermes config set providers.phone.base_url http://192.168.1.100:8080/v1
 
 ## The Business of Hermes — Decision Framework
 
-```
-┌──────────────────────────────────────────────────────┐
-│  SHOULD YOU BUILD A BUSINESS AROUND HERMES?          │
-│                                                      │
-│  YES, if you:                                        │
-│  • Already use Hermes daily                          │
-│  • Have 3+ skills you built for yourself             │
-│  • Know businesses that waste time on manual work    │
-│  • Can explain AI value in plain language            │
-│                                                      │
-│  START HERE:                                         │
-│  1. Pick ONE service (Chapter 9 scenarios)           │
-│  2. Build it for yourself first (dogfood it)         │
-│  3. Find 1 client who needs it                       │
-│  4. Deliver results, measure ROI                     │
-│  5. Use that case study to get 3 more clients        │
-│  6. Systematize with profiles and crons              │
-│  7. Hire VA when you hit 20 clients                  │
-│                                                      │
-│  DON'T:                                              │
-│  • Build the agency before having clients            │
-│  • Over-promise what Hermes can do                   │
-│  • Ignore compliance (GDPR, PII)                     │
-│  • Price based on your cost (price on value)         │
-│  • Scale before the system is stable                 │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Should You Build a Business Around Hermes?"]:1
+    block:yes["YES, if you:"]
+        "• Already use Hermes daily"
+        "• Have 3+ skills you built for yourself"
+        "• Know businesses that waste time on manual work"
+        "• Can explain AI value in plain language"
+    end
+    block:start["START HERE:"]
+        "1. Pick ONE service (Chapter 9 scenarios)"
+        "2. Build it for yourself first (dogfood it)"
+        "3. Find 1 client who needs it"
+        "4. Deliver results, measure ROI"
+        "5. Use that case study to get 3 more clients"
+        "6. Systematize with profiles and crons"
+        "7. Hire VA when you hit 20 clients"
+    end
+    block:dont["DON'T:"]
+        "• Build the agency before having clients"
+        "• Over-promise what Hermes can do"
+        "• Ignore compliance (GDPR, PII)"
+        "• Price based on your cost (price on value)"
+        "• Scale before the system is stable"
+    end
 ```
 
 ---

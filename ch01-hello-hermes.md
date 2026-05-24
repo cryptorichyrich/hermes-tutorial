@@ -26,20 +26,30 @@ It's not a chatbot. It's an **AI employee** that works 24/7 across all your plat
 
 The AI agent space is crowded. Here's where Hermes sits:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    AI TOOL SPECTRUM                      │
-├──────────────┬──────────────────┬───────────────────────┤
-│   Chatbots   │   Coding Agents  │    Full Agent Platforms│
-│              │                  │                        │
-│ • ChatGPT    │ • Claude Code    │ • Hermes Agent         │
-│ • Claude.ai  │ • GitHub Copilot │ • OpenHands            │
-│ • Gemini     │ • Cursor         │ • MetaGPT              │
-│              │ • Codex CLI      │                        │
-│ Q&A only     │ Code only        │ Everything + Memory    │
-│ No tools     │ IDE-bound        │ Multi-platform         │
-│ No memory    │ No scheduling    │ Persistent context     │
-└──────────────┴──────────────────┴───────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Chatbots["💬 Chatbots"]
+        direction TB
+        C1["ChatGPT"]
+        C2["Claude.ai"]
+        C3["Gemini"]
+        CT["❌ Q&A only · No tools · No memory"]
+    end
+    subgraph CodingAgents["💻 Coding Agents"]
+        direction TB
+        D1["Claude Code"]
+        D2["GitHub Copilot"]
+        D3["Cursor"]
+        D4["Codex CLI"]
+        DT["⚠️ Code only · IDE-bound · No scheduling"]
+    end
+    subgraph FullAgents["🚀 Full Agent Platforms"]
+        direction TB
+        F1["Hermes Agent"]
+        F2["OpenHands"]
+        F3["MetaGPT"]
+        FT["✅ Everything + Memory · Multi-platform · Persistent context"]
+    end
 ```
 
 **Key differentiators:**
@@ -74,27 +84,16 @@ In early 2026, a consensus emerged in the AI world: **the bottleneck isn't the m
 
 Hermes is the first agent that **ships with the harness built in**. Every component maps to a proven principle:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              THE HARNES BUILT INTO HERMES                    │
-│                                                            │
-│  Harness Component    │  Hermes Built-in System             │
-│  ─────────────────────┼─────────────────────────────────── │
-│  Instruction Layer    │  Skill System (auto-created +       │
-│  (teach the AI)       │  self-improving SKILL.md files)     │
-│                       │                                     │
-│  Constraint Layer     │  Tool permissions + sandbox +       │
-│  (keep it safe)       │  toolset enable/disable on demand   │
-│                       │                                     │
-│  Feedback Layer       │  Learning Loop (auto-retrospective  │
-│  (learn from mistakes)│  after each task, skill patching)   │
-│                       │                                     │
-│  Memory Layer         │  Three-layer memory (session +      │
-│  (don't forget)       │  persistent + skill) + FTS5 recall  │
-│                       │                                     │
-│  Orchestration Layer  │  Sub-Agent delegation + cron        │
-│  (coordinate work)    │  scheduling + multi-platform gateway│
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Harness["THE HARNESS BUILT INTO HERMES"]
+        direction TB
+        IL["📖 Instruction Layer<br/><i>Teach the AI</i>"] --> HS["⚙️ Skill System<br/><i>Auto-created + self-improving SKILL.md files</i>"]
+        CL["🔒 Constraint Layer<br/><i>Keep it safe</i>"] --> TP["🛡️ Tool Permissions<br/><i>Sandbox + toolset enable/disable on demand</i>"]
+        FL["🔁 Feedback Layer<br/><i>Learn from mistakes</i>"] --> LL["📊 Learning Loop<br/><i>Auto-retrospective after each task, skill patching</i>"]
+        ML["💾 Memory Layer<br/><i>Don't forget</i>"] --> TM["🗂️ Three-layer Memory<br/><i>Session + persistent + skill + FTS5 recall</i>"]
+        OL["🎼 Orchestration Layer<br/><i>Coordinate work</i>"] --> SA["🤖 Sub-Agent Delegation<br/><i>Cron scheduling + multi-platform gateway</i>"]
+    end
 ```
 
 Other tools require you to build this harness manually — writing config files, setting up hooks, managing memory by hand. Hermes does all five automatically, from your very first conversation.
@@ -306,24 +305,18 @@ Next session, next week, next month — Hermes will **still remember this**. No 
 
 In 5 minutes, you've experienced three core capabilities:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│              HERMES CAPABILITY TRIANGLE                  │
-│                                                         │
-│                    🧠 MEMORY                            │
-│                   /          \                          │
-│                  /            \                         │
-│                 /              \                        │
-│                /                \                       │
-│          🔧 TOOLS ────────── 💬 PLATFORMS              │
-│                                                         │
-│  Memory: Learns & persists across sessions              │
-│  Tools:  Terminal, files, web, browser, code, cron      │
-│  Platforms: Telegram, Discord, Slack, WhatsApp, CLI     │
-│                                                         │
-│  Together = An AI that knows you, acts for you,         │
-│  and meets you where you already work.                  │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    MEM["🧠 MEMORY<br/><i>Learns & persists across sessions</i>"]
+    TOOL["🔧 TOOLS<br/><i>Terminal, files, web, browser, code, cron</i>"]
+    PLAT["💬 PLATFORMS<br/><i>Telegram, Discord, Slack, WhatsApp, CLI</i>"]
+
+    MEM --- TOOL
+    TOOL --- PLAT
+    PLAT --- MEM
+
+    DESC["<b>Together =</b> An AI that knows you, acts for you,<br/>and meets you where you already work."]
+    MEM --> DESC
 ```
 
 **What's next:** In Chapter 2, we'll dive into *how* Hermes works — the agent loop, model selection, toolsets, and configuration. You'll understand what's happening under the hood so you can bend Hermes to your will.

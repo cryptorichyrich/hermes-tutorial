@@ -8,58 +8,79 @@
 
 The **gateway** is a long-running background process that connects your Hermes agent to messaging platforms. It's the bridge between your chat apps and the AI brain:
 
+```mermaid
+flowchart TD
+    subgraph platforms["Messaging Platforms"]
+        direction LR
+        T["💬 Telegram"]
+        D["💬 Discord"]
+        S["💬 Slack"]
+        W["💬 WhatsApp"]
+    end
+
+    platforms -->|"messages"| GW["🔄 GATEWAY<br/><b>Scheduler</b><br/>Routes messages<br/>Manages sessions<br/>Handles platform auth"]
+
+    GW -->|"routes to"| AL["🧠 AGENT LOOP<br/>Same brain<br/>Same memory<br/>Same tools"]
+
+    classDef platform fill:#4a9eff,color:#fff,stroke:#2d7dd2
+    classDef gateway fill:#ff6b35,color:#fff,stroke:#cc5529
+    classDef agent fill:#2ecc71,color:#fff,stroke:#25a25a
+    class T,D,S,W platform
+    class GW gateway
+    class AL agent
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    GATEWAY ARCHITECTURE                      │
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ Telegram  │  │ Discord  │  │  Slack   │  │ WhatsApp │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  │
-│       │              │              │              │         │
-│       └──────────────┴──────────────┴──────────────┘        │
-│                          │                                   │
-│                          ▼                                   │
-│                 ┌─────────────────┐                          │
-│                 │     GATEWAY     │  Routes messages         │
-│                 │   (Scheduler)   │  Manages sessions        │
-│                 │                 │  Handles platform auth   │
-│                 └────────┬────────┘                          │
-│                          │                                   │
-│                          ▼                                   │
-│                 ┌─────────────────┐                          │
-│                 │   AGENT LOOP    │  Same brain              │
-│                 │                 │  Same memory              │
-│                 │                 │  Same tools               │
-│                 └─────────────────┘                          │
-│                                                             │
-│  One session per conversation — switch platforms freely.    │
-└─────────────────────────────────────────────────────────────┘
-```
+
+*One session per conversation — switch platforms freely.*
 
 **Key insight:** The gateway doesn't create a separate Hermes — it connects your existing agent to messaging platforms. Same memory, same tools, same sessions. Start a conversation on Telegram, continue on CLI — it's one agent.
 
 ### Supported Platforms
 
+```mermaid
+flowchart LR
+    subgraph platforms["SUPPORTED MESSAGING PLATFORMS"]
+        direction TB
+        subgraph chat["💬 Chat Apps"]
+            direction TB
+            C1["Telegram"]
+            C2["Discord"]
+            C3["WhatsApp"]
+            C4["WeChat (Weixin)"]
+            C5["iMessage*"]
+        end
+        subgraph biz["🏢 Business"]
+            direction TB
+            B1["Slack"]
+            B2["Microsoft Teams"]
+            B3["DingTalk"]
+            B4["Feishu (Lark)"]
+            B5["WeCom"]
+        end
+        subgraph other["📱 Other"]
+            direction TB
+            O1["Signal"]
+            O2["Matrix"]
+            O3["Mattermost"]
+            O4["SMS"]
+            O5["Email"]
+        end
+        subgraph home["🏠 Smart Home"]
+            direction TB
+            H1["Home Assistant"]
+        end
+        subgraph integ["🔌 Integrations"]
+            direction TB
+            I1["API Server (REST)"]
+            I2["Webhooks"]
+            I3["Open WebUI"]
+        end
+    end
+
+    classDef cat fill:#4a9eff,color:#fff,stroke:#2d7dd2
+    class C1,C2,C3,C4,C5,B1,B2,B3,B4,B5,O1,O2,O3,O4,O5,H1,I1,I2,I3 cat
 ```
-┌────────────────────────────────────────────────────────────┐
-│               SUPPORTED MESSAGING PLATFORMS                 │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  💬 Chat Apps          🏢 Business         📱 Other        │
-│  • Telegram            • Slack             • Signal        │
-│  • Discord             • Microsoft Teams   • Matrix        │
-│  • WhatsApp            • DingTalk          • Mattermost    │
-│  • WeChat (Weixin)     • Feishu (Lark)     • SMS           │
-│  • iMessage*           • WeCom             • Email         │
-│                                                            │
-│  🏠 Smart Home          🔌 Integrations                    │
-│  • Home Assistant       • API Server (REST)                │
-│                         • Webhooks                         │
-│                         • Open WebUI                       │
-│                                                            │
-│  * via BlueBubbles (requires Mac)                          │
-└────────────────────────────────────────────────────────────┘
-```
+
+*\* iMessage via BlueBubbles (requires Mac)*
 
 That's **17+ platforms** — and they all have access to the same tools (terminal, files, web search, browser automation, etc.).
 
@@ -252,22 +273,23 @@ hermes config set tts.provider edge     # Free, no API key needed
 
 When you send a voice message, Hermes transcribes it automatically:
 
-```
-┌──────────────────────────────────────────┐
-│           VOICE TRANSCRIPTION FLOW        │
-│                                          │
-│  🎤 Voice message                        │
-│       │                                  │
-│       ▼                                  │
-│  STT Provider (priority order):          │
-│  1. Local faster-whisper  (free)         │
-│  2. Groq Whisper          (free tier)    │
-│  3. OpenAI Whisper        (paid)         │
-│  4. Mistral Voxtral       (paid)         │
-│       │                                  │
-│       ▼                                  │
-│  Transcribed text → Agent loop → Response │
-└──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    VM["🎤 Voice message"] --> STT["STT Provider<br/><i>priority order:</i>"]
+
+    STT --> P1["1. Local faster-whisper<br/><i>free</i>"]
+    STT --> P2["2. Groq Whisper<br/><i>free tier</i>"]
+    STT --> P3["3. OpenAI Whisper<br/><i>paid</i>"]
+    STT --> P4["4. Mistral Voxtral<br/><i>paid</i>"]
+
+    P1 & P2 & P3 & P4 --> RESULT["Transcribed text → Agent loop → Response"]
+
+    classDef voice fill:#9b59b6,color:#fff,stroke:#7d3c98
+    classDef provider fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef result fill:#2ecc71,color:#fff,stroke:#25a25a
+    class VM voice
+    class P1,P2,P3,P4 provider
+    class RESULT result
 ```
 
 **Setup local transcription (free, recommended):**

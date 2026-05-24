@@ -8,35 +8,18 @@
 
 Everything Hermes does follows one repeating pattern — the **agent loop**:
 
-```
-┌──────────────────────────────────────────────────────┐
-│                   THE AGENT LOOP                      │
-│                                                      │
-│   ┌──────────┐                                       │
-│   │ 1. BUILD │  Assemble system prompt + context     │
-│   │  PROMPT  │  (memory, skills, tools, history)     │
-│   └────┬─────┘                                       │
-│        ▼                                             │
-│   ┌──────────┐                                       │
-│   │ 2. CALL  │  Send everything to the LLM           │
-│   │   LLM   │  (Claude, GPT-4, Gemini, etc.)        │
-│   └────┬─────┘                                       │
-│        ▼                                             │
-│   ┌──────────┐     Tool call?                        │
-│   │ 3. PARSE │  ┌──────────┐                         │
-│   │ RESPONSE │─►│ YES: Run │─► Append result ─┐      │
-│   └────┬─────┘  │ the tool  │                 │      │
-│        │        └──────────┘                 │      │
-│        │               Text response?         │      │
-│        │        ┌─────────────┐               │      │
-│        └───────►│ DONE: Reply │               │      │
-│                 │ to user     │               │      │
-│                 └─────────────┘               │      │
-│                                               │      │
-│        ◄──────────────────────────────────────┘      │
-│        (Loop back to step 1 with new context)        │
-│                                                      │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>1. BUILD PROMPT</b><br/>Assemble system prompt + context<br/><i>memory, skills, tools, history</i>"]
+    B["<b>2. CALL LLM</b><br/>Send everything to the LLM<br/><i>Claude, GPT-4, Gemini, etc.</i>"]
+    C{"<b>3. PARSE RESPONSE</b><br/>Tool call?"}
+    D["YES: Run the tool"]
+    E["DONE: Reply to user"]
+    F["Append tool result"]
+
+    A --> B --> C
+    C -->|Tool call| D --> F --> A
+    C -->|Text response| E
 ```
 
 Here's what that looks like in practice:
@@ -132,25 +115,32 @@ hermes config set model.provider openrouter
 
 **Model tiers for different tasks:**
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              MODEL SELECTION GUIDE                        │
-│                                                          │
-│  🧠 Complex reasoning     Claude Sonnet 4, GPT-4o       │
-│     Architecture, debugging, multi-step planning         │
-│                                                          │
-│  ⚡ Fast & cheap          Claude Haiku, Gemini Flash     │
-│     Simple tasks, quick questions, bulk operations       │
-│                                                          │
-│  💻 Deep coding           Claude Sonnet 4, DeepSeek V3   │
-│     Code generation, refactoring, PR reviews             │
-│                                                          │
-│  📚 Long context           Gemini 2.5 Pro (1M tokens)   │
-│     Large codebases, document analysis                   │
-│                                                          │
-│  💰 Budget                 DeepSeek V3, Gemini Flash     │
-│     When cost matters more than peak quality             │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Complex["🧠 Complex Reasoning"]
+        CR1["Claude Sonnet 4"]
+        CR2["GPT-4o"]
+        CRD["<i>Architecture, debugging, multi-step planning</i>"]
+    end
+    subgraph Fast["⚡ Fast & Cheap"]
+        FC1["Claude Haiku"]
+        FC2["Gemini Flash"]
+        FCD["<i>Simple tasks, quick questions, bulk operations</i>"]
+    end
+    subgraph Coding["💻 Deep Coding"]
+        DC1["Claude Sonnet 4"]
+        DC2["DeepSeek V3"]
+        DCD["<i>Code generation, refactoring, PR reviews</i>"]
+    end
+    subgraph LongContext["📚 Long Context"]
+        LC1["Gemini 2.5 Pro (1M tokens)"]
+        LCD["<i>Large codebases, document analysis</i>"]
+    end
+    subgraph Budget["💰 Budget"]
+        BU1["DeepSeek V3"]
+        BU2["Gemini Flash"]
+        BUD["<i>When cost matters more than peak quality</i>"]
+    end
 ```
 
 ### Switching Models Mid-Conversation
@@ -182,32 +172,32 @@ When one key hits a rate limit, Hermes silently rotates to the next. No interrup
 
 Models think. **Toolsets act.** Each toolset is a bundle of related capabilities:
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                   HERMES TOOLSETS                         │
-│                                                          │
-│  🌐 web          Search engines + content extraction     │
-│  🔍 search       Web search only (subset of web)         │
-│  🖥️ terminal     Shell commands + process management     │
-│  📁 file         Read, write, search, patch files        │
-│  🌍 browser      Browser automation (Chromium)           │
-│  🐍 code_exec    Sandboxed Python execution              │
-│  👁️ vision       Image analysis                          │
-│  🎨 image_gen    AI image generation                     │
-│  🎬 video        Video analysis & generation             │
-│  🔊 tts          Text-to-speech                          │
-│  🧠 memory       Persistent cross-session memory         │
-│  🔎 session_search  Search past conversations            │
-│  👥 delegation   Subagent task delegation                │
-│  ⏰ cronjob      Scheduled task management               │
-│  ❓ clarify      Ask user clarifying questions            │
-│  📨 messaging    Cross-platform message sending          │
-│  ✅ todo         In-session task planning                 │
-│  📋 kanban       Multi-agent work queues                 │
-│  🎵 spotify      Spotify playback control                │
-│  🏠 homeassistant Smart home control                     │
-│  🔒 safe         Minimal toolset for locked sessions     │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Toolsets["HERMES TOOLSETS"]
+        direction TB
+        T1["🌐 web — Search engines + content extraction"]
+        T2["🔍 search — Web search only"]
+        T3["🖥️ terminal — Shell commands + process management"]
+        T4["📁 file — Read, write, search, patch files"]
+        T5["🌍 browser — Browser automation (Chromium)"]
+        T6["🐍 code_exec — Sandboxed Python execution"]
+        T7["👁️ vision — Image analysis"]
+        T8["🎨 image_gen — AI image generation"]
+        T9["🎬 video — Video analysis & generation"]
+        T10["🔊 tts — Text-to-speech"]
+        T11["🧠 memory — Persistent cross-session memory"]
+        T12["🔎 session_search — Search past conversations"]
+        T13["👥 delegation — Subagent task delegation"]
+        T14["⏰ cronjob — Scheduled task management"]
+        T15["❓ clarify — Ask user clarifying questions"]
+        T16["📨 messaging — Cross-platform message sending"]
+        T17["✅ todo — In-session task planning"]
+        T18["📋 kanban — Multi-agent work queues"]
+        T19["🎵 spotify — Spotify playback control"]
+        T20["🏠 homeassistant — Smart home control"]
+        T21["🔒 safe — Minimal toolset for locked sessions"]
+    end
 ```
 
 ### Managing Toolsets
@@ -251,17 +241,14 @@ Every chat you have with Hermes is a **session** — a self-contained conversati
 
 ### Session Lifecycle
 
-```
-┌─────────┐     ┌──────────┐     ┌──────────┐     ┌─────────┐
-│  NEW     │────►│  ACTIVE  │────►│COMPRESSED│────►│  CLOSED │
-│ SESSION  │     │ SESSION  │     │ SESSION  │     │(archived)│
-└─────────┘     └──────────┘     └──────────┘     └─────────┘
-     │                │                │
-     │                │                │
-     ▼                ▼                ▼
-  Fresh context   Growing context  Summarized context
-  Full tools      Full tools       Full tools
-  No memory       Can save memory  Memory preserved
+```mermaid
+flowchart LR
+    NEW["🆕 NEW SESSION<br/><i>Fresh context · Full tools · No memory</i>"]
+    ACTIVE["✅ ACTIVE SESSION<br/><i>Growing context · Full tools · Can save memory</i>"]
+    COMPRESSED["📦 COMPRESSED SESSION<br/><i>Summarized context · Full tools · Memory preserved</i>"]
+    CLOSED["🗄️ CLOSED (archived)"]
+
+    NEW -->|Start| ACTIVE -->|Compress| COMPRESSED -->|End| CLOSED
 ```
 
 ### Session Commands
@@ -436,45 +423,50 @@ Each profile gets its own:
 
 Let's zoom out and see the complete picture:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    HERMES ARCHITECTURE                       │
-│                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Telegram   │  │   Discord   │  │     CLI     │  ...   │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
-│         │                │                │                 │
-│         └────────────────┼────────────────┘                │
-│                          ▼                                  │
-│                 ┌─────────────────┐                         │
-│                 │     GATEWAY     │  Routes messages        │
-│                 │   (Scheduler)   │  Manages connections    │
-│                 └────────┬────────┘                         │
-│                          ▼                                  │
-│                 ┌─────────────────┐                         │
-│                 │   AGENT LOOP    │  Builds prompt          │
-│                 │                 │  Calls LLM              │
-│                 │  ┌───────────┐  │  Dispatches tools      │
-│                 │  │  Memory   │  │  Manages context        │
-│                 │  │  Skills   │  │                         │
-│                 │  │  Sessions │  │                         │
-│                 │  └───────────┘  │                         │
-│                 └────────┬────────┘                         │
-│                          ▼                                  │
-│         ┌────────────────┼────────────────┐                │
-│         ▼                ▼                ▼                 │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Terminal   │  │    Files    │  │     Web     │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Browser   │  │   Cron      │  │  Delegation │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │               PROVIDERS (20+ LLM APIs)              │   │
-│  │  OpenRouter • Anthropic • OpenAI • Google • ...     │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Platforms["📱 Messaging Platforms"]
+        TG["Telegram"]
+        DC["Discord"]
+        CLI["CLI"]
+        MORE["..."]
+    end
+
+    Platforms --> GW
+
+    subgraph Core["🔧 Core"]
+        GW["🔀 GATEWAY<br/><i>Routes messages · Manages connections</i>"]
+        AL["🔁 AGENT LOOP<br/><i>Builds prompt · Calls LLM · Dispatches tools · Manages context</i>"]
+
+        subgraph Internal["Internal State"]
+            MEM["🧠 Memory"]
+            SKL["📋 Skills"]
+            SES["💬 Sessions"]
+        end
+    end
+
+    GW --> AL
+
+    subgraph Tools["🛠️ Toolsets"]
+        T1["Terminal"]
+        T2["Files"]
+        T3["Web"]
+        T4["Browser"]
+        T5["Cron"]
+        T6["Delegation"]
+    end
+
+    AL --> Tools
+
+    subgraph Providers["☁️ Providers — 20+ LLM APIs"]
+        P1["OpenRouter"]
+        P2["Anthropic"]
+        P3["OpenAI"]
+        P4["Google"]
+        PM["..."]
+    end
+
+    AL --> Providers
 ```
 
 **The flow:**

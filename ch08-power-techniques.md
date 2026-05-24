@@ -8,21 +8,23 @@
 
 Every time Hermes wants to run a flagged shell command, it pauses and asks for permission. That's safe — but slow. YOLO mode skips all approval prompts.
 
-```
-┌─────────────────────────────────────────────────┐
-│  NORMAL MODE                                    │
-│                                                 │
-│  Hermes: "Run rm -rf node_modules?"             │
-│  You:    [waits... approves]                    │
-│  Hermes: "Run npm install?"                     │
-│  You:    [waits... approves]                    │
-│  → 3 commands = 3 approval pauses               │
-│                                                 │
-│  YOLO MODE                                      │
-│                                                 │
-│  Hermes: [runs all 3 commands back-to-back]     │
-│  → 3 commands = 0 pauses                        │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph normal["NORMAL MODE"]
+        direction TB
+        N1["Hermes: \"Run rm -rf node_modules?\""]
+        N2["You: [waits... approves]"]
+        N3["Hermes: \"Run npm install?\""]
+        N4["You: [waits... approves]"]
+        N5["→ 3 commands = 3 approval pauses"]
+        N1 --> N2 --> N3 --> N4 --> N5
+    end
+    subgraph yolo["YOLO MODE"]
+        direction TB
+        Y1["Hermes: runs all 3 commands back-to-back"]
+        Y2["→ 3 commands = 0 pauses"]
+        Y1 --> Y2
+    end
 ```
 
 ### Three Ways to Activate
@@ -56,24 +58,26 @@ export HERMES_YOLO_MODE=1
 
 Sometimes a task takes more than one message. You want Hermes to keep working on something across multiple turns without you repeating the objective every time.
 
-```
-┌─────────────────────────────────────────────────┐
-│  WITHOUT /goal                                  │
-│                                                 │
-│  You: "Refactor the auth module"                │
-│  Hermes: [refactors auth]                       │
-│  You: "Also update the tests"                   │
-│  Hermes: "What tests?" (lost context)           │
-│                                                 │
-│  WITH /goal                                     │
-│                                                 │
-│  You: /goal Refactor auth module to use JWT     │
-│  Hermes: [Goal set. Working on JWT refactor...] │
-│  You: "Also update the tests"                   │
-│  Hermes: [Still in JWT context, updates tests]  │
-│  You: "Check the middleware too"                │
-│  Hermes: [Still in JWT context, checks MW]      │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph without["WITHOUT /goal"]
+        direction TB
+        U1["You: \"Refactor the auth module\""]
+        U2["Hermes: refactors auth"]
+        U3["You: \"Also update the tests\""]
+        U4["Hermes: \"What tests?\" (lost context)"]
+        U1 --> U2 --> U3 --> U4
+    end
+    subgraph with["WITH /goal"]
+        direction TB
+        G1["You: /goal Refactor auth module to use JWT"]
+        G2["Hermes: Goal set. Working on JWT refactor..."]
+        G3["You: \"Also update the tests\""]
+        G4["Hermes: Still in JWT context, updates tests"]
+        G5["You: \"Check the middleware too\""]
+        G6["Hermes: Still in JWT context, checks MW"]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6
+    end
 ```
 
 ### Goal Commands
@@ -102,16 +106,10 @@ Hermes is in the middle of a 10-step refactor. You just realized it should also 
 
 `/steer` queues a message that gets injected **after the next tool call completes** — not immediately, not at the end. It's a course correction that doesn't break stride.
 
-```
-Timeline:
-───────────────────────────────────────────────────►
-
-  Step 1    Step 2    Step 3    Step 4    Step 5
-  [done]    [done]    [running] [queued]  [queued]
-                      │
-                      └── /steer injected here
-                          after Step 3's tool call
-                          returns
+```mermaid
+flowchart LR
+    S1["Step 1\ndone"] --> S2["Step 2\ndone"] --> S3["Step 3\nrunning"] --> S4["Step 4\nqueued"] --> S5["Step 5\nqueued"]
+    S3 -.->|"/steer injected here\nafter Step 3's tool call returns"| S4
 ```
 
 ### When to Steer vs. Queue vs. New Message
@@ -138,16 +136,16 @@ Hermes is running a long test suite. You have three more things you want done af
 
 Each queued command runs sequentially after the current turn completes. You can stack as many as you want.
 
-```
-┌──────────────────────────────────────────────┐
-│  QUEUE                                        │
-│                                               │
-│  [1] Run linter on auth module     ← next    │
-│  [2] Check Docker build                      │
-│  [3] Update README                           │
-│                                               │
-│  Current task: Running test suite (80%)       │
-└──────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph queue["QUEUE"]
+        Q1["[1] Run linter on auth module ← next"]
+        Q2["[2] Check Docker build"]
+        Q3["[3] Update README"]
+        Q1 --> Q2 --> Q3
+    end
+    CT["Current task: Running test suite (80%)"]
+    CT --> queue
 ```
 
 💡 **Tip:** `/queue` is FIFO (first in, first out). Plan your order — lint before build, build before docs.
@@ -164,19 +162,25 @@ You're in the middle of a productive session and want to try a risky approach wi
 
 This creates a **fork** of the current conversation — a new session that starts with the same history. Your original session remains untouched.
 
-```
-        Session A (original)
-        │
-        ├── message 1
-        ├── message 2
-        │
-        ├── /branch ────── Session B (fork)
-        │                  │
-        ├── message 3      ├── risky experiment
-        ├── message 4      ├── didn't work
-        │                  └── /quit (discard)
-        └── continued
-            normally
+```mermaid
+flowchart TD
+    subgraph sessionA["Session A (original)"]
+        A1["message 1"]
+        A2["message 2"]
+        A3["/branch"]
+        A4["message 3"]
+        A5["message 4"]
+        A6["continued normally"]
+        A1 --> A2 --> A3
+        A3 --> A4 --> A5 --> A6
+    end
+    subgraph sessionB["Session B (fork)"]
+        B1["risky experiment"]
+        B2["didn't work"]
+        B3["/quit (discard)"]
+        B1 --> B2 --> B3
+    end
+    A3 -->|fork| sessionB
 ```
 
 Use cases:
@@ -213,14 +217,10 @@ hermes config set checkpoints.max_snapshots 50
 /rollback 3
 ```
 
-```
-CHECKPOINT TIMELINE:
-
-  CP0 ──── CP1 ──── CP2 ──── CP3 ──── CP4 (current)
-  (init)   (step1)  (step2)  (step3)  (step4)
-                              │
-                              └── /rollback 1
-                                  restores to CP3
+```mermaid
+flowchart LR
+    CP0["CP0\n(init)"] --> CP1["CP1\n(step1)"] --> CP2["CP2\n(step2)"] --> CP3["CP3\n(step3)"] --> CP4["CP4 (current)\n(step4)"]
+    CP4 -.->|"/rollback 1\nrestores to CP3"| CP3
 ```
 
 Each checkpoint captures file state at that moment. Hermes creates them automatically before each tool call that modifies files when checkpoints are enabled.
@@ -312,21 +312,25 @@ Hermes is in the middle of a long operation. You send a message. What happens? T
 /busy status      # Check current mode
 ```
 
-```
-BUSY MODE COMPARISON:
-
-  QUEUE:          STEER:          INTERRUPT:
-  ┌──────┐       ┌──────┐       ┌──────┐
-  │ Work │       │ Work │       │ Work │
-  │  ↓   │       │  ↓   │       │  ✗   │ ← stopped
-  │[wait]│       │inject│       │      │
-  │  ↓   │       │  ↓   │       │ New  │
-  │Your  │       │cont. │       │ msg  │
-  │ msg  │       │      │       │ runs │
-  └──────┘       └──────┘       └──────┘
-
-  Safe, orderly   Mid-flight    Immediate
-  but slowest     course change context switch
+```mermaid
+flowchart TD
+    subgraph q["QUEUE: Safe, orderly but slowest"]
+        Q1["Work"]
+        Q2["[wait]"]
+        Q3["Your msg"]
+        Q1 --> Q2 --> Q3
+    end
+    subgraph s["STEER: Mid-flight course change"]
+        S1["Work"]
+        S2["inject"]
+        S3["cont."]
+        S1 --> S2 --> S3
+    end
+    subgraph i["INTERRUPT: Immediate context switch"]
+        I1["Work ✗ stopped"]
+        I2["New msg runs"]
+        I1 --> I2
+    end
 ```
 
 **Recommendation:**
@@ -344,15 +348,23 @@ BUSY MODE COMPARISON:
 
 Runs a prompt in the background inside your session. Hermes processes it independently while you continue chatting normally.
 
-```
-  Main thread:        Background thread:
-  ┌──────────┐       ┌──────────────────────┐
-  │ You: ... │       │ Researching Next.js   │
-  │ Hermes:  │       │ Reading docs...       │
-  │ You: ... │       │ Writing summary...    │
-  │ Hermes:  │       │ ✅ Done → saved to    │
-  │ You: ... │       │    ~/research/        │
-  └──────────┘       └──────────────────────┘
+```mermaid
+flowchart LR
+    subgraph main["Main thread"]
+        M1["You: ..."]
+        M2["Hermes:"]
+        M3["You: ..."]
+        M4["Hermes:"]
+        M5["You: ..."]
+        M1 --> M2 --> M3 --> M4 --> M5
+    end
+    subgraph bg["Background thread"]
+        B1["Researching Next.js"]
+        B2["Reading docs..."]
+        B3["Writing summary..."]
+        B4["✅ Done → saved to\n~/research/"]
+        B1 --> B2 --> B3 --> B4
+    end
 ```
 
 Background prompts:
@@ -426,17 +438,20 @@ Hermes keeps the full conversation context. The new model picks up exactly where
 
 ### Strategic Model Switching
 
-```
-Task timeline:
-───────────────────────────────────────────────────►
-
-  [Cheap model]     [Expensive model]    [Cheap model]
-  Boilerplate →     Complex logic →      Write tests
-  scaffolding       implementation        and docs
-
-  deepseek/deepseek  anthropic/claude    deepseek/deepseek
-  -chat              -sonnet-4           -chat
-  ($0.14/M tokens)  ($3/M tokens)       ($0.14/M tokens)
+```mermaid
+flowchart LR
+    subgraph phase1["Cheap model"]
+        A["deepseek/deepseek-chat\n$0.14/M tokens"]
+    end
+    subgraph phase2["Expensive model"]
+        B["anthropic/claude-sonnet-4\n$3/M tokens"]
+    end
+    subgraph phase3["Cheap model"]
+        C["deepseek/deepseek-chat\n$0.14/M tokens"]
+    end
+    A -->|"Boilerplate\nscaffolding"| B
+    B -->|"Complex logic\nimplementation"| C
+    C -->|"Write tests\nand docs"| D["Done"]
 ```
 
 💡 **Tip:** Use cheap models for scaffolding, formatting, and boilerplate. Switch to expensive models only for the hard parts — complex algorithms, architecture decisions, debugging. Switch back for tests and docs.
@@ -468,20 +483,18 @@ hermes config set compression.target_ratio 0.20  # Compress to 20% of original (
 hermes config set compression.target_ratio 0.40  # Less aggressive: keep 40%
 ```
 
-```
-CONTEXT WINDOW LIFECYCLE:
-
-  0% ────────────── 50% ────────────── 100%
-  │                   │                  │
-  │  Normal operation │ Auto-compress    │ Hard limit
-  │                   │ triggers here    │ (error)
-  │                   │
-  │    threshold=0.50 ┘
-  │
-  │  After compression:
-  │  0% ────── 10% (target_ratio=0.20)
-  │            │
-  │            Fresh space for continued work
+```mermaid
+flowchart TD
+    subgraph before["Before compression"]
+        Z1["0%"] --> Z2["50% — threshold\nAuto-compress triggers here"] --> Z3["100% — Hard limit (error)"]
+        Z4["Normal operation\n0% → 50%"]
+    end
+    subgraph after["After compression"]
+        A1["0% → 10%\ntarget_ratio=0.20"]
+        A2["Fresh space for\ncontinued work"]
+        A1 --> A2
+    end
+    before --> after
 ```
 
 ### Compression Best Practices
@@ -501,29 +514,28 @@ CONTEXT WINDOW LIFECYCLE:
 
 You covered profiles in Chapter 7 for configuration isolation. Here's the **power-user pattern**: using profiles as completely separate workspaces.
 
-```
-┌─────────────────────────────────────────────────┐
-│  HERMES PROFILES                                │
-│                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
-│  │  work    │  │ personal │  │   lab    │     │
-│  │          │  │          │  │          │     │
-│  │ Config:  │  │ Config:  │  │ Config:  │     │
-│  │ Claude   │  │ DeepSeek │  │ Local    │     │
-│  │          │  │          │  │ Ollama   │     │
-│  │ Skills:  │  │ Skills:  │  │ Skills:  │     │
-│  │ GitHub,  │  │ Blog,    │  │ Exper-   │     │
-│  │ review,  │  │ Spotify, │  │ imental  │     │
-│  │ deploy   │  │ home     │  │ only     │     │
-│  │          │  │          │  │          │     │
-│  │ Memory:  │  │ Memory:  │  │ Memory:  │     │
-│  │ Work     │  │ Personal │  │ None     │     │
-│  │ projects │  │ prefs    │  │ (clean)  │     │
-│  │          │  │          │  │          │     │
-│  │ Sessions:│  │ Sessions:│  │ Sessions:│     │
-│  │ Isolated │  │ Isolated │  │ Isolated │     │
-│  └──────────┘  └──────────┘  └──────────┘     │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph profiles["HERMES PROFILES"]
+        subgraph work["work"]
+            WC["Config:\nClaude"]
+            WS["Skills:\nGitHub, review, deploy"]
+            WM["Memory:\nWork projects"]
+            WS2["Sessions:\nIsolated"]
+        end
+        subgraph personal["personal"]
+            PC["Config:\nDeepSeek"]
+            PS["Skills:\nBlog, Spotify, home"]
+            PM["Memory:\nPersonal prefs"]
+            PS2["Sessions:\nIsolated"]
+        end
+        subgraph lab["lab"]
+            LC["Config:\nLocal Ollama"]
+            LS["Skills:\nExperimental only"]
+            LM["Memory:\nNone (clean)"]
+            LS2["Sessions:\nIsolated"]
+        end
+    end
 ```
 
 ### The Three-Profile Setup
@@ -652,30 +664,15 @@ This is the most underused power technique. When Hermes hits an error, crashes, 
 
 Hermes has access to the same tools you do. It can read logs, inspect config, search files, run commands, and read its own source code. It knows more about its own internals than you do. Use that.
 
-```
-┌──────────────────────────────────────────────────────┐
-│  THE SELF-DEBUG LOOP                                 │
-│                                                      │
-│  You: "Fix it"                                       │
-│      │                                               │
-│      ▼                                               │
-│  Hermes reads the error message                      │
-│      │                                               │
-│      ▼                                               │
-│  Hermes reads the relevant config / code             │
-│      │                                               │
-│      ▼                                               │
-│  Hermes diagnoses the root cause                     │
-│      │                                               │
-│      ▼                                               │
-│  Hermes applies the fix                              │
-│      │                                               │
-│      ▼                                               │
-│  Hermes verifies the fix worked                      │
-│      │                                               │
-│      ▼                                               │
-│  Done. You watched.                                  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["You: \"Fix it\""]
+    A --> B["Hermes reads the error message"]
+    B --> C["Hermes reads the relevant config / code"]
+    C --> D["Hermes diagnoses the root cause"]
+    D --> E["Hermes applies the fix"]
+    E --> F["Hermes verifies the fix worked"]
+    F --> G["Done. You watched."]
 ```
 
 ### The Magic Phrases

@@ -13,24 +13,14 @@ You've set up Hermes, connected it to Telegram, built up skills and memory. But 
 - **Scale** — one Hermes can monitor 10 systems, write 2 blog posts a day, and review every PR
 - **Freedom** — you sleep, Hermes works. You code, Hermes handles ops.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              THE AUTOMATION SPECTRUM                        │
-│                                                            │
-│  MANUAL          SCHEDULED          EVENT-DRIVEN           │
-│  (you type)      (cron jobs)        (webhooks)             │
-│                                                            │
-│  ┌──────┐        ┌──────────┐       ┌──────────┐          │
-│  │ You  │        │ Scheduler│       │  Hook    │          │
-│  │  →   │        │  →       │       │  →       │          │
-│  │ Hermes│       │ Hermes   │       │ Hermes   │          │
-│  └──────┘        └──────────┘       └──────────┘          │
-│                                                            │
-│  "Write this"    "Every day at 9am"  "When PR is opened"  │
-│                                                            │
-│  ──────────────────────────────────────────────────────    │
-│  LOW AUTONOMY ────────────────────────── HIGH AUTONOMY    │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph spectrum ["THE AUTOMATION SPECTRUM — LOW AUTONOMY → HIGH AUTONOMY"]
+        M["MANUAL\n(you type)\nYou → Hermes\n\"Write this\""]
+        S["SCHEDULED\n(cron jobs)\nScheduler → Hermes\n\"Every day at 9am\""]
+        E["EVENT-DRIVEN\n(webhooks)\nHook → Hermes\n\"When PR is opened\""]
+    end
+    M --> S --> E
 ```
 
 Hermes gives you four automation mechanisms, each with a different trigger:
@@ -62,25 +52,21 @@ hermes cron create "30m"
 
 During creation, Hermes walks you through the key settings:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                CRON JOB ANATOMY                             │
-│                                                            │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Schedule:  "0 9 * * *"        ← When it runs        │  │
-│  │  Name:      "morning-digest"   ← Human label         │  │
-│  │  Prompt:    "Check emails..."  ← What Hermes does    │  │
-│  │  Skills:    [email, summary]   ← Preloaded knowledge │  │
-│  │  Model:     claude-sonnet-4    ← Optional override   │  │
-│  │  Deliver:   telegram           ← Where output goes   │  │
-│  │  Workdir:   ~/projects/app     ← Project context     │  │
-│  │  Enabled:   [x]                ← Active or paused    │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                            │
-│  Result: Hermes wakes up at 9am, loads the email and       │
-│  summary skills, checks your inbox, writes a digest,       │
-│  and delivers it to your Telegram.                         │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph anatomy ["CRON JOB ANATOMY"]
+        direction TB
+        S["Schedule: \"0 9 * * *\" — When it runs"]
+        N["Name: \"morning-digest\" — Human label"]
+        P["Prompt: \"Check emails...\" — What Hermes does"]
+        SK["Skills: [email, summary] — Preloaded knowledge"]
+        MO["Model: claude-sonnet-4 — Optional override"]
+        D["Deliver: telegram — Where output goes"]
+        W["Workdir: ~/projects/app — Project context"]
+        E["Enabled: [x] — Active or paused"]
+    end
+    S --> N --> P --> SK --> MO --> D --> W --> E
+    E -.->|"Result: Hermes wakes up at 9am,\nloads skills, checks inbox,\nwrites digest, delivers to Telegram"| R((📰 Digest))
 ```
 
 ### Schedule Formats
@@ -174,30 +160,26 @@ A daily digest might use a fast/cheap model, while a code review job needs the b
 
 Not every scheduled task needs an LLM. **Script-only jobs** run a script and deliver its output verbatim — no agent loop, no tokens, no model call:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│            SCRIPT-ONLY vs AGENT JOBS                        │
-│                                                            │
-│  AGENT JOB                    SCRIPT-ONLY JOB              │
-│  (default)                    (no_agent: true)             │
-│                                                            │
-│  Schedule tick                Schedule tick                │
-│       │                            │                       │
-│       ▼                            ▼                       │
-│  Load agent                  Run script                    │
-│       │                            │                       │
-│       ▼                            ▼                       │
-│  Load skills                 Capture stdout                │
-│       │                            │                       │
-│       ▼                            ▼                       │
-│  Run LLM prompt              ┌─ stdout empty? → SILENT    │
-│       │                      │  stdout has text? → SEND   │
-│       ▼                      │  exit non-zero? → ERROR    │
-│  Deliver response             └                            │
-│                                                            │
-│  ~5-50K tokens/job           ~0 tokens/job                │
-│  Minutes per run             Seconds per run              │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph agent ["AGENT JOB (default)"]
+        A1["Schedule tick"] --> A2["Load agent"]
+        A2 --> A3["Load skills"]
+        A3 --> A4["Run LLM prompt"]
+        A4 --> A5["Deliver response"]
+    end
+
+    subgraph script ["SCRIPT-ONLY JOB (no_agent: true)"]
+        B1["Schedule tick"] --> B2["Run script"]
+        B2 --> B3["Capture stdout"]
+        B3 --> B4{"stdout?"}
+        B4 -->|"empty"| B5["SILENT — nothing sent"]
+        B4 -->|"has text"| B6["SEND — deliver verbatim"]
+        B4 -->|"exit non-zero"| B7["ERROR — alert sent"]
+    end
+
+    A5 -.- NOTE1["~5-50K tokens/job\nMinutes per run"]
+    B5 -.- NOTE2["~0 tokens/job\nSeconds per run"]
 ```
 
 **When to use script-only:**
@@ -249,24 +231,17 @@ hermes cron create "every 10m" \
 
 **How it works:**
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              GATEWAY HEARTBEAT (every 10 min)               │
-│                                                            │
-│  1. Check gateway PID — is the process running?            │
-│  2. Check gateway.log — has it been written to recently?   │
-│                                                            │
-│  ┌──────────┐                                              │
-│  │ ALIVE?   │── YES ──► Silent exit (nothing sent)         │
-│  │          │                                              │
-│  │          │── NO ───► Kill zombie PIDs                   │
-│  └──────────┘            │                                 │
-│                          ▼                                 │
-│                    Restart gateway                          │
-│                    Notify you via Telegram                   │
-│                                                            │
-│  Cost: $0.00 — no LLM tokens used. It's a Python script.  │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["GATEWAY HEARTBEAT\nevery 10 min"] --> B{"ALIVE?"}
+    B -->|"YES"| C["Silent exit\n(nothing sent)"]
+    B -->|"NO"| D["Kill zombie PIDs"]
+    D --> E["Restart gateway"]
+    E --> F["Notify you via Telegram"]
+
+    style A fill:#e3f2fd
+    style C fill:#e8f5e9
+    style F fill:#fff3e0
 ```
 
 **Key details:**
@@ -303,26 +278,18 @@ This gives you **two safety nets** — the internal cron heartbeat (runs while t
 
 Jobs can chain together — the output of Job A feeds as context into Job B:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                JOB CHAINING WITH context_from               │
-│                                                            │
-│  ┌──────────────┐     ┌──────────────┐     ┌───────────┐  │
-│  │   JOB A      │     │   JOB B      │     │  JOB C    │  │
-│  │              │     │              │     │           │  │
-│  │ Collect data │────►│ Summarize    │────►│ Deliver   │  │
-│  │ (script)     │     │ (LLM agent)  │     │ (telegram)│  │
-│  └──────────────┘     └──────────────┘     └───────────┘  │
-│                                                            │
-│  Job B config:                                             │
-│    context_from: ["job-a-id"]                              │
-│                                                            │
-│  Job C config:                                             │
-│    context_from: ["job-b-id"]                              │  │
-│                                                            │
-│  Note: uses the MOST RECENT completed output,              │
-│  does NOT wait for upstream jobs in the same tick.         │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph chain ["JOB CHAINING WITH context_from"]
+        A["JOB A\nCollect data\n(script)"]
+        B["JOB B\nSummarize\n(LLM agent)"]
+        C["JOB C\nDeliver\n(telegram)"]
+    end
+    A -->|"stdout"| B
+    B -->|"analysis"| C
+
+    B -.- NOTE_B["context_from: [\"job-a-id\"]"]
+    C -.- NOTE_C["context_from: [\"job-b-id\"]"]
 ```
 
 **Practical example — daily competitive intelligence:**
@@ -367,32 +334,22 @@ hermes webhook remove deploy-hook
 
 This creates an HTTP endpoint at `/webhooks/deploy-hook`. When an external service (GitHub, Stripe, your CI) sends a POST to that endpoint, Hermes processes it.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                WEBHOOK EVENT FLOW                           │
-│                                                            │
-│  GitHub PR opened          Stripe payment                  │
-│       │                         │                          │
-│       ▼                         ▼                          │
-│  POST /webhooks/pr-hook   POST /webhooks/payment          │
-│       │                         │                          │
-│       └──────────┬──────────────┘                          │
-│                  │                                         │
-│                  ▼                                         │
-│         ┌──────────────┐                                   │
-│         │   GATEWAY    │  Receives HTTP POST               │
-│         │              │  Parses payload                   │
-│         └──────┬───────┘  Triggers agent                   │
-│                │                                           │
-│                ▼                                           │
-│         ┌──────────────┐                                   │
-│         │ AGENT LOOP   │  Processes event                  │
-│         │              │  Runs tools                       │
-│         │              │  Delivers response                │
-│         └──────────────┘                                   │
-│                                                            │
-│  No schedule needed — pure event-driven.                   │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    GH["GitHub PR opened"] --> POST1["POST /webhooks/pr-hook"]
+    SP["Stripe payment"] --> POST2["POST /webhooks/payment"]
+    POST1 --> GW
+    POST2 --> GW
+
+    subgraph gateway ["GATEWAY"]
+        GW["Receives HTTP POST\nParses payload\nTriggers agent"]
+    end
+
+    GW --> AL
+
+    subgraph agentloop ["AGENT LOOP"]
+        AL["Processes event\nRuns tools\nDelivers response"]
+    end
 ```
 
 **Common webhook patterns:**
@@ -416,30 +373,14 @@ terminal(command="npm run build", background=True, notify_on_complete=True)
 # You get notified when it finishes
 ```
 
-```
-┌────────────────────────────────────────────────────────────┐
-│            BACKGROUND TASK LIFECYCLE                        │
-│                                                            │
-│  ┌──────────┐     ┌──────────┐     ┌──────────┐          │
-│  │  START   │────►│ RUNNING  │────►│  DONE    │          │
-│  │          │     │          │     │          │          │
-│  │ terminal( │    │ process( │     │  Auto-   │          │
-│  │ bg=true) │     │ poll)    │     │ notify   │          │
-│  └──────────┘     └────┬─────┘     └──────────┘          │
-│                        │                                    │
-│                        ▼                                    │
-│                   ┌──────────┐                              │
-│                   │ CHECK    │  poll → see progress         │
-│                   │ PROGRESS │  log → full output           │
-│                   │          │  wait → block until done     │
-│                   └──────────┘                              │
-│                                                            │
-│  notify_on_complete=True → exact ONE notification at end   │
-│  watch_patterns=["Build OK"] → notify on rare mid-run text │
-│                                                            │
-│  ⚠️ watch_patterns has a rate limit: 1 notification        │
-│     per 15 seconds. Use notify_on_complete for end-of-run. │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    START["START\nterminal(bg=true)"] --> RUNNING["RUNNING\nprocess(poll)"]
+    RUNNING --> DONE["DONE\nAuto-notify"]
+    RUNNING --> CHECK["CHECK PROGRESS\npoll → see progress\nlog → full output\nwait → block until done"]
+
+    DONE -.- NOTE1["notify_on_complete=True →\none notification at end"]
+    CHECK -.- NOTE2["watch_patterns=[\"Build OK\"] →\nnotify on rare mid-run text\n(rate limit: 1 per 15 sec)"]
 ```
 
 **Process management commands:**
@@ -476,34 +417,18 @@ process(action="close", session_id="...")
 
 Running autonomous agents on a schedule comes with responsibility. Here's how to keep things safe:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│               CRON SAFETY CHECKLIST                         │
-│                                                            │
-│  ✅ PROMPT: Self-contained — no chat context available     │
-│     Cron jobs run in fresh sessions. Include everything    │
-│     the agent needs to know in the prompt.                 │
-│                                                            │
-│  ✅ SKILLS: Attach the right skills                        │
-│     A cron job has no conversation history to draw from.   │
-│     Skills inject the knowledge it needs.                  │
-│                                                            │
-│  ✅ NO RECURSIVE CRON: Cron jobs must NOT create more      │
-│     cron jobs. Period. This prevents runaway scheduling.   │
-│                                                            │
-│  ✅ TIMEOUT: 3-minute hard limit per run                   │
-│     Hermes enforces this — no infinite loops.              │
-│                                                            │
-│  ✅ DEDUP: .tick.lock prevents duplicate ticks             │
-│     Two gateway processes won't run the same job twice.    │
-│                                                            │
-│  ✅ MEMORY: Cron sessions skip memory by default            │
-│     They don't pollute your memory with scheduled output.  │
-│                                                            │
-│  ✅ SCRIPT JOBS: Design for silence                         │
-│     Empty stdout = nothing sent. Only output alerts,       │
-│     not "everything is fine" noise.                        │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph safety ["CRON SAFETY CHECKLIST"]
+        P["PROMPT: Self-contained — no chat context available\nCron jobs run in fresh sessions.\nInclude everything the agent needs to know."]
+        SK["SKILLS: Attach the right skills\nA cron job has no conversation history.\nSkills inject the knowledge it needs."]
+        NR["NO RECURSIVE CRON: Cron jobs must NOT\ncreate more cron jobs. Prevents runaway scheduling."]
+        TO["TIMEOUT: 3-minute hard limit per run\nHermes enforces this — no infinite loops."]
+        DD["DEDUP: .tick.lock prevents duplicate ticks\nTwo gateway processes won't run the same job twice."]
+        MEM["MEMORY: Cron sessions skip memory by default\nThey don't pollute your memory with scheduled output."]
+        SC["SCRIPT JOBS: Design for silence\nEmpty stdout = nothing sent.\nOnly output alerts, not noise."]
+    end
+    P --> SK --> NR --> TO --> DD --> MEM --> SC
 ```
 
 ### Cost Awareness
@@ -526,78 +451,45 @@ Cron jobs consume tokens. Here's a rough guide:
 
 ### Workflow 1: Content Marketing Engine
 
-```
-┌────────────────────────────────────────────────────────────┐
-│           DAILY BLOG PIPELINE (2 articles/day)              │
-│                                                            │
-│  8:00 AM ─► Job "morning-article"                          │
-│             Skills: [blog, marketing-copy, humanizer]       │
-│             Prompt: "Write today's morning article..."      │
-│             Deliver: telegram                               │
-│             │                                               │
-│             ▼                                               │
-│             Hermes researches topics, writes, edits,        │
-│             and publishes. You get a notification.          │
-│                                                            │
-│  6:00 PM ─► Job "evening-article"                          │
-│             Same pipeline, different time slot.             │
-│                                                            │
-│  Weekly  ─► Job "content-digest"                           │
-│             context_from: [morning, evening]                │
-│             Summarizes the week's content performance.      │
-│                                                            │
-│  Cost: ~$1.50-3.00/day                                     │
-│  Value: Replaces $2,000-5,000/mo content writer             │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph pipeline ["DAILY BLOG PIPELINE (2 articles/day)"]
+        M["8:00 AM — Job: morning-article\nSkills: [blog, marketing-copy, humanizer]\nPrompt: Write today's morning article...\nDeliver: telegram"]
+        M --> MH["Hermes researches topics,\nwrites, edits, and publishes.\nYou get a notification."]
+        E["6:00 PM — Job: evening-article\nSame pipeline, different time slot."]
+        W["Weekly — Job: content-digest\ncontext_from: [morning, evening]\nSummarizes the week's content performance."]
+    end
+    M --> MH --> E --> W
+    W -.- COST["Cost: ~$1.50-3.00/day\nValue: Replaces $2,000-5,000/mo content writer"]
 ```
 
 ### Workflow 2: Server Watchdog
 
-```
-┌────────────────────────────────────────────────────────────┐
-│           INFRASTRUCTURE MONITORING                         │
-│                                                            │
-│  Every 5 min ─► Script-only: health_check.py               │
-│                  Checks: API uptime, DB connections,        │
-│                  disk space, memory usage                   │
-│                  Output: silent unless something's wrong    │
-│                  Cost: $0.00 (no LLM)                      │
-│                                                            │
-│  Every 15 min ─► Script-only: gpu_monitor.py               │
-│                   Checks: GPU temp, memory, utilization    │
-│                   Output: alert only if >90%               │
-│                   Cost: $0.00                               │
-│                                                            │
-│  On alert ─► Webhook: auto-remediation                     │
-│              Hermes receives the alert, investigates,       │
-│              attempts fix, notifies if manual action needed │
-│              Cost: ~$0.05-0.10 per incident                │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph infra ["INFRASTRUCTURE MONITORING"]
+        H["Every 5 min — Script-only: health_check.py\nChecks: API uptime, DB connections,\ndisk space, memory usage\nOutput: silent unless something's wrong\nCost: $0.00 (no LLM)"]
+        G["Every 15 min — Script-only: gpu_monitor.py\nChecks: GPU temp, memory, utilization\nOutput: alert only if >90%\nCost: $0.00"]
+        A["On alert — Webhook: auto-remediation\nHermes receives the alert, investigates,\nattempts fix, notifies if manual action needed\nCost: ~$0.05-0.10 per incident"]
+    end
+    H -->|"alert"| A
+    G -->|"alert"| A
 ```
 
 ### Workflow 3: GitHub PR Auto-Review
 
-```
-┌────────────────────────────────────────────────────────────┐
-│           CODE REVIEW AUTOMATION                            │
-│                                                            │
-│  Webhook: /webhooks/pr-review                              │
-│  Trigger: GitHub PR opened or updated                      │
-│                                                            │
-│  Flow:                                                     │
-│  1. GitHub sends PR event to webhook                       │
-│  2. Hermes loads github-code-review skill                  │
-│  3. Agent reads the diff, runs analysis                    │
-│  4. Posts inline review comments on the PR                 │
-│  5. Sends summary to Discord #engineering channel          │
-│                                                            │
-│  Skills: [github-code-review, requesting-code-review]      │
-│  Workdir: ~/projects/myapp                                 │
-│  Deliver: discord:#engineering                              │
-│                                                            │
-│  Cost: ~$0.10-0.50 per review                              │
-│  Value: Catches bugs before production                     │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph review ["CODE REVIEW AUTOMATION"]
+        WH["Webhook: /webhooks/pr-review\nTrigger: GitHub PR opened or updated"]
+        S1["1. GitHub sends PR event to webhook"]
+        S2["2. Hermes loads github-code-review skill"]
+        S3["3. Agent reads the diff, runs analysis"]
+        S4["4. Posts inline review comments on the PR"]
+        S5["5. Sends summary to Discord #engineering channel"]
+    end
+    WH --> S1 --> S2 --> S3 --> S4 --> S5
+    S5 -.- CFG["Skills: [github-code-review, requesting-code-review]\nWorkdir: ~/projects/myapp\nDeliver: discord:#engineering\nCost: ~$0.10-0.50 per review\nValue: Catches bugs before production"]
 ```
 
 ---

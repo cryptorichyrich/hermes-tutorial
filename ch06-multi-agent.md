@@ -15,48 +15,36 @@ You've seen Hermes handle single tasks well — write code, search the web, mana
 
 One agent does these sequentially. Multiple agents do them in parallel — and parallelism is where the real throughput gains live.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              SEQUENTIAL vs PARALLEL                          │
-│                                                            │
-│  Sequential (1 agent):                                     │
-│  ├── Research: 20 min                                      │
-│  ├── Backend:  45 min                                      │
-│  ├── Frontend: 40 min                                      │
-│  └── Review:   15 min                                     │
-│  Total: ~120 min                                           │
-│                                                            │
-│  Parallel (3 agents):                                      │
-│  ├── Agent A: Research (20 min)                            │
-│  ├── Agent B: Backend  ──────────────┐                     │
-│  └── Agent C: Frontend ──────────────┤                     │
-│      Review (waits for B + C): 15 min│                     │
-│  Total: ~60 min  (2x faster)         │                     │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph seq ["Sequential (1 agent) — Total: ~120 min"]
+        direction TB
+        S1["Research: 20 min"] --> S2["Backend: 45 min"]
+        S2 --> S3["Frontend: 40 min"]
+        S3 --> S4["Review: 15 min"]
+    end
+
+    subgraph par ["Parallel (3 agents) — Total: ~60 min (2x faster)"]
+        direction TB
+        P1["Agent A: Research (20 min)"]
+        P2["Agent B: Backend"]
+        P3["Agent C: Frontend"]
+        P1 --> P4["Review (waits for B + C): 15 min"]
+        P2 --> P4
+        P3 --> P4
+    end
 ```
 
 Hermes gives you **four mechanisms** for multi-agent work, each suited to different scenarios:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              MULTI-AGENT MECHANISMS                           │
-│                                                              │
-│  1. DELEGATION (delegate_task)                               │
-│     Quick synchronous subtasks inside your session            │
-│     Best for: research, code review, file analysis            │
-│                                                              │
-│  2. SPAWNING (tmux + hermes process)                         │
-│     Fully independent Hermes instances                       │
-│     Best for: long autonomous missions, hours/days            │
-│                                                              │
-│  3. KANBAN BOARD (multi-agent work queue)                     │
-│     Durable SQLite-backed task board with profiles            │
-│     Best for: project-scale work, specialist teams            │
-│                                                              │
-│  4. EXTERNAL AGENTS (KiloCode, Claude Code, Codex)            │
-│     Delegate to dedicated coding CLIs                         │
-│     Best for: heavy coding, PRs, refactoring                  │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph mechanisms ["MULTI-AGENT MECHANISMS"]
+        D["1. DELEGATION (delegate_task)\nQuick synchronous subtasks inside your session\nBest for: research, code review, file analysis"]
+        S["2. SPAWNING (tmux + hermes process)\nFully independent Hermes instances\nBest for: long autonomous missions, hours/days"]
+        K["3. KANBAN BOARD (multi-agent work queue)\nDurable SQLite-backed task board with profiles\nBest for: project-scale work, specialist teams"]
+        E["4. EXTERNAL AGENTS (KiloCode, Claude Code, Codex)\nDelegate to dedicated coding CLIs\nBest for: heavy coding, PRs, refactoring"]
+    end
 ```
 
 ---
@@ -118,23 +106,17 @@ Hermes: Dispatching 3 subagents in parallel...
 
 ### Delegation Anatomy
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              DELEGATION PARAMETERS                        │
-│                                                          │
-│  goal        What the subagent should accomplish          │
-│  context     Background info the subagent needs          │
-│  toolsets    Which tools to give it (default: inherits   │
-│              parent's tools)                             │
-│  role        'leaf' (default) or 'orchestrator'          │
-│                                                          │
-│  RETURNS: Final summary only.                            │
-│  Intermediate tool output NEVER enters parent context.   │
-│                                                          │
-│  LIFETIME: Bound to parent's turn.                       │
-│  If parent is interrupted → child is cancelled.          │
-│  For durable work, use cronjob or background terminal.   │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph params ["DELEGATION PARAMETERS"]
+        G["goal — What the subagent should accomplish"]
+        CTX["context — Background info the subagent needs"]
+        TS["toolsets — Which tools to give it\n(default: inherits parent's tools)"]
+        R["role — 'leaf' (default) or 'orchestrator'"]
+    end
+    G --> CTX --> TS --> R
+    R -.- RTN["RETURNS: Final summary only.\nIntermediate tool output NEVER enters parent context."]
+    R -.- LIFE["LIFETIME: Bound to parent's turn.\nIf parent is interrupted → child is cancelled.\nFor durable work, use cronjob or background terminal."]
 ```
 
 ### Leaf vs Orchestrator Roles
@@ -152,23 +134,23 @@ delegation:
 
 ### Choosing What to Delegate
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              WHEN TO DELEGATE                                 │
-│                                                              │
-│  ✅ DO delegate:                                             │
-│  • Research tasks (web search + synthesis)                   │
-│  • Code review (read files + assess quality)                 │
-│  • File analysis (search + summarize)                        │
-│  • Parallel independent subtasks                             │
-│  • Tasks that would flood your context with data             │
-│                                                              │
-│  ❌ DON'T delegate:                                          │
-│  • Single tool calls (just call the tool directly)           │
-│  • Tasks needing user interaction (subagents can't ask you)  │
-│  • Long-running work (use cronjob or background instead)     │
-│  • Simple questions (answer directly, no overhead)           │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph when ["WHEN TO DELEGATE"]
+        subgraph do ["DO delegate"]
+            D1["Research tasks (web search + synthesis)"]
+            D2["Code review (read files + assess quality)"]
+            D3["File analysis (search + summarize)"]
+            D4["Parallel independent subtasks"]
+            D5["Tasks that would flood your context with data"]
+        end
+        subgraph dont ["DON'T delegate"]
+            N1["Single tool calls (just call the tool directly)"]
+            N2["Tasks needing user interaction (subagents can't ask you)"]
+            N3["Long-running work (use cronjob or background instead)"]
+            N4["Simple questions (answer directly, no overhead)"]
+        end
+    end
 ```
 
 ---
@@ -216,28 +198,14 @@ tmux send-keys -t backend '/exit' Enter && sleep 2 && tmux kill-session -t backe
 
 The real power: spawn multiple agents, each on a different workstream, and relay context between them:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              MULTI-AGENT COORDINATION                         │
-│                                                              │
-│  ┌─────────┐                            ┌─────────┐         │
-│  │ BACKEND │◄─── API schema relay ────► │FRONTEND │         │
-│  │ agent   │                            │ agent   │         │
-│  │(tmux:be)│                            │(tmux:fe)│         │
-│  └────┬────┘                            └────┬────┘         │
-│       │                                      │               │
-│       │    ┌─────────┐                        │               │
-│       └───►│  YOU    │◄───────────────────────┘               │
-│            │ (Hermes │                                         │
-│            │  main)  │  Monitor both, relay info              │
-│            └─────────┘                                         │
-│                                                              │
-│  1. Spawn backend agent: "Build REST API"                    │
-│  2. Spawn frontend agent: "Build React dashboard"            │
-│  3. Capture backend API schema                               │
-│  4. Send schema to frontend agent                            │
-│  5. Both work in parallel                                    │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    BE["BACKEND agent\n(tmux:be)"] <-->|"API schema relay"| FE["FRONTEND agent\n(tmux:fe)"]
+    BE --> YOU
+    FE --> YOU
+    YOU["YOU (Hermes main)\nMonitor both, relay info"]
+
+    BE -.- STEP["1. Spawn backend agent: Build REST API\n2. Spawn frontend agent: Build React dashboard\n3. Capture backend API schema\n4. Send schema to frontend agent\n5. Both work in parallel"]
 ```
 
 ```bash
@@ -258,19 +226,28 @@ tmux send-keys -t frontend "Here is the API schema from the backend agent:\n$BAC
 
 ### Delegation vs Spawning — Quick Reference
 
-```
-┌──────────────────┬──────────────────┬──────────────────┐
-│                  │ delegate_task    │ Spawn hermes     │
-├──────────────────┼──────────────────┼──────────────────┤
-│ Isolation        │ Separate convo,  │ Fully independent│
-│                  │ shared process   │ process          │
-│ Duration         │ Minutes          │ Hours/days       │
-│ Tool access      │ Subset of parent │ Full access      │
-│ Interactive      │ No               │ Yes (via tmux)   │
-│ Survives restart │ No               │ Yes (tmux)       │
-│ Overhead         │ Low              │ Medium           │
-│ Best for         │ Quick subtasks   │ Long missions    │
-└──────────────────┴──────────────────┴──────────────────┘
+```mermaid
+flowchart TD
+    subgraph comparison ["DELEGATE_TASK vs SPAWN HERMES"]
+        subgraph dt ["delegate_task"]
+            D1["Isolation: Separate convo, shared process"]
+            D2["Duration: Minutes"]
+            D3["Tool access: Subset of parent"]
+            D4["Interactive: No"]
+            D5["Survives restart: No"]
+            D6["Overhead: Low"]
+            D7["Best for: Quick subtasks"]
+        end
+        subgraph sh ["Spawn hermes"]
+            H1["Isolation: Fully independent process"]
+            H2["Duration: Hours/days"]
+            H3["Tool access: Full access"]
+            H4["Interactive: Yes (via tmux)"]
+            H5["Survives restart: Yes (tmux)"]
+            H6["Overhead: Medium"]
+            H7["Best for: Long missions"]
+        end
+    end
 ```
 
 ---
@@ -289,28 +266,18 @@ Unlike delegation (ephemeral) or spawning (manual coordination), Kanban provides
 - **Automatic dispatch** — the dispatcher assigns and spawns workers
 - **Audit trail** — every action logged in the board's history
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              KANBAN TASK LIFECYCLE                         │
-│                                                          │
-│  ┌──────┐    ┌───────┐    ┌────────┐    ┌──────┐       │
-│  │ TODO │───►│ READY │───►│CLAIMED │───►│ DONE │       │
-│  │      │    │       │    │(worker │    │      │       │
-│  │      │    │       │    │running)│    │      │       │
-│  └──────┘    └───┬───┘    └───┬────┘    └──────┘       │
-│                  │             │                         │
-│                  │        ┌────┴────┐                    │
-│                  │        │ BLOCKED │                    │
-│                  │        │(waiting │                    │
-│                  │        │for human│                    │
-│                  │        │ input)  │                    │
-│                  │        └─────────┘                    │
-│                                                          │
-│  Parents not done → stays in TODO                        │
-│  All parents done → auto-promote to READY                │
-│  Dispatcher picks up READY tasks → spawns worker         │
-│  Worker finishes → DONE, children auto-promoted          │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> TODO
+    TODO --> READY : All parents done
+    READY --> CLAIMED : Dispatcher picks up
+    CLAIMED --> DONE : Worker finishes
+    CLAIMED --> BLOCKED : Waiting for human input
+    BLOCKED --> READY : Human provides input
+
+    NOTE_RIGHT of TODO: Parents not done → stays here
+    NOTE_RIGHT of READY: Dispatcher spawns worker
+    NOTE_RIGHT of DONE: Children auto-promoted
 ```
 
 ### Setting Up the Board
@@ -380,29 +347,26 @@ hermes -p reviewer skills install requesting-code-review
 
 Dependencies are what make Kanban shine for complex projects:
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              DEPENDENCY GRAPH EXAMPLE                      │
-│                                                          │
-│  T1: Design database schema  ──┐                         │
-│  (backend-dev)                  │                         │
-│                                 ├──► T3: Build REST API   │
-│  T2: Design API contract     ──┘    (backend-dev)        │
-│  (backend-dev)                       │                    │
-│                                      ├──► T5: Integration │
-│  T4: Build React UI                  │    testing         │
-│  (frontend-dev)  ────────────────────┘    (reviewer)     │
-│                                                │          │
-│                                                ▼          │
-│                                           T6: Deploy      │
-│                                           (backend-dev)   │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    T1["T1: Design database schema\n(backend-dev)"]
+    T2["T2: Design API contract\n(backend-dev)"]
+    T3["T3: Build REST API\n(backend-dev)"]
+    T4["T4: Build React UI\n(frontend-dev)"]
+    T5["T5: Integration testing\n(reviewer)"]
+    T6["T6: Deploy\n(backend-dev)"]
 
-  T1 + T2 run in parallel (no dependencies)
-  T3 starts when both T1 and T2 complete
-  T4 runs in parallel with T3 (no dependency on backend)
-  T5 starts when both T3 and T4 complete
-  T6 starts when T5 completes
+    T1 --> T3
+    T2 --> T3
+    T3 --> T5
+    T4 --> T5
+    T5 --> T6
+
+    T1 -.- NOTE1["T1 + T2 run in parallel (no dependencies)"]
+    T3 -.- NOTE2["T3 starts when both T1 and T2 complete"]
+    T4 -.- NOTE3["T4 runs in parallel with T3"]
+    T5 -.- NOTE4["T5 starts when both T3 and T4 complete"]
+    T6 -.- NOTE5["T6 starts when T5 completes"]
 ```
 
 ### Managing Tasks
@@ -432,22 +396,23 @@ hermes kanban stats
 
 ### When to Use Kanban
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              USE KANBAN WHEN...                                │
-│                                                              │
-│  ✅ Multiple specialists are needed                          │
-│  ✅ Work should survive crashes/restarts                     │
-│  ✅ Human-in-the-loop at any step                            │
-│  ✅ Multiple subtasks can run in parallel                    │
-│  ✅ Review/iteration cycles are expected                     │
-│  ✅ Audit trail matters                                      │
-│                                                              │
-│  ❌ USE delegate_task FOR...                                  │
-│  ❌ Quick one-off subtasks                                    │
-│  ❌ Simple parallel research                                 │
-│  ❌ Tasks that complete in minutes                           │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph when_kanban ["USE KANBAN WHEN..."]
+        subgraph use ["Use Kanban"]
+            K1["Multiple specialists are needed"]
+            K2["Work should survive crashes/restarts"]
+            K3["Human-in-the-loop at any step"]
+            K4["Multiple subtasks can run in parallel"]
+            K5["Review/iteration cycles are expected"]
+            K6["Audit trail matters"]
+        end
+        subgraph use_delegate ["USE delegate_task FOR..."]
+            D1["Quick one-off subtasks"]
+            D2["Simple parallel research"]
+            D3["Tasks that complete in minutes"]
+        end
+    end
 ```
 
 ---
@@ -575,27 +540,16 @@ Hermes:
 
 ### Pattern 4: Daily Operations (Cron + Delegation)
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              DAILY AUTOMATED PIPELINE                         │
-│                                                              │
-│  6:00 AM  Cron: Check server health                         │
-│           → Script-only job, $0, alert if down               │
-│                                                              │
-│  9:00 AM  Cron: Daily competitive digest                     │
-│           → Agent job: web search + summarize                │
-│           → Delegate_task for parallel research               │
-│                                                              │
-│  12:00 PM Cron: Review open PRs                              │
-│           → Agent job: gh pr list + code review               │
-│           → Uses github-code-review skill                    │
-│                                                              │
-│  6:00 PM  Cron: End-of-day report                            │
-│           → Collects results from all previous jobs           │
-│           → Uses context_from to chain outputs                │
-│                                                              │
-│  All automated. You review the 6 PM digest.                  │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph daily ["DAILY AUTOMATED PIPELINE"]
+        C1["6:00 AM — Cron: Check server health\nScript-only job, $0, alert if down"]
+        C2["9:00 AM — Cron: Daily competitive digest\nAgent job: web search + summarize\ndelegate_task for parallel research"]
+        C3["12:00 PM — Cron: Review open PRs\nAgent job: gh pr list + code review\nUses github-code-review skill"]
+        C4["6:00 PM — Cron: End-of-day report\nCollects results from all previous jobs\nUses context_from to chain outputs"]
+    end
+    C1 --> C2 --> C3 --> C4
+    C4 -.- NOTE["All automated. You review the 6 PM digest."]
 ```
 
 ---
