@@ -410,6 +410,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
+            overflow: hidden;
         }}
         [data-theme="dark"] .nav {{
             background: rgba(28,25,23,0.95);
@@ -423,14 +424,15 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             font-family: 'Inter', sans-serif;
             font-weight: 500; font-size: 15px; color: var(--ink);
             text-decoration: none; display: flex; align-items: center; gap: 6px;
-            letter-spacing: 0;
+            letter-spacing: 0; flex-shrink: 0; white-space: nowrap;
         }}
-        .nav-brand span {{ 
+        .nav-brand span {{
             font-family: 'EB Garamond', 'Times New Roman', serif;
             font-weight: 300; font-size: 24px; letter-spacing: -0.32px;
         }}
         .nav-links {{
-            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+            display: flex; gap: 2px; margin-left: 24px;
+            overflow-x: auto; flex-shrink: 1; min-width: 0;
         }}
         .nav-links a {{
             padding: 4px 12px; border-radius: 9999px; color: var(--muted);
@@ -442,7 +444,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         }}
 
         /* Search — integrated bar */
-        .nav-search {{ margin-left: auto; position: relative; }}
+        .nav-search {{ margin-left: auto; position: relative; flex-shrink: 0; }}
         .nav-search-bar {{
             display: flex; align-items: center; gap: 8px;
             background: var(--surface-card); border: 1px solid var(--hairline);
@@ -450,7 +452,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             cursor: pointer; transition: all 0.25s ease; min-width: 44px;
         }}
         .nav-search-bar:hover, .nav-search-bar.open {{ border-color: var(--ink); }}
-        .nav-search-bar.open {{ min-width: 260px; }}
+        .nav-search-bar.open {{ min-width: 240px; max-width: 300px; }}
         .nav-search-bar svg {{
             width: 16px; height: 16px; stroke: var(--muted); fill: none;
             stroke-width: 2; flex-shrink: 0; transition: stroke 0.2s;
@@ -459,10 +461,9 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         .nav-search-bar input {{
             border: none; outline: none; background: transparent;
             color: var(--ink); font-size: 14px; font-family: inherit;
-            letter-spacing: 0; width: 0; padding: 0;
-            transition: width 0.25s ease;
+            width: 0; opacity: 0; transition: width 0.25s ease, opacity 0.2s;
         }}
-        .nav-search-bar.open input {{ width: 200px; }}
+        .nav-search-bar.open input {{ width: 180px; opacity: 1; }}
         .nav-search-bar input::placeholder {{ color: var(--muted); }}
 
         /* Search dropdown */
@@ -835,6 +836,9 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             :root:not([data-theme]) .author-bio {{ background: var(--canvas-soft); }}
         }}
 
+        @media (max-width: 900px) {{
+            .nav-links {{ display: none; }}
+        }}
         @media (max-width: 768px) {{
             .markdown-body {{ padding: 24px 18px; }}
             .markdown-body h1 {{ font-size: 32px; letter-spacing: -0.32px; }}
@@ -843,6 +847,11 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             .container {{ padding: 0 12px; }}
             .chapter-nav {{ flex-direction: column; gap: 12px; }}
             .chapter-nav a {{ text-align: center; justify-content: center; }}
+            .nav-search-bar.open {{
+                position: absolute; right: 60px; top: 50%; transform: translateY(-50%);
+                min-width: 0; max-width: calc(100vw - 120px); z-index: 10;
+            }}
+            .nav-search-bar.open input {{ width: 140px; }}
         }}
     </style>
     <script>(function(){{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){{document.documentElement.setAttribute('data-theme','dark');}}}})();</script>
@@ -1144,6 +1153,26 @@ def build_index() -> str:
             --surface-card: #1c1917;
             --surface-strong: #292524;
         }}
+        [data-theme="dark"] .markdown-body {{ color: var(--body); }}
+        [data-theme="dark"] .markdown-body p,
+        [data-theme="dark"] .markdown-body li,
+        [data-theme="dark"] .markdown-body td {{ color: var(--body); }}
+        [data-theme="dark"] .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
+        [data-theme="dark"] .markdown-body a {{ color: var(--primary); }}
+        [data-theme="dark"] .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
+        [data-theme="dark"] .markdown-body pre {{ background: var(--canvas-soft); }}
+        [data-theme="dark"] .markdown-body pre code {{ color: var(--ink); }}
+        [data-theme="dark"] .markdown-body h1,
+        [data-theme="dark"] .markdown-body h2,
+        [data-theme="dark"] .markdown-body h3,
+        [data-theme="dark"] .markdown-body h4 {{ color: var(--ink); }}
+        [data-theme="dark"] .markdown-body table tr {{ border-color: var(--hairline); }}
+        [data-theme="dark"] .markdown-body table tr:nth-child(2n) {{ background: var(--canvas-soft); }}
+        [data-theme="dark"] .markdown-body strong {{ color: var(--ink); }}
+        [data-theme="dark"] .markdown-body hr {{ border-color: var(--hairline); }}
+        [data-theme="dark"] .copy-md-btn {{ background: var(--surface-card); color: var(--ink); border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }}
+        [data-theme="dark"] .copy-md-btn.copied {{ background: #166534; color: white; }}
         @media (prefers-color-scheme: dark) {{
             :root:not([data-theme]) {{
                 --primary: #e7e5e4;
@@ -1162,6 +1191,48 @@ def build_index() -> str:
                 --surface-strong: #292524;
             }}
         }}
+        :root:not([data-theme]) .markdown-body {{ color: var(--body); }}
+        :root:not([data-theme]) .markdown-body p,
+        :root:not([data-theme]) .markdown-body li,
+        :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
+        :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+        :root:not([data-theme]) .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
+        :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
+        :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
+        :root:not([data-theme]) .markdown-body pre {{ background: var(--canvas-soft); }}
+        :root:not([data-theme]) .markdown-body pre code {{ color: var(--ink); }}
+        :root:not([data-theme]) .markdown-body h1,
+        :root:not([data-theme]) .markdown-body h2,
+        :root:not([data-theme]) .markdown-body h3,
+        :root:not([data-theme]) .markdown-body h4 {{ color: var(--ink); }}
+        :root:not([data-theme]) .markdown-body table tr {{ border-color: var(--hairline); }}
+        :root:not([data-theme]) .markdown-body table tr:nth-child(2n) {{ background: var(--canvas-soft); }}
+        :root:not([data-theme]) .markdown-body strong {{ color: var(--ink); }}
+        :root:not([data-theme]) .markdown-body hr {{ border-color: var(--hairline); }}
+        :root:not([data-theme]) .copy-md-btn {{ background: var(--surface-card); color: var(--ink); border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }}
+        :root:not([data-theme]) .copy-md-btn.copied {{ background: #166534; color: white; }}
+        @media (prefers-color-scheme: dark) {{
+            :root:not([data-theme]) .markdown-body {{ color: var(--body); }}
+            :root:not([data-theme]) .markdown-body p,
+            :root:not([data-theme]) .markdown-body li,
+            :root:not([data-theme]) .markdown-body td {{ color: var(--body); }}
+            :root:not([data-theme]) .markdown-body th {{ background: var(--surface-strong); color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body blockquote {{ color: var(--muted); border-left-color: var(--hairline-strong); background: var(--canvas-soft); }}
+            :root:not([data-theme]) .markdown-body a {{ color: var(--primary); }}
+            :root:not([data-theme]) .markdown-body code {{ background: var(--canvas-soft); color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body pre {{ background: var(--canvas-soft); }}
+            :root:not([data-theme]) .markdown-body pre code {{ color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body h1,
+            :root:not([data-theme]) .markdown-body h2,
+            :root:not([data-theme]) .markdown-body h3,
+            :root:not([data-theme]) .markdown-body h4 {{ color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body table tr {{ border-color: var(--hairline); }}
+            :root:not([data-theme]) .markdown-body table tr:nth-child(2n) {{ background: var(--canvas-soft); }}
+            :root:not([data-theme]) .markdown-body strong {{ color: var(--ink); }}
+            :root:not([data-theme]) .markdown-body hr {{ border-color: var(--hairline); }}
+            :root:not([data-theme]) .copy-md-btn {{ background: var(--surface-card); color: var(--ink); border-color: var(--hairline-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }}
+            :root:not([data-theme]) .copy-md-btn.copied {{ background: #166534; color: white; }}
+        }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1172,6 +1243,7 @@ def build_index() -> str:
             background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
+            overflow: hidden;
         }}
         [data-theme="dark"] .nav {{
             background: rgba(28,25,23,0.95);
@@ -1184,14 +1256,16 @@ def build_index() -> str:
         .nav-brand {{
             font-family: 'Inter', sans-serif;
             font-weight: 500; font-size: 15px; color: var(--ink);
-            text-decoration: none; display: flex; align-items: center; gap: 6px; letter-spacing: 0;
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+            letter-spacing: 0; flex-shrink: 0; white-space: nowrap;
         }}
-        .nav-brand span {{ 
+        .nav-brand span {{
             font-family: 'EB Garamond', 'Times New Roman', serif;
             font-weight: 300; font-size: 24px; letter-spacing: -0.32px;
         }}
         .nav-links {{
-            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+            display: flex; gap: 2px; margin-left: 24px;
+            overflow-x: auto; flex-shrink: 1; min-width: 0;
         }}
         .nav-links a {{
             padding: 4px 12px; border-radius: 9999px; color: var(--muted);
@@ -1201,7 +1275,7 @@ def build_index() -> str:
         .nav-links a:hover {{ background: var(--primary); color: white; }}
 
         /* Search — integrated bar */
-        .nav-search {{ margin-left: auto; position: relative; }}
+        .nav-search {{ margin-left: auto; position: relative; flex-shrink: 0; }}
         .nav-search-bar {{
             display: flex; align-items: center; gap: 8px;
             background: var(--surface-card); border: 1px solid var(--hairline);
@@ -1209,7 +1283,7 @@ def build_index() -> str:
             cursor: pointer; transition: all 0.25s ease; min-width: 44px;
         }}
         .nav-search-bar:hover, .nav-search-bar.open {{ border-color: var(--ink); }}
-        .nav-search-bar.open {{ min-width: 260px; }}
+        .nav-search-bar.open {{ min-width: 240px; max-width: 300px; }}
         .nav-search-bar svg {{
             width: 16px; height: 16px; stroke: var(--muted); fill: none;
             stroke-width: 2; flex-shrink: 0; transition: stroke 0.2s;
@@ -1218,10 +1292,9 @@ def build_index() -> str:
         .nav-search-bar input {{
             border: none; outline: none; background: transparent;
             color: var(--ink); font-size: 14px; font-family: inherit;
-            letter-spacing: 0; width: 0; padding: 0;
-            transition: width 0.25s ease;
+            width: 0; opacity: 0; transition: width 0.25s ease, opacity 0.2s;
         }}
-        .nav-search-bar.open input {{ width: 200px; }}
+        .nav-search-bar.open input {{ width: 180px; opacity: 1; }}
         .nav-search-bar input::placeholder {{ color: var(--muted); }}
         .search-dropdown {{
             position: absolute; top: 44px; right: 0; width: 420px;
@@ -1354,11 +1427,19 @@ def build_index() -> str:
         .bottom-bar a {{ color: var(--ink); text-decoration: none; font-weight: 500; }}
         .bottom-bar a:hover {{ text-decoration: underline; }}
 
+        @media (max-width: 900px) {{
+            .nav-links {{ display: none; }}
+        }}
         @media (max-width: 768px) {{
             .hero h1 {{ font-size: 48px; letter-spacing: -0.96px; }}
             .hero::before {{ width: 250px; height: 250px; top: -50px; }}
             .hero::after {{ width: 200px; height: 200px; right: -50px; }}
             .nav-links {{ display: none; }}
+            .nav-search-bar.open {{
+                position: absolute; right: 60px; top: 50%; transform: translateY(-50%);
+                min-width: 0; max-width: calc(100vw - 120px); z-index: 10;
+            }}
+            .nav-search-bar.open input {{ width: 140px; }}
         }}
     </style>
     <script>(function(){{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){{document.documentElement.setAttribute('data-theme','dark');}}}})();</script>
