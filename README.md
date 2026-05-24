@@ -6,7 +6,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/cryptorichyrich/hermes-tutorial?style=social)](https://github.com/cryptorichyrich/hermes-tutorial)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Chapters](https://img.shields.io/badge/Chapters-10-blueviolet)]()
-[![Words](https://img.shields.io/badge/Words-34%2C500-green)]()
 
 The **first comprehensive English tutorial** for [Hermes Agent](https://github.com/nousresearch/hermes-agent) — Nous Research's open-source, self-improving AI Agent framework.
 
@@ -18,20 +17,18 @@ Hermes Agent is a 24/7 autonomous AI Agent that learns from experience. It remem
 
 ## Table of Contents
 
-| # | Chapter | Topic | Words |
-|---|---------|-------|-------|
-| 1 | [Hello Hermes](ch01-hello-hermes.md) | Install, first run, 5-minute win, Harness Framework, Three Tools Three Jobs | ~1,800 |
-| 2 | [Core Concepts](ch02-core-concepts.md) | Agent Loop, models, tools, execution pipeline | ~2,300 |
-| 3 | [Messaging Gateway](ch03-messaging-gateway.md) | Telegram, voice, slash commands, deployment costs | ~3,000 |
-| 4 | [Skills & Memory](ch04-skills-memory.md) | Learning Loop, Skill system, Curator, session search | ~3,300 |
-| 5 | [Automation](ch05-automation-scheduling.md) | Cron jobs, webhooks, background tasks, gateway heartbeat | ~3,300 |
-| 6 | [Multi-Agent Orchestration](ch06-multi-agent.md) | Delegation, subagents, Kanban workflows | ~3,400 |
-| 7 | [Advanced Configuration](ch07-advanced-config.md) | Security, MCP, profiles, local models, Android | ~4,800 |
-| 8 | [Power Techniques](ch08-power-techniques.md) | YOLO mode, goals, steering, self-debugging | ~3,900 |
-| 9 | [Business Use Cases](ch09-business-use-cases.md) | 10 real scenarios with ROI numbers | ~4,700 |
-| 10 | [Business Around Hermes](ch10-business-around-hermes.md) | Pricing, white-label, scaling your practice | ~3,800 |
-
-**Total: ~34,500 words across 10 chapters.**
+| # | Chapter | Topic |
+|---|---------|-------|
+| 1 | [Hello Hermes](ch01-hello-hermes.md) | Install, first run, 5-minute win, Harness Framework, Three Tools Three Jobs |
+| 2 | [Core Concepts](ch02-core-concepts.md) | Agent Loop, models, tools, execution pipeline |
+| 3 | [Messaging Gateway](ch03-messaging-gateway.md) | Telegram, voice, slash commands, deployment costs |
+| 4 | [Skills & Memory](ch04-skills-memory.md) | Learning Loop, Skill system, Curator, session search |
+| 5 | [Automation](ch05-automation-scheduling.md) | Cron jobs, webhooks, background tasks, gateway heartbeat |
+| 6 | [Multi-Agent Orchestration](ch06-multi-agent.md) | Delegation, subagents, Kanban workflows |
+| 7 | [Advanced Configuration](ch07-advanced-config.md) | Security, MCP, profiles, local models, Android |
+| 8 | [Power Techniques](ch08-power-techniques.md) | YOLO mode, goals, steering, self-debugging |
+| 9 | [Business Use Cases](ch09-business-use-cases.md) | 10 real scenarios with ROI numbers |
+| 10 | [Business Around Hermes](ch10-business-around-hermes.md) | Pricing, white-label, scaling your practice |
 
 ## Quick Start
 
@@ -58,7 +55,7 @@ cd hermes-tutorial
 | | This Tutorial | Orange Book |
 |---|---|---|
 | Language | English | Chinese |
-| Depth | 34,500 words, code-heavy | ~10,000 words, concept-heavy |
+| Depth | Code-heavy, production-tested | Concept-heavy, overview-oriented |
 | Code examples | 100+ runnable snippets | High-level overviews |
 | Business use cases | 10 scenarios with dollar ROI | Cost overview only |
 | Harness Framework | Full chapter with mapping table | Originated the concept |
