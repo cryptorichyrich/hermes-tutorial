@@ -38,38 +38,52 @@
   }
 }</script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --primary: #292524;
+            --primary-active: #0c0a09;
+            --ink: #0c0a09;
+            --body: #4e4e4e;
+            --muted: #777169;
+            --hairline: #e7e5e4;
+            --canvas: #f5f5f5;
+            --canvas-soft: #fafafa;
+            --surface-card: #ffffff;
+            --gradient-mint: #a7e5d3;
+            --gradient-peach: #f4c5a8;
+            --gradient-lavender: #c8b8e0;
+            --gradient-sky: #a8c8e8;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg); color: var(--text); line-height: 1.7;
+            background: var(--canvas); color: var(--body); line-height: 1.5; letter-spacing: 0.16px;
         }
         .nav {
-            position: fixed; top: 0; left: 0; right: 0; height: 56px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
         }
         .nav-brand {
-            font-weight: 700; font-size: 1rem; color: var(--primary);
-            text-decoration: none; display: flex; align-items: center; gap: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500; font-size: 15px; color: var(--ink);
+            text-decoration: none; display: flex; align-items: center; gap: 6px; letter-spacing: 0;
+        }
+        .nav-brand span { 
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-weight: 300; font-size: 24px; letter-spacing: -0.32px;
         }
         .nav-links {
             display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
         }
         .nav-links a {
-            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
-            text-decoration: none; font-size: 0.8rem; font-weight: 500;
-            white-space: nowrap; transition: all 0.2s;
+            padding: 4px 12px; border-radius: 9999px; color: var(--muted);
+            text-decoration: none; font-size: 15px; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s; letter-spacing: 0;
         }
         .nav-links a:hover { background: var(--primary); color: white; }
 
@@ -78,116 +92,143 @@
             margin-left: auto; position: relative;
         }
         .nav-search-input {
-            width: 0; padding: 6px 0; border: 2px solid transparent;
-            border-radius: 8px; font-size: 0.85rem; outline: none;
-            background: var(--bg); color: var(--text);
+            width: 0; padding: 6px 0; border: 1px solid var(--hairline);
+            border-radius: 9999px; font-size: 15px; outline: none;
+            background: var(--surface-card); color: var(--ink);
             transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
-            font-family: inherit;
+            font-family: inherit; letter-spacing: 0;
         }
         .nav-search-input.open {
-            width: 220px; padding: 6px 12px; border-color: var(--primary);
+            width: 220px; padding: 6px 12px; border-color: var(--ink);
         }
         .nav-search-btn {
             background: none; border: none; cursor: pointer;
-            color: var(--text-muted); font-size: 1.1rem; padding: 4px;
-            display: flex; align-items: center;
+            color: var(--muted); font-size: 15px; padding: 4px;
+            display: flex; align-items: center; font-weight: 500;
         }
-        .nav-search-btn:hover { color: var(--primary); }
+        .nav-search-btn:hover { color: var(--ink); }
         .search-dropdown {
             position: absolute; top: 44px; right: 0; width: 420px;
             max-height: 480px; overflow-y: auto;
-            background: var(--surface); border-radius: 12px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+            background: var(--surface-card); border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 0 0 1px var(--hairline);
             z-index: 200; display: none;
         }
         .search-dropdown.open { display: block; }
         .search-dropdown .sr-label {
-            padding: 10px 16px 6px; font-size: 0.72rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.05em;
-            color: var(--text-muted); border-bottom: 1px solid var(--border);
+            padding: 10px 16px 6px; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.96px;
+            color: var(--muted); border-bottom: 1px solid var(--hairline);
         }
         .search-dropdown .sr-item {
             display: block; padding: 10px 16px; text-decoration: none;
-            color: var(--text); transition: background 0.15s; cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
+            color: var(--ink); transition: background 0.15s; cursor: pointer;
+            border-bottom: 1px solid var(--hairline-soft);
         }
-        .search-dropdown .sr-item:hover { background: #eef2ff; }
+        .search-dropdown .sr-item:hover { background: var(--canvas); }
         .search-dropdown .sr-item:last-child { border-bottom: none; }
-        .sr-item-chapter { font-size: 0.72rem; font-weight: 600; color: var(--primary); margin-bottom: 2px; }
-        .sr-item-heading { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
-        .sr-item-snippet { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
-        .sr-item-snippet mark { background: #fef08a; color: var(--text); padding: 0 2px; border-radius: 2px; }
-        .sr-empty { padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+        .sr-item-chapter { font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.96px; }
+        .sr-item-heading { font-weight: 500; font-size: 16px; margin-bottom: 2px; color: var(--ink); }
+        .sr-item-snippet { font-size: 15px; color: var(--body); line-height: 1.4; letter-spacing: 0.15px; }
+        .sr-item-snippet mark { background: #fef08a; color: var(--ink); padding: 0 2px; border-radius: 2px; }
+        .sr-empty { padding: 24px 16px; text-align: center; color: var(--muted); font-size: 15px; letter-spacing: 0.15px; }
 
+        /* Hero section with gradient orb */
         .hero {
-            text-align: center; padding: 120px 20px 48px;
+            position: relative;
+            text-align: center; padding: 96px 20px 48px;
             max-width: 700px; margin: 0 auto;
         }
-        .hero-emoji { font-size: 3rem; margin-bottom: 16px; }
-        .hero h1 {
-            font-size: 2.4rem; font-weight: 800; margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--primary), #a855f7);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--gradient-mint) 0%, transparent 70%);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: -1;
         }
-        .hero p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 8px; }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--gradient-peach) 0%, transparent 70%);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .hero h1 {
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-size: 64px; font-weight: 300; margin-bottom: 16px;
+            line-height: 1.05; letter-spacing: -1.92px; color: var(--ink);
+        }
+        .hero p { color: var(--body); font-size: 18px; margin-bottom: 8px; letter-spacing: 0.18px; }
 
         .toc {
-            max-width: 700px; margin: 0 auto 40px; padding: 0 20px;
-            display: flex; flex-direction: column; gap: 8px;
+            max-width: 700px; margin: 0 auto 48px; padding: 0 20px;
+            display: flex; flex-direction: column; gap: 12px;
         }
         .toc-card {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px 20px; background: var(--surface);
-            border-radius: 12px; border: 1px solid var(--border);
-            text-decoration: none; color: var(--text);
+            display: flex; align-items: center; gap: 16px;
+            padding: 20px 24px; background: var(--surface-card);
+            border-radius: 16px; border: 1px solid var(--hairline);
+            text-decoration: none; color: var(--ink);
             transition: all 0.2s;
         }
         .toc-card:hover {
-            border-color: var(--primary); box-shadow: 0 4px 16px rgba(99,102,241,0.12);
-            transform: translateY(-1px);
+            border-color: var(--hairline-strong); box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            transform: translateY(-2px);
         }
         .toc-num {
-            font-weight: 700; color: var(--primary); font-size: 0.85rem;
-            min-width: 48px;
+            font-weight: 600; color: var(--primary); font-size: 14px;
+            min-width: 60px; text-transform: uppercase; letter-spacing: 0.96px;
         }
         .toc-title {
-            flex: 1; font-weight: 500; font-size: 0.95rem;
+            flex: 1; font-weight: 500; font-size: 16px; letter-spacing: 0.16px;
         }
         .toc-arrow {
-            color: var(--text-muted); font-size: 1.1rem; transition: transform 0.2s;
+            color: var(--muted); font-size: 20px; transition: transform 0.2s;
         }
-        .toc-card:hover .toc-arrow { transform: translateX(4px); color: var(--primary); }
+        .toc-card:hover .toc-arrow { transform: translateX(4px); color: var(--ink); }
 
         .bottom-bar {
-            text-align: center; padding: 24px 20px; color: var(--text-muted);
-            font-size: 0.85rem;
+            text-align: center; padding: 48px 20px 64px; color: var(--muted);
+            font-size: 15px; letter-spacing: 0.15px;
         }
-        .bottom-bar a { color: var(--primary); text-decoration: none; }
+        .bottom-bar a { color: var(--ink); text-decoration: none; font-weight: 500; }
         .bottom-bar a:hover { text-decoration: underline; }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 1.6rem; }
+            .hero h1 { font-size: 48px; letter-spacing: -0.96px; }
+            .hero::before { width: 250px; height: 250px; top: -50px; }
+            .hero::after { width: 200px; height: 200px; right: -50px; }
             .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
     <nav class="nav">
-        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search">🔍</button>
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search">Search</button>
             <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
     </nav>
 
     <div class="hero">
-        <div class="hero-emoji">📘</div>
         <h1>Hermes Agent — The Complete Tutorial</h1>
         <p>The AI Agent that ships with reins built in.</p>
-        <p style="margin-top:8px;">
-            By <a href="https://biotama.cv" style="color:var(--primary);font-weight:600;">Bio</a> ·
+        <p style="margin-top:12px;">
+            By <a href="https://biotama.cv" style="color:var(--ink);font-weight:500;">Bio</a> ·
             System Architect · Fintech Engineer
         </p>
     </div>

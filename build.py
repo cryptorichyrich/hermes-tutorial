@@ -167,7 +167,7 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
     # Breadcrumbs
     breadcrumbs = f"""
     <nav class="breadcrumbs" aria-label="Breadcrumb">
-        <a href="index.html">📘 Home</a>
+        <a href="index.html">Home</a>
         <span class="sep">›</span>
         <span>Chapter {ch}</span>
     </nav>
@@ -266,47 +266,64 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
     <script type="application/ld+json">{json.dumps(schema, indent=2)}</script>
 
     <!-- Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <style>
         :root {{
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --accent: #f59e0b;
-            --success: #10b981;
+            --primary: #292524;
+            --primary-active: #0c0a09;
+            --ink: #0c0a09;
+            --body: #4e4e4e;
+            --body-strong: #292524;
+            --muted: #777169;
+            --muted-soft: #a8a29e;
+            --hairline: #e7e5e4;
+            --hairline-soft: #f0efed;
+            --hairline-strong: #d6d3d1;
+            --canvas: #f5f5f5;
+            --canvas-soft: #fafafa;
+            --surface-card: #ffffff;
+            --gradient-mint: #a7e5d3;
+            --gradient-peach: #f4c5a8;
+            --gradient-lavender: #c8b8e0;
+            --gradient-sky: #a8c8e8;
         }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
+            background: var(--canvas);
+            color: var(--body);
+            line-height: 1.5;
+            letter-spacing: 0.16px;
         }}
 
         /* Top bar */
         .nav {{
-            position: fixed; top: 0; left: 0; right: 0; height: 56px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
         }}
         .nav-brand {{
-            font-weight: 700; font-size: 1rem; color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500; font-size: 15px; color: var(--ink);
             text-decoration: none; display: flex; align-items: center; gap: 6px;
+            letter-spacing: 0;
         }}
-        .nav-brand span {{ font-size: 1.2rem; }}
+        .nav-brand span {{ 
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-weight: 300; font-size: 24px; letter-spacing: -0.32px;
+        }}
         .nav-links {{
             display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
         }}
         .nav-links a {{
-            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
-            text-decoration: none; font-size: 0.8rem; font-weight: 500;
-            white-space: nowrap; transition: all 0.2s;
+            padding: 4px 12px; border-radius: 9999px; color: var(--muted);
+            text-decoration: none; font-size: 15px; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s; letter-spacing: 0;
         }}
         .nav-links a:hover, .nav-links a.active {{
             background: var(--primary); color: white;
@@ -317,113 +334,119 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             margin-left: auto; position: relative;
         }}
         .nav-search-input {{
-            width: 0; padding: 6px 0; border: 2px solid transparent;
-            border-radius: 8px; font-size: 0.85rem; outline: none;
-            background: var(--bg); color: var(--text);
+            width: 0; padding: 6px 0; border: 1px solid var(--hairline);
+            border-radius: 9999px; font-size: 15px; outline: none;
+            background: var(--surface-card); color: var(--ink);
             transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
-            font-family: inherit;
+            font-family: inherit; letter-spacing: 0;
         }}
         .nav-search-input.open {{
-            width: 220px; padding: 6px 12px; border-color: var(--primary);
+            width: 220px; padding: 6px 12px; border-color: var(--ink);
         }}
         .nav-search-btn {{
             background: none; border: none; cursor: pointer;
-            color: var(--text-muted); font-size: 1.1rem; padding: 4px;
-            display: flex; align-items: center;
+            color: var(--muted); font-size: 15px; padding: 4px;
+            display: flex; align-items: center; font-weight: 500;
         }}
-        .nav-search-btn:hover {{ color: var(--primary); }}
+        .nav-search-btn:hover {{ color: var(--ink); }}
 
         /* Search dropdown */
         .search-dropdown {{
             position: absolute; top: 44px; right: 0; width: 420px;
             max-height: 480px; overflow-y: auto;
-            background: var(--surface); border-radius: 12px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+            background: var(--surface-card); border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 0 0 1px var(--hairline);
             z-index: 200; display: none;
         }}
         .search-dropdown.open {{ display: block; }}
         .search-dropdown .sr-label {{
-            padding: 10px 16px 6px; font-size: 0.72rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.05em;
-            color: var(--text-muted); border-bottom: 1px solid var(--border);
+            padding: 10px 16px 6px; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.96px;
+            color: var(--muted); border-bottom: 1px solid var(--hairline);
         }}
         .search-dropdown .sr-item {{
             display: block; padding: 10px 16px; text-decoration: none;
-            color: var(--text); transition: background 0.15s; cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
+            color: var(--ink); transition: background 0.15s; cursor: pointer;
+            border-bottom: 1px solid var(--hairline-soft);
         }}
         .search-dropdown .sr-item:hover, .search-dropdown .sr-item.active {{
-            background: #eef2ff;
+            background: var(--canvas);
         }}
         .search-dropdown .sr-item:last-child {{ border-bottom: none; }}
         .sr-item-chapter {{
-            font-size: 0.72rem; font-weight: 600; color: var(--primary);
-            margin-bottom: 2px;
+            font-size: 12px; font-weight: 600; color: var(--primary);
+            margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.96px;
         }}
         .sr-item-heading {{
-            font-weight: 600; font-size: 0.9rem; margin-bottom: 2px;
+            font-weight: 500; font-size: 16px; margin-bottom: 2px; color: var(--ink);
         }}
         .sr-item-snippet {{
-            font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;
+            font-size: 15px; color: var(--body); line-height: 1.4; letter-spacing: 0.15px;
         }}
         .sr-item-snippet mark {{
-            background: #fef08a; color: var(--text); padding: 0 2px;
+            background: #fef08a; color: var(--ink); padding: 0 2px;
             border-radius: 2px;
         }}
         .sr-empty {{
-            padding: 24px 16px; text-align: center; color: var(--text-muted);
-            font-size: 0.85rem;
+            padding: 24px 16px; text-align: center; color: var(--muted);
+            font-size: 15px; letter-spacing: 0.15px;
         }}
         .sr-kbd {{
-            display: inline-block; padding: 1px 6px; border-radius: 4px;
-            background: var(--bg); border: 1px solid var(--border);
-            font-size: 0.7rem; font-family: monospace; color: var(--text-muted);
+            display: inline-block; padding: 1px 6px; border-radius: 9999px;
+            background: var(--canvas); border: 1px solid var(--hairline);
+            font-size: 12px; font-family: monospace; color: var(--muted);
         }}
 
         .container {{
-            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+            max-width: 860px; margin: 96px auto 60px; padding: 0 20px;
         }}
 
         /* Breadcrumbs */
         .breadcrumbs {{
-            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+            font-size: 15px; color: var(--muted); margin-bottom: 16px; letter-spacing: 0.15px;
         }}
-        .breadcrumbs a {{ color: var(--primary); text-decoration: none; }}
+        .breadcrumbs a {{ color: var(--ink); text-decoration: none; font-weight: 500; }}
         .breadcrumbs a:hover {{ text-decoration: underline; }}
         .breadcrumbs .sep {{ margin: 0 8px; }}
 
         /* Content */
         .markdown-body {{
-            background: var(--surface); border-radius: 16px; padding: 44px 52px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+            background: var(--surface-card); border-radius: 16px; padding: 48px 52px;
+            box-shadow: 0 0 0 1px var(--hairline);
         }}
 
         .markdown-body h1 {{
-            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
-            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-size: 48px; font-weight: 300; margin-bottom: 8px;
+            padding-bottom: 24px; border-bottom: 1px solid var(--hairline);
+            line-height: 1.08; letter-spacing: -0.96px; color: var(--ink);
         }}
         .markdown-body h2 {{
-            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
-            padding-left: 14px; border-left: 4px solid var(--primary);
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-size: 36px; font-weight: 300; margin-top: 48px; margin-bottom: 16px;
+            padding-left: 16px; border-left: 1px solid var(--hairline);
+            line-height: 1.17; letter-spacing: -0.36px; color: var(--ink);
         }}
         .markdown-body h3 {{
-            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-size: 24px; font-weight: 300; margin-top: 32px; margin-bottom: 12px;
+            line-height: 1.2; color: var(--ink);
         }}
-        .markdown-body p {{ margin-bottom: 14px; }}
+        .markdown-body p {{ margin-bottom: 16px; line-height: 1.5; }}
 
         .markdown-body blockquote {{
-            border-left: 4px solid var(--accent); background: #fffbeb;
-            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+            border-left: 1px solid var(--hairline-strong); background: var(--canvas);
+            padding: 16px 20px; border-radius: 0 16px 16px 0; margin: 24px 0;
         }}
         .markdown-body blockquote p {{ margin-bottom: 0; }}
 
         .markdown-body code {{
-            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            background: var(--canvas); padding: 2px 7px; border-radius: 4px;
             font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
         }}
         .markdown-body pre {{
-            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
-            overflow-x: auto; margin: 18px 0;
+            background: #0c0a09; border-radius: 16px; padding: 18px 22px;
+            overflow-x: auto; margin: 24px 0;
         }}
         .markdown-body pre code {{
             background: none; padding: 0; color: #cdd6f4;
@@ -432,100 +455,103 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
 
         .markdown-body table {{
             width: 100%; border-collapse: separate; border-spacing: 0;
-            margin: 18px 0; border-radius: 10px; overflow: hidden;
-            box-shadow: 0 0 0 1px var(--border);
+            margin: 24px 0; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--hairline);
         }}
         .markdown-body th {{
-            background: var(--primary); color: white; font-weight: 600;
-            text-align: left; padding: 10px 14px;
+            background: var(--primary); color: white; font-weight: 500;
+            text-align: left; padding: 12px 16px; font-size: 15px;
         }}
-        .markdown-body td {{ padding: 8px 14px; border-top: 1px solid var(--border); }}
-        .markdown-body tr:nth-child(even) td {{ background: #f8fafc; }}
+        .markdown-body td {{ padding: 10px 16px; border-top: 1px solid var(--hairline); font-size: 15px; }}
+        .markdown-body tr:nth-child(even) td {{ background: var(--canvas); }}
 
-        .markdown-body ul, .markdown-body ol {{ padding-left: 22px; margin-bottom: 14px; }}
-        .markdown-body li {{ margin-bottom: 5px; }}
+        .markdown-body ul, .markdown-body ol {{ padding-left: 24px; margin-bottom: 16px; }}
+        .markdown-body li {{ margin-bottom: 6px; line-height: 1.5; }}
 
         .markdown-body hr {{
-            border: none; height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
-            margin: 36px 0;
+            border: none; height: 1px;
+            background: var(--hairline);
+            margin: 48px 0;
         }}
 
         .markdown-body img {{
-            max-width: 100%; border-radius: 10px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            max-width: 100%; border-radius: 16px;
+            box-shadow: 0 0 0 1px var(--hairline);
         }}
 
         .markdown-body a {{
             color: var(--primary); text-decoration: none; font-weight: 500;
-            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+            border-bottom: 1px solid var(--hairline); transition: all 0.2s;
         }}
-        .markdown-body a:hover {{ color: var(--primary-light); border-bottom-color: var(--primary-light); }}
+        .markdown-body a:hover {{ color: var(--primary-active); border-bottom-color: var(--primary-active); }}
 
         /* Mermaid */
-        .mermaid {{ margin: 20px auto; text-align: center; }}
+        .mermaid {{ margin: 32px auto; text-align: center; }}
 
         /* Chapter nav */
         .chapter-nav {{
-            display: flex; justify-content: space-between; margin-top: 40px;
-            padding-top: 20px; border-top: 2px solid var(--border);
+            display: flex; justify-content: space-between; margin-top: 48px;
+            padding-top: 24px; border-top: 1px solid var(--hairline);
         }}
         .chapter-nav a {{
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 8px 18px; border-radius: 8px; background: var(--bg);
-            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
-            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 9999px; background: var(--primary);
+            color: white; font-weight: 500; border: none;
+            transition: all 0.2s; text-decoration: none; font-size: 15px; height: 40px;
+            letter-spacing: 0;
         }}
         .chapter-nav a:hover {{
-            background: var(--primary); color: white; border-color: var(--primary);
+            background: var(--primary-active);
         }}
+        .chapter-nav .prev, .chapter-nav .next {{ border: 1px solid var(--hairline); background: var(--surface-card); color: var(--ink); }}
+        .chapter-nav .prev:hover, .chapter-nav .next:hover {{ background: var(--primary); color: white; border-color: var(--primary); }}
 
         /* Author bio — subtle */
         .author-bio {{
-            display: flex; align-items: center; gap: 14px; margin-top: 32px;
-            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 16px; margin-top: 48px;
+            padding: 24px; background: var(--canvas); border-radius: 16px;
+            border: 1px solid var(--hairline);
         }}
         .author-avatar {{
             width: 40px; height: 40px; border-radius: 50%;
             background: var(--primary); color: white;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+            font-weight: 600; font-size: 15px; flex-shrink: 0;
         }}
-        .author-info {{ font-size: 0.88rem; line-height: 1.5; }}
-        .author-info strong {{ color: var(--text); }}
+        .author-info {{ font-size: 15px; line-height: 1.5; letter-spacing: 0.15px; }}
+        .author-info strong {{ color: var(--ink); font-weight: 500; }}
         .author-info a {{
             color: var(--primary); text-decoration: none;
-            border-bottom: 1px solid var(--primary-light);
+            border-bottom: 1px solid var(--hairline);
         }}
         .author-info a:hover {{ text-decoration: underline; }}
-        .author-info p {{ margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }}
+        .author-info p {{ margin: 2px 0 0; color: var(--muted); font-size: 15px; }}
 
         /* Footer */
         footer {{
-            text-align: center; padding: 24px 20px; color: var(--text-muted);
-            font-size: 0.82rem; margin-top: 20px;
+            text-align: center; padding: 24px 20px; color: var(--muted);
+            font-size: 15px; margin-top: 24px; letter-spacing: 0.15px;
         }}
-        footer a {{ color: var(--primary); text-decoration: none; }}
+        footer a {{ color: var(--ink); text-decoration: none; font-weight: 500; }}
         footer a:hover {{ text-decoration: underline; }}
 
         @media (max-width: 768px) {{
             .markdown-body {{ padding: 24px 18px; }}
-            .markdown-body h1 {{ font-size: 1.5rem; }}
-            .markdown-body h2 {{ font-size: 1.2rem; }}
+            .markdown-body h1 {{ font-size: 32px; letter-spacing: -0.32px; }}
+            .markdown-body h2 {{ font-size: 24px; letter-spacing: 0; }}
             .nav-links {{ display: none; }}
             .container {{ padding: 0 12px; }}
-            .chapter-nav {{ flex-direction: column; gap: 10px; }}
+            .chapter-nav {{ flex-direction: column; gap: 12px; }}
             .chapter-nav a {{ text-align: center; justify-content: center; }}
         }}
     </style>
 </head>
 <body>
     <nav class="nav">
-        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links">{nav_links}</div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search">🔍</button>
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search">Search</button>
             <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
@@ -550,13 +576,14 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             startOnLoad: true,
             theme: 'base',
             themeVariables: {{
-                primaryColor: '#eef2ff',
-                primaryTextColor: '#1e293b',
-                primaryBorderColor: '#6366f1',
-                lineColor: '#6366f1',
-                secondaryColor: '#f0fdf4',
-                tertiaryColor: '#fffbeb',
-                fontSize: '14px'
+                primaryColor: '#fafafa',
+                primaryTextColor: '#0c0a09',
+                primaryBorderColor: '#e7e5e4',
+                lineColor: '#292524',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#ffffff',
+                fontSize: '15px',
+                fontFamily: 'Inter'
             }},
             flowchart: {{ curve: 'basis', padding: 16 }}
         }});
@@ -618,38 +645,52 @@ def build_index() -> str:
 
     <script type="application/ld+json">{json.dumps(schema, indent=2)}</script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {{
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --primary: #292524;
+            --primary-active: #0c0a09;
+            --ink: #0c0a09;
+            --body: #4e4e4e;
+            --muted: #777169;
+            --hairline: #e7e5e4;
+            --canvas: #f5f5f5;
+            --canvas-soft: #fafafa;
+            --surface-card: #ffffff;
+            --gradient-mint: #a7e5d3;
+            --gradient-peach: #f4c5a8;
+            --gradient-lavender: #c8b8e0;
+            --gradient-sky: #a8c8e8;
         }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg); color: var(--text); line-height: 1.7;
+            background: var(--canvas); color: var(--body); line-height: 1.5; letter-spacing: 0.16px;
         }}
         .nav {{
-            position: fixed; top: 0; left: 0; right: 0; height: 56px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background: rgba(250,250,250,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--hairline);
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
         }}
         .nav-brand {{
-            font-weight: 700; font-size: 1rem; color: var(--primary);
-            text-decoration: none; display: flex; align-items: center; gap: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500; font-size: 15px; color: var(--ink);
+            text-decoration: none; display: flex; align-items: center; gap: 6px; letter-spacing: 0;
+        }}
+        .nav-brand span {{ 
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-weight: 300; font-size: 24px; letter-spacing: -0.32px;
         }}
         .nav-links {{
             display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
         }}
         .nav-links a {{
-            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
-            text-decoration: none; font-size: 0.8rem; font-weight: 500;
-            white-space: nowrap; transition: all 0.2s;
+            padding: 4px 12px; border-radius: 9999px; color: var(--muted);
+            text-decoration: none; font-size: 15px; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s; letter-spacing: 0;
         }}
         .nav-links a:hover {{ background: var(--primary); color: white; }}
 
@@ -658,116 +699,143 @@ def build_index() -> str:
             margin-left: auto; position: relative;
         }}
         .nav-search-input {{
-            width: 0; padding: 6px 0; border: 2px solid transparent;
-            border-radius: 8px; font-size: 0.85rem; outline: none;
-            background: var(--bg); color: var(--text);
+            width: 0; padding: 6px 0; border: 1px solid var(--hairline);
+            border-radius: 9999px; font-size: 15px; outline: none;
+            background: var(--surface-card); color: var(--ink);
             transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s;
-            font-family: inherit;
+            font-family: inherit; letter-spacing: 0;
         }}
         .nav-search-input.open {{
-            width: 220px; padding: 6px 12px; border-color: var(--primary);
+            width: 220px; padding: 6px 12px; border-color: var(--ink);
         }}
         .nav-search-btn {{
             background: none; border: none; cursor: pointer;
-            color: var(--text-muted); font-size: 1.1rem; padding: 4px;
-            display: flex; align-items: center;
+            color: var(--muted); font-size: 15px; padding: 4px;
+            display: flex; align-items: center; font-weight: 500;
         }}
-        .nav-search-btn:hover {{ color: var(--primary); }}
+        .nav-search-btn:hover {{ color: var(--ink); }}
         .search-dropdown {{
             position: absolute; top: 44px; right: 0; width: 420px;
             max-height: 480px; overflow-y: auto;
-            background: var(--surface); border-radius: 12px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+            background: var(--surface-card); border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 0 0 1px var(--hairline);
             z-index: 200; display: none;
         }}
         .search-dropdown.open {{ display: block; }}
         .search-dropdown .sr-label {{
-            padding: 10px 16px 6px; font-size: 0.72rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.05em;
-            color: var(--text-muted); border-bottom: 1px solid var(--border);
+            padding: 10px 16px 6px; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.96px;
+            color: var(--muted); border-bottom: 1px solid var(--hairline);
         }}
         .search-dropdown .sr-item {{
             display: block; padding: 10px 16px; text-decoration: none;
-            color: var(--text); transition: background 0.15s; cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
+            color: var(--ink); transition: background 0.15s; cursor: pointer;
+            border-bottom: 1px solid var(--hairline-soft);
         }}
-        .search-dropdown .sr-item:hover {{ background: #eef2ff; }}
+        .search-dropdown .sr-item:hover {{ background: var(--canvas); }}
         .search-dropdown .sr-item:last-child {{ border-bottom: none; }}
-        .sr-item-chapter {{ font-size: 0.72rem; font-weight: 600; color: var(--primary); margin-bottom: 2px; }}
-        .sr-item-heading {{ font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }}
-        .sr-item-snippet {{ font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }}
-        .sr-item-snippet mark {{ background: #fef08a; color: var(--text); padding: 0 2px; border-radius: 2px; }}
-        .sr-empty {{ padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }}
+        .sr-item-chapter {{ font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.96px; }}
+        .sr-item-heading {{ font-weight: 500; font-size: 16px; margin-bottom: 2px; color: var(--ink); }}
+        .sr-item-snippet {{ font-size: 15px; color: var(--body); line-height: 1.4; letter-spacing: 0.15px; }}
+        .sr-item-snippet mark {{ background: #fef08a; color: var(--ink); padding: 0 2px; border-radius: 2px; }}
+        .sr-empty {{ padding: 24px 16px; text-align: center; color: var(--muted); font-size: 15px; letter-spacing: 0.15px; }}
 
+        /* Hero section with gradient orb */
         .hero {{
-            text-align: center; padding: 120px 20px 48px;
+            position: relative;
+            text-align: center; padding: 96px 20px 48px;
             max-width: 700px; margin: 0 auto;
         }}
-        .hero-emoji {{ font-size: 3rem; margin-bottom: 16px; }}
-        .hero h1 {{
-            font-size: 2.4rem; font-weight: 800; margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--primary), #a855f7);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        .hero::before {{
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--gradient-mint) 0%, transparent 70%);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: -1;
         }}
-        .hero p {{ color: var(--text-muted); font-size: 1.1rem; margin-bottom: 8px; }}
+        .hero::after {{
+            content: '';
+            position: absolute;
+            top: 50px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--gradient-peach) 0%, transparent 70%);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }}
+        .hero h1 {{
+            font-family: 'EB Garamond', 'Times New Roman', serif;
+            font-size: 64px; font-weight: 300; margin-bottom: 16px;
+            line-height: 1.05; letter-spacing: -1.92px; color: var(--ink);
+        }}
+        .hero p {{ color: var(--body); font-size: 18px; margin-bottom: 8px; letter-spacing: 0.18px; }}
 
         .toc {{
-            max-width: 700px; margin: 0 auto 40px; padding: 0 20px;
-            display: flex; flex-direction: column; gap: 8px;
+            max-width: 700px; margin: 0 auto 48px; padding: 0 20px;
+            display: flex; flex-direction: column; gap: 12px;
         }}
         .toc-card {{
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px 20px; background: var(--surface);
-            border-radius: 12px; border: 1px solid var(--border);
-            text-decoration: none; color: var(--text);
+            display: flex; align-items: center; gap: 16px;
+            padding: 20px 24px; background: var(--surface-card);
+            border-radius: 16px; border: 1px solid var(--hairline);
+            text-decoration: none; color: var(--ink);
             transition: all 0.2s;
         }}
         .toc-card:hover {{
-            border-color: var(--primary); box-shadow: 0 4px 16px rgba(99,102,241,0.12);
-            transform: translateY(-1px);
+            border-color: var(--hairline-strong); box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            transform: translateY(-2px);
         }}
         .toc-num {{
-            font-weight: 700; color: var(--primary); font-size: 0.85rem;
-            min-width: 48px;
+            font-weight: 600; color: var(--primary); font-size: 14px;
+            min-width: 60px; text-transform: uppercase; letter-spacing: 0.96px;
         }}
         .toc-title {{
-            flex: 1; font-weight: 500; font-size: 0.95rem;
+            flex: 1; font-weight: 500; font-size: 16px; letter-spacing: 0.16px;
         }}
         .toc-arrow {{
-            color: var(--text-muted); font-size: 1.1rem; transition: transform 0.2s;
+            color: var(--muted); font-size: 20px; transition: transform 0.2s;
         }}
-        .toc-card:hover .toc-arrow {{ transform: translateX(4px); color: var(--primary); }}
+        .toc-card:hover .toc-arrow {{ transform: translateX(4px); color: var(--ink); }}
 
         .bottom-bar {{
-            text-align: center; padding: 24px 20px; color: var(--text-muted);
-            font-size: 0.85rem;
+            text-align: center; padding: 48px 20px 64px; color: var(--muted);
+            font-size: 15px; letter-spacing: 0.15px;
         }}
-        .bottom-bar a {{ color: var(--primary); text-decoration: none; }}
+        .bottom-bar a {{ color: var(--ink); text-decoration: none; font-weight: 500; }}
         .bottom-bar a:hover {{ text-decoration: underline; }}
 
         @media (max-width: 768px) {{
-            .hero h1 {{ font-size: 1.6rem; }}
+            .hero h1 {{ font-size: 48px; letter-spacing: -0.96px; }}
+            .hero::before {{ width: 250px; height: 250px; top: -50px; }}
+            .hero::after {{ width: 200px; height: 200px; right: -50px; }}
             .nav-links {{ display: none; }}
         }}
     </style>
 </head>
 <body>
     <nav class="nav">
-        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <a href="index.html" class="nav-brand"><span>Hermes Tutorial</span></a>
         <div class="nav-links">{nav_links}</div>
         <div class="nav-search">
-            <button class="nav-search-btn" id="searchToggle" aria-label="Search">🔍</button>
+            <button class="nav-search-btn" id="searchToggle" aria-label="Search">Search</button>
             <input class="nav-search-input" id="searchInput" type="text" placeholder="Search tutorial…" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
         </div>
     </nav>
 
     <div class="hero">
-        <div class="hero-emoji">📘</div>
         <h1>Hermes Agent — The Complete Tutorial</h1>
         <p>The AI Agent that ships with reins built in.</p>
-        <p style="margin-top:8px;">
-            By <a href="{AUTHOR_URL}" style="color:var(--primary);font-weight:600;">{AUTHOR_NAME}</a> ·
+        <p style="margin-top:12px;">
+            By <a href="{AUTHOR_URL}" style="color:var(--ink);font-weight:500;">{AUTHOR_NAME}</a> ·
             {AUTHOR_TITLE}
         </p>
     </div>
