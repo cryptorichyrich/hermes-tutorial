@@ -35,20 +35,30 @@ It's not a chatbot. It's an **AI employee** that works 24/7 across all your plat
 
 The AI agent space is crowded. Here's where Hermes sits:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    AI TOOL SPECTRUM                      │
-├──────────────┬──────────────────┬───────────────────────┤
-│   Chatbots   │   Coding Agents  │    Full Agent Platforms│
-│              │                  │                        │
-│ • ChatGPT    │ • Claude Code    │ • Hermes Agent         │
-│ • Claude.ai  │ • GitHub Copilot │ • OpenHands            │
-│ • Gemini     │ • Cursor         │ • MetaGPT              │
-│              │ • Codex CLI      │                        │
-│ Q&A only     │ Code only        │ Everything + Memory    │
-│ No tools     │ IDE-bound        │ Multi-platform         │
-│ No memory    │ No scheduling    │ Persistent context     │
-└──────────────┴──────────────────┴───────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Chatbots["💬 Chatbots"]
+        direction TB
+        C1["ChatGPT"]
+        C2["Claude.ai"]
+        C3["Gemini"]
+        CT["❌ Q&A only · No tools · No memory"]
+    end
+    subgraph CodingAgents["💻 Coding Agents"]
+        direction TB
+        D1["Claude Code"]
+        D2["GitHub Copilot"]
+        D3["Cursor"]
+        D4["Codex CLI"]
+        DT["⚠️ Code only · IDE-bound · No scheduling"]
+    end
+    subgraph FullAgents["🚀 Full Agent Platforms"]
+        direction TB
+        F1["Hermes Agent"]
+        F2["OpenHands"]
+        F3["MetaGPT"]
+        FT["✅ Everything + Memory · Multi-platform · Persistent context"]
+    end
 ```
 
 **Key differentiators:**
@@ -83,27 +93,16 @@ In early 2026, a consensus emerged in the AI world: **the bottleneck isn't the m
 
 Hermes is the first agent that **ships with the harness built in**. Every component maps to a proven principle:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              THE HARNES BUILT INTO HERMES                    │
-│                                                            │
-│  Harness Component    │  Hermes Built-in System             │
-│  ─────────────────────┼─────────────────────────────────── │
-│  Instruction Layer    │  Skill System (auto-created +       │
-│  (teach the AI)       │  self-improving SKILL.md files)     │
-│                       │                                     │
-│  Constraint Layer     │  Tool permissions + sandbox +       │
-│  (keep it safe)       │  toolset enable/disable on demand   │
-│                       │                                     │
-│  Feedback Layer       │  Learning Loop (auto-retrospective  │
-│  (learn from mistakes)│  after each task, skill patching)   │
-│                       │                                     │
-│  Memory Layer         │  Three-layer memory (session +      │
-│  (don't forget)       │  persistent + skill) + FTS5 recall  │
-│                       │                                     │
-│  Orchestration Layer  │  Sub-Agent delegation + cron        │
-│  (coordinate work)    │  scheduling + multi-platform gateway│
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Harness["THE HARNESS BUILT INTO HERMES"]
+        direction TB
+        IL["📖 Instruction Layer<br/><i>Teach the AI</i>"] --> HS["⚙️ Skill System<br/><i>Auto-created + self-improving SKILL.md files</i>"]
+        CL["🔒 Constraint Layer<br/><i>Keep it safe</i>"] --> TP["🛡️ Tool Permissions<br/><i>Sandbox + toolset enable/disable on demand</i>"]
+        FL["🔁 Feedback Layer<br/><i>Learn from mistakes</i>"] --> LL["📊 Learning Loop<br/><i>Auto-retrospective after each task, skill patching</i>"]
+        ML["💾 Memory Layer<br/><i>Don't forget</i>"] --> TM["🗂️ Three-layer Memory<br/><i>Session + persistent + skill + FTS5 recall</i>"]
+        OL["🎼 Orchestration Layer<br/><i>Coordinate work</i>"] --> SA["🤖 Sub-Agent Delegation<br/><i>Cron scheduling + multi-platform gateway</i>"]
+    end
 ```
 
 Other tools require you to build this harness manually — writing config files, setting up hooks, managing memory by hand. Hermes does all five automatically, from your very first conversation.
@@ -315,24 +314,18 @@ Next session, next week, next month — Hermes will **still remember this**. No 
 
 In 5 minutes, you've experienced three core capabilities:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│              HERMES CAPABILITY TRIANGLE                  │
-│                                                         │
-│                    🧠 MEMORY                            │
-│                   /          \                          │
-│                  /            \                         │
-│                 /              \                        │
-│                /                \                       │
-│          🔧 TOOLS ────────── 💬 PLATFORMS              │
-│                                                         │
-│  Memory: Learns & persists across sessions              │
-│  Tools:  Terminal, files, web, browser, code, cron      │
-│  Platforms: Telegram, Discord, Slack, WhatsApp, CLI     │
-│                                                         │
-│  Together = An AI that knows you, acts for you,         │
-│  and meets you where you already work.                  │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    MEM["🧠 MEMORY<br/><i>Learns & persists across sessions</i>"]
+    TOOL["🔧 TOOLS<br/><i>Terminal, files, web, browser, code, cron</i>"]
+    PLAT["💬 PLATFORMS<br/><i>Telegram, Discord, Slack, WhatsApp, CLI</i>"]
+
+    MEM --- TOOL
+    TOOL --- PLAT
+    PLAT --- MEM
+
+    DESC["<b>Together =</b> An AI that knows you, acts for you,<br/>and meets you where you already work."]
+    MEM --> DESC
 ```
 
 **What's next:** In Chapter 2, we'll dive into *how* Hermes works — the agent loop, model selection, toolsets, and configuration. You'll understand what's happening under the hood so you can bend Hermes to your will.
@@ -392,35 +385,18 @@ Now you have Hermes on your phone. **Every feature from the CLI is available thr
 
 Everything Hermes does follows one repeating pattern — the **agent loop**:
 
-```
-┌──────────────────────────────────────────────────────┐
-│                   THE AGENT LOOP                      │
-│                                                      │
-│   ┌──────────┐                                       │
-│   │ 1. BUILD │  Assemble system prompt + context     │
-│   │  PROMPT  │  (memory, skills, tools, history)     │
-│   └────┬─────┘                                       │
-│        ▼                                             │
-│   ┌──────────┐                                       │
-│   │ 2. CALL  │  Send everything to the LLM           │
-│   │   LLM   │  (Claude, GPT-4, Gemini, etc.)        │
-│   └────┬─────┘                                       │
-│        ▼                                             │
-│   ┌──────────┐     Tool call?                        │
-│   │ 3. PARSE │  ┌──────────┐                         │
-│   │ RESPONSE │─►│ YES: Run │─► Append result ─┐      │
-│   └────┬─────┘  │ the tool  │                 │      │
-│        │        └──────────┘                 │      │
-│        │               Text response?         │      │
-│        │        ┌─────────────┐               │      │
-│        └───────►│ DONE: Reply │               │      │
-│                 │ to user     │               │      │
-│                 └─────────────┘               │      │
-│                                               │      │
-│        ◄──────────────────────────────────────┘      │
-│        (Loop back to step 1 with new context)        │
-│                                                      │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>1. BUILD PROMPT</b><br/>Assemble system prompt + context<br/><i>memory, skills, tools, history</i>"]
+    B["<b>2. CALL LLM</b><br/>Send everything to the LLM<br/><i>Claude, GPT-4, Gemini, etc.</i>"]
+    C{"<b>3. PARSE RESPONSE</b><br/>Tool call?"}
+    D["YES: Run the tool"]
+    E["DONE: Reply to user"]
+    F["Append tool result"]
+
+    A --> B --> C
+    C -->|Tool call| D --> F --> A
+    C -->|Text response| E
 ```
 
 Here's what that looks like in practice:
@@ -516,25 +492,32 @@ hermes config set model.provider openrouter
 
 **Model tiers for different tasks:**
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              MODEL SELECTION GUIDE                        │
-│                                                          │
-│  🧠 Complex reasoning     Claude Sonnet 4, GPT-4o       │
-│     Architecture, debugging, multi-step planning         │
-│                                                          │
-│  ⚡ Fast & cheap          Claude Haiku, Gemini Flash     │
-│     Simple tasks, quick questions, bulk operations       │
-│                                                          │
-│  💻 Deep coding           Claude Sonnet 4, DeepSeek V3   │
-│     Code generation, refactoring, PR reviews             │
-│                                                          │
-│  📚 Long context           Gemini 2.5 Pro (1M tokens)   │
-│     Large codebases, document analysis                   │
-│                                                          │
-│  💰 Budget                 DeepSeek V3, Gemini Flash     │
-│     When cost matters more than peak quality             │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Complex["🧠 Complex Reasoning"]
+        CR1["Claude Sonnet 4"]
+        CR2["GPT-4o"]
+        CRD["<i>Architecture, debugging, multi-step planning</i>"]
+    end
+    subgraph Fast["⚡ Fast & Cheap"]
+        FC1["Claude Haiku"]
+        FC2["Gemini Flash"]
+        FCD["<i>Simple tasks, quick questions, bulk operations</i>"]
+    end
+    subgraph Coding["💻 Deep Coding"]
+        DC1["Claude Sonnet 4"]
+        DC2["DeepSeek V3"]
+        DCD["<i>Code generation, refactoring, PR reviews</i>"]
+    end
+    subgraph LongContext["📚 Long Context"]
+        LC1["Gemini 2.5 Pro (1M tokens)"]
+        LCD["<i>Large codebases, document analysis</i>"]
+    end
+    subgraph Budget["💰 Budget"]
+        BU1["DeepSeek V3"]
+        BU2["Gemini Flash"]
+        BUD["<i>When cost matters more than peak quality</i>"]
+    end
 ```
 
 ### Switching Models Mid-Conversation
@@ -566,32 +549,32 @@ When one key hits a rate limit, Hermes silently rotates to the next. No interrup
 
 Models think. **Toolsets act.** Each toolset is a bundle of related capabilities:
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                   HERMES TOOLSETS                         │
-│                                                          │
-│  🌐 web          Search engines + content extraction     │
-│  🔍 search       Web search only (subset of web)         │
-│  🖥️ terminal     Shell commands + process management     │
-│  📁 file         Read, write, search, patch files        │
-│  🌍 browser      Browser automation (Chromium)           │
-│  🐍 code_exec    Sandboxed Python execution              │
-│  👁️ vision       Image analysis                          │
-│  🎨 image_gen    AI image generation                     │
-│  🎬 video        Video analysis & generation             │
-│  🔊 tts          Text-to-speech                          │
-│  🧠 memory       Persistent cross-session memory         │
-│  🔎 session_search  Search past conversations            │
-│  👥 delegation   Subagent task delegation                │
-│  ⏰ cronjob      Scheduled task management               │
-│  ❓ clarify      Ask user clarifying questions            │
-│  📨 messaging    Cross-platform message sending          │
-│  ✅ todo         In-session task planning                 │
-│  📋 kanban       Multi-agent work queues                 │
-│  🎵 spotify      Spotify playback control                │
-│  🏠 homeassistant Smart home control                     │
-│  🔒 safe         Minimal toolset for locked sessions     │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Toolsets["HERMES TOOLSETS"]
+        direction TB
+        T1["🌐 web — Search engines + content extraction"]
+        T2["🔍 search — Web search only"]
+        T3["🖥️ terminal — Shell commands + process management"]
+        T4["📁 file — Read, write, search, patch files"]
+        T5["🌍 browser — Browser automation (Chromium)"]
+        T6["🐍 code_exec — Sandboxed Python execution"]
+        T7["👁️ vision — Image analysis"]
+        T8["🎨 image_gen — AI image generation"]
+        T9["🎬 video — Video analysis & generation"]
+        T10["🔊 tts — Text-to-speech"]
+        T11["🧠 memory — Persistent cross-session memory"]
+        T12["🔎 session_search — Search past conversations"]
+        T13["👥 delegation — Subagent task delegation"]
+        T14["⏰ cronjob — Scheduled task management"]
+        T15["❓ clarify — Ask user clarifying questions"]
+        T16["📨 messaging — Cross-platform message sending"]
+        T17["✅ todo — In-session task planning"]
+        T18["📋 kanban — Multi-agent work queues"]
+        T19["🎵 spotify — Spotify playback control"]
+        T20["🏠 homeassistant — Smart home control"]
+        T21["🔒 safe — Minimal toolset for locked sessions"]
+    end
 ```
 
 ### Managing Toolsets
@@ -635,17 +618,14 @@ Every chat you have with Hermes is a **session** — a self-contained conversati
 
 ### Session Lifecycle
 
-```
-┌─────────┐     ┌──────────┐     ┌──────────┐     ┌─────────┐
-│  NEW     │────►│  ACTIVE  │────►│COMPRESSED│────►│  CLOSED │
-│ SESSION  │     │ SESSION  │     │ SESSION  │     │(archived)│
-└─────────┘     └──────────┘     └──────────┘     └─────────┘
-     │                │                │
-     │                │                │
-     ▼                ▼                ▼
-  Fresh context   Growing context  Summarized context
-  Full tools      Full tools       Full tools
-  No memory       Can save memory  Memory preserved
+```mermaid
+flowchart LR
+    NEW["🆕 NEW SESSION<br/><i>Fresh context · Full tools · No memory</i>"]
+    ACTIVE["✅ ACTIVE SESSION<br/><i>Growing context · Full tools · Can save memory</i>"]
+    COMPRESSED["📦 COMPRESSED SESSION<br/><i>Summarized context · Full tools · Memory preserved</i>"]
+    CLOSED["🗄️ CLOSED (archived)"]
+
+    NEW -->|Start| ACTIVE -->|Compress| COMPRESSED -->|End| CLOSED
 ```
 
 ### Session Commands
@@ -820,45 +800,50 @@ Each profile gets its own:
 
 Let's zoom out and see the complete picture:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    HERMES ARCHITECTURE                       │
-│                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Telegram   │  │   Discord   │  │     CLI     │  ...   │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
-│         │                │                │                 │
-│         └────────────────┼────────────────┘                │
-│                          ▼                                  │
-│                 ┌─────────────────┐                         │
-│                 │     GATEWAY     │  Routes messages        │
-│                 │   (Scheduler)   │  Manages connections    │
-│                 └────────┬────────┘                         │
-│                          ▼                                  │
-│                 ┌─────────────────┐                         │
-│                 │   AGENT LOOP    │  Builds prompt          │
-│                 │                 │  Calls LLM              │
-│                 │  ┌───────────┐  │  Dispatches tools      │
-│                 │  │  Memory   │  │  Manages context        │
-│                 │  │  Skills   │  │                         │
-│                 │  │  Sessions │  │                         │
-│                 │  └───────────┘  │                         │
-│                 └────────┬────────┘                         │
-│                          ▼                                  │
-│         ┌────────────────┼────────────────┐                │
-│         ▼                ▼                ▼                 │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Terminal   │  │    Files    │  │     Web     │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Browser   │  │   Cron      │  │  Delegation │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │               PROVIDERS (20+ LLM APIs)              │   │
-│  │  OpenRouter • Anthropic • OpenAI • Google • ...     │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Platforms["📱 Messaging Platforms"]
+        TG["Telegram"]
+        DC["Discord"]
+        CLI["CLI"]
+        MORE["..."]
+    end
+
+    Platforms --> GW
+
+    subgraph Core["🔧 Core"]
+        GW["🔀 GATEWAY<br/><i>Routes messages · Manages connections</i>"]
+        AL["🔁 AGENT LOOP<br/><i>Builds prompt · Calls LLM · Dispatches tools · Manages context</i>"]
+
+        subgraph Internal["Internal State"]
+            MEM["🧠 Memory"]
+            SKL["📋 Skills"]
+            SES["💬 Sessions"]
+        end
+    end
+
+    GW --> AL
+
+    subgraph Tools["🛠️ Toolsets"]
+        T1["Terminal"]
+        T2["Files"]
+        T3["Web"]
+        T4["Browser"]
+        T5["Cron"]
+        T6["Delegation"]
+    end
+
+    AL --> Tools
+
+    subgraph Providers["☁️ Providers — 20+ LLM APIs"]
+        P1["OpenRouter"]
+        P2["Anthropic"]
+        P3["OpenAI"]
+        P4["Google"]
+        PM["..."]
+    end
+
+    AL --> Providers
 ```
 
 **The flow:**
@@ -931,58 +916,79 @@ Before we move on, let's lock in the terminology:
 
 The **gateway** is a long-running background process that connects your Hermes agent to messaging platforms. It's the bridge between your chat apps and the AI brain:
 
+```mermaid
+flowchart TD
+    subgraph platforms["Messaging Platforms"]
+        direction LR
+        T["💬 Telegram"]
+        D["💬 Discord"]
+        S["💬 Slack"]
+        W["💬 WhatsApp"]
+    end
+
+    platforms -->|"messages"| GW["🔄 GATEWAY<br/><b>Scheduler</b><br/>Routes messages<br/>Manages sessions<br/>Handles platform auth"]
+
+    GW -->|"routes to"| AL["🧠 AGENT LOOP<br/>Same brain<br/>Same memory<br/>Same tools"]
+
+    classDef platform fill:#4a9eff,color:#fff,stroke:#2d7dd2
+    classDef gateway fill:#ff6b35,color:#fff,stroke:#cc5529
+    classDef agent fill:#2ecc71,color:#fff,stroke:#25a25a
+    class T,D,S,W platform
+    class GW gateway
+    class AL agent
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    GATEWAY ARCHITECTURE                      │
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ Telegram  │  │ Discord  │  │  Slack   │  │ WhatsApp │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  │
-│       │              │              │              │         │
-│       └──────────────┴──────────────┴──────────────┘        │
-│                          │                                   │
-│                          ▼                                   │
-│                 ┌─────────────────┐                          │
-│                 │     GATEWAY     │  Routes messages         │
-│                 │   (Scheduler)   │  Manages sessions        │
-│                 │                 │  Handles platform auth   │
-│                 └────────┬────────┘                          │
-│                          │                                   │
-│                          ▼                                   │
-│                 ┌─────────────────┐                          │
-│                 │   AGENT LOOP    │  Same brain              │
-│                 │                 │  Same memory              │
-│                 │                 │  Same tools               │
-│                 └─────────────────┘                          │
-│                                                             │
-│  One session per conversation — switch platforms freely.    │
-└─────────────────────────────────────────────────────────────┘
-```
+
+*One session per conversation — switch platforms freely.*
 
 **Key insight:** The gateway doesn't create a separate Hermes — it connects your existing agent to messaging platforms. Same memory, same tools, same sessions. Start a conversation on Telegram, continue on CLI — it's one agent.
 
 ### Supported Platforms
 
+```mermaid
+flowchart LR
+    subgraph platforms["SUPPORTED MESSAGING PLATFORMS"]
+        direction TB
+        subgraph chat["💬 Chat Apps"]
+            direction TB
+            C1["Telegram"]
+            C2["Discord"]
+            C3["WhatsApp"]
+            C4["WeChat (Weixin)"]
+            C5["iMessage*"]
+        end
+        subgraph biz["🏢 Business"]
+            direction TB
+            B1["Slack"]
+            B2["Microsoft Teams"]
+            B3["DingTalk"]
+            B4["Feishu (Lark)"]
+            B5["WeCom"]
+        end
+        subgraph other["📱 Other"]
+            direction TB
+            O1["Signal"]
+            O2["Matrix"]
+            O3["Mattermost"]
+            O4["SMS"]
+            O5["Email"]
+        end
+        subgraph home["🏠 Smart Home"]
+            direction TB
+            H1["Home Assistant"]
+        end
+        subgraph integ["🔌 Integrations"]
+            direction TB
+            I1["API Server (REST)"]
+            I2["Webhooks"]
+            I3["Open WebUI"]
+        end
+    end
+
+    classDef cat fill:#4a9eff,color:#fff,stroke:#2d7dd2
+    class C1,C2,C3,C4,C5,B1,B2,B3,B4,B5,O1,O2,O3,O4,O5,H1,I1,I2,I3 cat
 ```
-┌────────────────────────────────────────────────────────────┐
-│               SUPPORTED MESSAGING PLATFORMS                 │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  💬 Chat Apps          🏢 Business         📱 Other        │
-│  • Telegram            • Slack             • Signal        │
-│  • Discord             • Microsoft Teams   • Matrix        │
-│  • WhatsApp            • DingTalk          • Mattermost    │
-│  • WeChat (Weixin)     • Feishu (Lark)     • SMS           │
-│  • iMessage*           • WeCom             • Email         │
-│                                                            │
-│  🏠 Smart Home          🔌 Integrations                    │
-│  • Home Assistant       • API Server (REST)                │
-│                         • Webhooks                         │
-│                         • Open WebUI                       │
-│                                                            │
-│  * via BlueBubbles (requires Mac)                          │
-└────────────────────────────────────────────────────────────┘
-```
+
+*\* iMessage via BlueBubbles (requires Mac)*
 
 That's **17+ platforms** — and they all have access to the same tools (terminal, files, web search, browser automation, etc.).
 
@@ -1175,22 +1181,23 @@ hermes config set tts.provider edge     # Free, no API key needed
 
 When you send a voice message, Hermes transcribes it automatically:
 
-```
-┌──────────────────────────────────────────┐
-│           VOICE TRANSCRIPTION FLOW        │
-│                                          │
-│  🎤 Voice message                        │
-│       │                                  │
-│       ▼                                  │
-│  STT Provider (priority order):          │
-│  1. Local faster-whisper  (free)         │
-│  2. Groq Whisper          (free tier)    │
-│  3. OpenAI Whisper        (paid)         │
-│  4. Mistral Voxtral       (paid)         │
-│       │                                  │
-│       ▼                                  │
-│  Transcribed text → Agent loop → Response │
-└──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    VM["🎤 Voice message"] --> STT["STT Provider<br/><i>priority order:</i>"]
+
+    STT --> P1["1. Local faster-whisper<br/><i>free</i>"]
+    STT --> P2["2. Groq Whisper<br/><i>free tier</i>"]
+    STT --> P3["3. OpenAI Whisper<br/><i>paid</i>"]
+    STT --> P4["4. Mistral Voxtral<br/><i>paid</i>"]
+
+    P1 & P2 & P3 & P4 --> RESULT["Transcribed text → Agent loop → Response"]
+
+    classDef voice fill:#9b59b6,color:#fff,stroke:#7d3c98
+    classDef provider fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef result fill:#2ecc71,color:#fff,stroke:#25a25a
+    class VM voice
+    class P1,P2,P3,P4 provider
+    class RESULT result
 ```
 
 **Setup local transcription (free, recommended):**
@@ -1600,40 +1607,21 @@ systemd=true
 
 The most surprising thing about Hermes isn't what it can do — it's that **it changes**. The more you use it, the better it gets. This isn't marketing. It's an observable, verifiable closed loop.
 
+```mermaid
+flowchart TD
+    A["1️⃣ CURATE MEMORY<br/>After each task, decide what's worth<br/>remembering → save to persistent store"]
+    B["2️⃣ CREATE SKILL<br/>If the solution is reusable, distill it<br/>into a SKILL.md with steps + pitfalls"]
+    C["3️⃣ IMPROVE SKILL<br/>When a Skill fails or gets corrected,<br/>patch it — it never makes the same mistake twice"]
+    D["4️⃣ RECALL via FTS5<br/>FTS5 full-text search finds the right<br/>skill/memory instantly on next task"]
+    E["5️⃣ USER MODEL<br/>Over time, Hermes builds a model of<br/>who you are, what you prefer, how you work"]
+
+    A --> B --> C --> D --> E
+
+    classDef step fill:#3498db,color:#fff,stroke:#2980b9,rx:8,ry:8
+    class A,B,C,D,E step
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   THE LEARNING LOOP                          │
-│                                                            │
-│  ┌──────────────┐                                          │
-│  │ 1. CURATE    │  After each task, decide what's worth    │
-│  │    MEMORY    │  remembering → save to persistent store   │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 2. CREATE    │  If the solution is reusable, distill it │
-│  │    SKILL     │  into a SKILL.md with steps + pitfalls   │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 3. IMPROVE   │  When a Skill fails or gets corrected,   │
-│  │    SKILL     │  patch it — it never makes the same       │
-│  │              │  mistake twice                            │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 4. RECALL    │  FTS5 full-text search finds the right   │
-│  │    (FTS5)    │  skill/memory instantly on next task      │
-│  └──────┬───────┘                                          │
-│         ▼                                                  │
-│  ┌──────────────┐                                          │
-│  │ 5. USER      │  Over time, Hermes builds a model of     │
-│  │    MODEL     │  who you are, what you prefer, how you   │
-│  │              │  work → injected into every session       │
-│  └──────────────┘                                          │
-│                                                            │
-│  Nobody teaches it any of this. It figures it out alone.   │
-└────────────────────────────────────────────────────────────┘
-```
+
+*Nobody teaches it any of this. It figures it out alone.*
 
 **Step 1: Memory Curation** — After each conversation, Hermes actively decides what's worth remembering. Not brute-force chat history dumps — selective, indexed saves to a SQLite database with FTS5 full-text search. (Covered in §4.3)
 
@@ -1657,37 +1645,22 @@ A **skill** is a structured document that teaches Hermes how to handle a specifi
 
 Every skill is a `SKILL.md` file with YAML frontmatter and a markdown body:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                   SKILL STRUCTURE                           │
-│                                                            │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │  --- (YAML frontmatter)                          │      │
-│  │  name: my-skill                                  │      │
-│  │  description: "What this skill does"             │      │
-│  │  version: 1.0.0                                  │      │
-│  │  author: Your Name                               │      │
-│  │  metadata:                                       │      │
-│  │    hermes:                                       │      │
-│  │      tags: [tag1, tag2]                          │      │
-│  │  ---                                             │      │
-│  ├──────────────────────────────────────────────────┤      │
-│  │  # Skill Name                                    │      │
-│  │                                                  │      │
-│  │  ## When to Use                                  │      │
-│  │  Trigger conditions...                           │      │
-│  │                                                  │      │
-│  │  ## Steps                                        │      │
-│  │  1. Do this with `exact-command`                 │      │
-│  │  2. Then check that                              │      │
-│  │  3. Pitfall: don't forget X                     │      │
-│  │                                                  │      │
-│  │  ## Verification                                 │      │
-│  │  How to confirm it worked...                     │      │
-│  └──────────────────────────────────────────────────┘      │
-│                                                            │
-│  Optional: references/, templates/, scripts/               │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph skill["SKILL STRUCTURE"]
+        FM["📋 YAML frontmatter<br/>name · description · version · author<br/>metadata → tags"]
+        BODY["📝 Markdown Body<br/><br/># Skill Name<br/>## When to Use — trigger conditions<br/>## Steps — numbered with exact commands<br/>## Verification — confirm it worked"]
+        OPT["📁 Optional Extras<br/>references/ · templates/ · scripts/"]
+    end
+
+    FM --> BODY --> OPT
+
+    classDef yaml fill:#f39c12,color:#fff,stroke:#d68910
+    classDef md fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef opt fill:#95a5a6,color:#fff,stroke:#7f8c8d
+    class FM yaml
+    class BODY md
+    class OPT opt
 ```
 
 The YAML frontmatter provides metadata (name, description, tags, version). The markdown body is the actual knowledge — step-by-step procedures, commands, pitfalls, and verification steps.
@@ -1715,36 +1688,53 @@ hermes skills install https://raw.githubusercontent.com/user/repo/main/SKILL.md
 
 **Category highlights:**
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                 SKILL CATEGORIES (88+ skills)             │
-│                                                          │
-│  🔧 Software Dev        🎨 Creative        🌐 Web Dev    │
-│  • debugging             • ascii-art         • blog       │
-│  • test-driven-dev       • design-md         • fullstack  │
-│  • writing-plans         • excalidraw        • devcard    │
-│  • spike                 • sketch            • web-dkc    │
-│                                                          │
-│  🤖 AI Agents            📊 Data Science     📝 Productivity│
-│  • claude-code           • jupyter-live      • notion     │
-│  • codex                 •                    • linear     │
-│  • kilocode              •                    • google-ws  │
-│  • opencode              •                    • powerpoint │
-│                                                          │
-│  🎮 Gaming & Media       🔬 Research         🏠 Smart Home│
-│  • youtube-content       • arxiv             • openhue    │
-│  • gif-search            • blogwatcher       •            │
-│  • spotify               • polymarket        •            │
-│  • songsee               • llm-wiki          •            │
-│                                                          │
-│  🔒 Red Teaming          🛠 DevOps           📧 Email     │
-│  • godmode               • webhook-subs      • himalaya   │
-│                          • kanban                          │
-│                                                          │
-│  🚀 Autonomous Agents                                     │
-│  • hermes-agent (you're using it now!)                    │
-│  • kanban-worker, kanban-orchestrator                     │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph cats["SKILL CATEGORIES — 88+ skills"]
+        direction TB
+        subgraph sw["🔧 Software Dev"]
+            SW1["debugging · test-driven-dev<br/>writing-plans · spike"]
+        end
+        subgraph cr["🎨 Creative"]
+            CR1["ascii-art · design-md<br/>excalidraw · sketch"]
+        end
+        subgraph wd["🌐 Web Dev"]
+            WD1["blog · fullstack<br/>devcard · web-dkc"]
+        end
+        subgraph ai["🤖 AI Agents"]
+            AI1["claude-code · codex<br/>kilocode · opencode"]
+        end
+        subgraph ds["📊 Data Science"]
+            DS1["jupyter-live"]
+        end
+        subgraph pr["📝 Productivity"]
+            PR1["notion · linear<br/>google-ws · powerpoint"]
+        end
+        subgraph gm["🎮 Gaming & Media"]
+            GM1["youtube-content · gif-search<br/>spotify · songsee"]
+        end
+        subgraph rs["🔬 Research"]
+            RS1["arxiv · blogwatcher<br/>polymarket · llm-wiki"]
+        end
+        subgraph sh["🏠 Smart Home"]
+            SH1["openhue"]
+        end
+        subgraph rt["🔒 Red Teaming"]
+            RT1["godmode"]
+        end
+        subgraph dv["🛠 DevOps"]
+            DV1["webhook-subs · kanban"]
+        end
+        subgraph em["📧 Email"]
+            EM1["himalaya"]
+        end
+        subgraph aa["🚀 Autonomous Agents"]
+            AA1["hermes-agent<br/>kanban-worker · kanban-orchestrator"]
+        end
+    end
+
+    classDef cat fill:#3498db,color:#fff,stroke:#2980b9
+    class SW1,CR1,WD1,AI1,DS1,PR1,GM1,RS1,SH1,RT1,DV1,EM1,AA1 cat
 ```
 
 ### Loading Skills into a Session
@@ -1803,25 +1793,23 @@ Hermes: ✓ Skill saved as "systematic-debugging"
 
 Hermes has a built-in **curator** that automatically maintains skills over time:
 
+```mermaid
+flowchart LR
+    ACTIVE["✅ ACTIVE<br/><i>in use</i>"] -->|"idle over time"| STALE["⏳ STALE<br/><i>idle</i>"]
+    STALE -->|"further idle"| ARCHIVED["📦 ARCHIVED<br/><i>backed up</i>"]
+
+    classDef active fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef stale fill:#f39c12,color:#fff,stroke:#d68910
+    classDef archived fill:#95a5a6,color:#fff,stroke:#7f8c8d
+    class ACTIVE active
+    class STALE stale
+    class ARCHIVED archived
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   CURATOR LIFECYCLE                         │
-│                                                            │
-│  ┌─────────┐     ┌─────────┐     ┌─────────┐             │
-│  │  ACTIVE  │────►│  STALE  │────►│ ARCHIVED│             │
-│  │  (in use)│     │ (idle)  │     │ (backed  │             │
-│  │          │     │         │     │  up)     │             │
-│  └─────────┘     └─────────┘     └─────────┘             │
-│       │               │                                    │
-│       │          Usage tracked via                          │
-│       │          .usage.json                                │
-│       │                                                    │
-│  Pinned skills are exempt from all auto-transitions.       │
-│  Only agent-created skills are touched.                    │
-│  Hub/bundled skills are never modified.                    │
-│  Nothing is ever deleted — max action is archive.          │
-└────────────────────────────────────────────────────────────┘
-```
+
+- Usage tracked via `.usage.json`
+- Pinned skills are exempt from all auto-transitions
+- Only agent-created skills are touched; hub/bundled skills are never modified
+- Nothing is ever deleted — max action is archive
 
 ```bash
 # Check curator status
@@ -1848,39 +1836,24 @@ While skills store *procedures*, **memory** stores *facts*. Memory survives acro
 
 ### Two Memory Stores
 
+```mermaid
+flowchart TD
+    subgraph memory["MEMORY ARCHITECTURE"]
+        UP["👤 USER PROFILE<br/><b>Who you are:</b><br/>• Name, role, timezone<br/>• Tech stack preferences<br/>• Communication style<br/>• Device info<br/><br/><i>\"Bio is a senior fullstack<br/>architect using React,<br/>TypeScript, Flutter...\"</i>"]
+        AN["🤖 AGENT NOTES<br/><b>What Hermes has learned:</b><br/>• Environment facts<br/>• Project conventions<br/>• Tool quirks discovered<br/>• Lessons from mistakes<br/><br/><i>\"Hermes home is at<br/>C:\\Users\\bio\\AppData...\"</i>"]
+    end
+
+    UP & AN -->|"injected into<br/>every session"| SESSION["💬 Every Session"]
+
+    classDef profile fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef notes fill:#e74c3c,color:#fff,stroke:#c0392b
+    classDef session fill:#2ecc71,color:#fff,stroke:#25a25a
+    class UP profile
+    class AN notes
+    class SESSION session
 ```
-┌────────────────────────────────────────────────────────────┐
-│                   MEMORY ARCHITECTURE                       │
-│                                                            │
-│  ┌──────────────────────────────┐                          │
-│  │       USER PROFILE           │                          │
-│  │  Who you are:                │                          │
-│  │  • Name, role, timezone      │                          │
-│  │  • Tech stack preferences    │                          │
-│  │  • Communication style       │                          │
-│  │  • Device info               │                          │
-│  │                              │                          │
-│  │  "Bio is a senior fullstack  │                          │
-│  │   architect using React,     │                          │
-│  │   TypeScript, Flutter..."    │                          │
-│  └──────────────────────────────┘                          │
-│                                                            │
-│  ┌──────────────────────────────┐                          │
-│  │       AGENT NOTES            │                          │
-│  │  What Hermes has learned:    │                          │
-│  │  • Environment facts         │                          │
-│  │  • Project conventions       │                          │
-│  │  • Tool quirks discovered    │                          │
-│  │  • Lessons from mistakes     │                          │
-│  │                              │                          │
-│  │  "Hermes home is at          │                          │
-│  │   C:\Users\bio\AppData..."   │                          │
-│  └──────────────────────────────┘                          │
-│                                                            │
-│  Both are injected into every session automatically.       │
-│  Memory is compact — only facts that persist.              │
-└────────────────────────────────────────────────────────────┘
-```
+
+*Both are injected into every session automatically. Memory is compact — only facts that persist.*
 
 ### How Memory Gets Saved
 
@@ -1948,22 +1921,16 @@ Hermes: [searches session history]
 
 **Three search modes:**
 
-```
-┌────────────────────────────────────────────────────────┐
-│              SESSION SEARCH MODES                       │
-│                                                        │
-│  1. DISCOVERY — search by keyword                      │
-│     session_search(query="docker networking")          │
-│     Returns: matching sessions + context windows       │
-│                                                        │
-│  2. SCROLL — read inside a found session               │
-│     session_search(session_id="...", around_msg=42)    │
-│     Returns: ±5 messages around the match              │
-│                                                        │
-│  3. BROWSE — recent sessions chronologically           │
-│     session_search()                                   │
-│     Returns: latest sessions with previews             │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph modes["SESSION SEARCH MODES"]
+        M1["1️⃣ DISCOVERY — search by keyword<br/><code>session_search(query='docker networking')</code><br/>→ matching sessions + context windows"]
+        M2["2️⃣ SCROLL — read inside a found session<br/><code>session_search(session_id='...', around_msg=42)</code><br/>→ ±5 messages around the match"]
+        M3["3️⃣ BROWSE — recent sessions chronologically<br/><code>session_search()</code><br/>→ latest sessions with previews"]
+    end
+
+    classDef mode fill:#9b59b6,color:#fff,stroke:#7d3c98
+    class M1,M2,M3 mode
 ```
 
 ### Memory Backends
@@ -1993,28 +1960,36 @@ hermes memory off
 
 Profiles let you run multiple independent Hermes configurations on the same machine:
 
-```
-┌────────────────────────────────────────────────────────┐
-│                  PROFILE ARCHITECTURE                   │
-│                                                        │
-│  ~/.hermes/                                            │
-│  ├── config.yaml           ← Default profile           │
-│  ├── .env                                             │
-│  ├── skills/                                          │
-│  ├── sessions/                                        │
-│  ├── profiles/                                        │
-│  │   ├── work/              ← Work profile             │
-│  │   │   ├── config.yaml    (separate model, tools)    │
-│  │   │   ├── .env           (separate API keys)        │
-│  │   │   ├── skills/        (separate skills)          │
-│  │   │   └── sessions/      (separate history)         │
-│  │   └── personal/          ← Personal profile         │
-│  │       ├── config.yaml                               │
-│  │       ├── .env                                      │
-│  │       ├── skills/                                   │
-│  │       └── sessions/                                 │
-│  └── state.db              ← Shared session store      │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph hermes["~/.hermes/"]
+        CFG["📄 config.yaml<br/><i>← Default profile</i>"]
+        ENV["🔐 .env"]
+        SKILLS["📁 skills/"]
+        SESSIONS["📁 sessions/"]
+        STATE["🗄️ state.db<br/><i>← Shared session store</i>"]
+        subgraph profiles["📁 profiles/"]
+            subgraph work["🏢 work/ — Work profile"]
+                WCFG["📄 config.yaml<br/><i>separate model, tools</i>"]
+                WENV["🔐 .env<br/><i>separate API keys</i>"]
+                WSKILLS["📁 skills/<br/><i>separate skills</i>"]
+                WSESSIONS["📁 sessions/<br/><i>separate history</i>"]
+            end
+            subgraph personal["🏠 personal/ — Personal profile"]
+                PCFG["📄 config.yaml"]
+                PENV["🔐 .env"]
+                PSKILLS["📁 skills/"]
+                PSESSIONS["📁 sessions/"]
+            end
+        end
+    end
+
+    classDef file fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef dir fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef profile fill:#e74c3c,color:#fff,stroke:#c0392b
+    class CFG,ENV,STATE,WCFG,WENV,PCFG,PENV file
+    class SKILLS,SESSIONS,WSKILLS,WSESSIONS,PSKILLS,PSESSIONS dir
+    class profiles,work,personal profile
 ```
 
 **Each profile gets its own:** config, API keys, skills, sessions, and memory.
@@ -2066,17 +2041,24 @@ hermes auth remove openrouter 2
 hermes auth reset openrouter
 ```
 
+```mermaid
+flowchart LR
+    K1["🔑 Key 1"] -->|"Rate limited?"| R1["🔄 Rotate"]
+    K2["🔑 Key 2"] -->|"Rate limited?"| R2["🔄 Rotate"]
+    K3["🔑 Key 3"] -->|"Available!"| USE["✅ Use this"]
+
+    R1 --> K2
+    R2 --> K3
+
+    classDef key fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef rotate fill:#f39c12,color:#fff,stroke:#d68910
+    classDef use fill:#2ecc71,color:#fff,stroke:#25a25a
+    class K1,K2,K3 key
+    class R1,R2 rotate
+    class USE use
 ```
-┌────────────────────────────────────────────────────────┐
-│              CREDENTIAL ROTATION                        │
-│                                                        │
-│  Key 1: sk-or-v1-aaaa  ──►  Rate limited? ──► Rotate  │
-│  Key 2: sk-or-v1-bbbb  ──►  Rate limited? ──► Rotate  │
-│  Key 3: sk-or-v1-cccc  ──►  Available! ──► Use this   │
-│                                                        │
-│  Automatic, silent, zero interruption.                 │
-└────────────────────────────────────────────────────────┘
-```
+
+*Automatic, silent, zero interruption.*
 
 **When this matters:**
 - Heavy cron job schedules hitting the same provider
@@ -2098,29 +2080,35 @@ compression:
   target_ratio: 0.20  # Compress down to 20% of original
 ```
 
+```mermaid
+flowchart TD
+    subgraph lifecycle["CONTEXT LIFECYCLE"]
+        direction LR
+        NEW["📄 New session<br/><i>empty</i>"] -->|"messages arrive"| GROW["📈 Growing<br/><i>messages accumulating</i>"]
+        GROW -->|"50% full"| NEAR["⚠️ Near limit"]
+        NEAR -->|"auto-trigger"| COMP["📦 Compressed<br/><i>summarized</i>"]
+    end
+
+    subgraph before["Before compression"]
+        B1["msg 1"] --- B2["msg 2"] --- BD["..."] --- B48["msg 48"] --- B49["msg 49"] --- BN["new"]
+    end
+
+    subgraph after["After compression"]
+        SUM["📝 Summary of<br/>msgs 1-47"] --- A48["msg 48"] --- A49["msg 49"] --- AN["new"] --- AD["..."]
+    end
+
+    NEAR -.->|"shows"| before
+    COMP -.->|"becomes"| after
+
+    classDef phase fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef old fill:#e74c3c,color:#fff,stroke:#c0392b
+    classDef sum fill:#2ecc71,color:#fff,stroke:#25a25a
+    class NEW,GROW,NEAR,COMP phase
+    class B1,B2,BD,B48,B49,BN old
+    class SUM,A48,A49,AN,AD sum
 ```
-┌────────────────────────────────────────────────────────┐
-│              CONTEXT LIFECYCLE                          │
-│                                                        │
-│  New session ─► Growing ─► Near limit ─► Compressed    │
-│  [empty]       [messages]  [50% full]   [summarized]   │
-│                                                        │
-│  Before compression:                                   │
-│  ╔══════════════════════════════════════════════╗      │
-│  ║ msg 1 ║ msg 2 ║ ... ║ msg 48 ║ msg 49 ║ new ║      │
-│  ╚══════════════════════════════════════════════╝      │
-│                                                        │
-│  After compression:                                    │
-│  ╔════════════════╤══════════════════════════════╗     │
-│  ║ [summary of    │ msg 48 ║ msg 49 ║ new ║ ... ║     │
-│  ║  msgs 1-47]    │                              ║     │
-│  ╚════════════════╧══════════════════════════════╝     │
-│                                                        │
-│  Recent messages preserved verbatim.                   │
-│  Older messages become a summary.                      │
-│  You can also trigger manually: /compress              │
-└────────────────────────────────────────────────────────┘
-```
+
+*Recent messages preserved verbatim. Older messages become a summary. You can also trigger manually: `/compress`*
 
 ---
 
@@ -2267,24 +2255,14 @@ You've set up Hermes, connected it to Telegram, built up skills and memory. But 
 - **Scale** — one Hermes can monitor 10 systems, write 2 blog posts a day, and review every PR
 - **Freedom** — you sleep, Hermes works. You code, Hermes handles ops.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              THE AUTOMATION SPECTRUM                        │
-│                                                            │
-│  MANUAL          SCHEDULED          EVENT-DRIVEN           │
-│  (you type)      (cron jobs)        (webhooks)             │
-│                                                            │
-│  ┌──────┐        ┌──────────┐       ┌──────────┐          │
-│  │ You  │        │ Scheduler│       │  Hook    │          │
-│  │  →   │        │  →       │       │  →       │          │
-│  │ Hermes│       │ Hermes   │       │ Hermes   │          │
-│  └──────┘        └──────────┘       └──────────┘          │
-│                                                            │
-│  "Write this"    "Every day at 9am"  "When PR is opened"  │
-│                                                            │
-│  ──────────────────────────────────────────────────────    │
-│  LOW AUTONOMY ────────────────────────── HIGH AUTONOMY    │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph spectrum ["THE AUTOMATION SPECTRUM — LOW AUTONOMY → HIGH AUTONOMY"]
+        M["MANUAL\n(you type)\nYou → Hermes\n\"Write this\""]
+        S["SCHEDULED\n(cron jobs)\nScheduler → Hermes\n\"Every day at 9am\""]
+        E["EVENT-DRIVEN\n(webhooks)\nHook → Hermes\n\"When PR is opened\""]
+    end
+    M --> S --> E
 ```
 
 Hermes gives you four automation mechanisms, each with a different trigger:
@@ -2316,25 +2294,21 @@ hermes cron create "30m"
 
 During creation, Hermes walks you through the key settings:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                CRON JOB ANATOMY                             │
-│                                                            │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Schedule:  "0 9 * * *"        ← When it runs        │  │
-│  │  Name:      "morning-digest"   ← Human label         │  │
-│  │  Prompt:    "Check emails..."  ← What Hermes does    │  │
-│  │  Skills:    [email, summary]   ← Preloaded knowledge │  │
-│  │  Model:     claude-sonnet-4    ← Optional override   │  │
-│  │  Deliver:   telegram           ← Where output goes   │  │
-│  │  Workdir:   ~/projects/app     ← Project context     │  │
-│  │  Enabled:   [x]                ← Active or paused    │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                            │
-│  Result: Hermes wakes up at 9am, loads the email and       │
-│  summary skills, checks your inbox, writes a digest,       │
-│  and delivers it to your Telegram.                         │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph anatomy ["CRON JOB ANATOMY"]
+        direction TB
+        S["Schedule: \"0 9 * * *\" — When it runs"]
+        N["Name: \"morning-digest\" — Human label"]
+        P["Prompt: \"Check emails...\" — What Hermes does"]
+        SK["Skills: [email, summary] — Preloaded knowledge"]
+        MO["Model: claude-sonnet-4 — Optional override"]
+        D["Deliver: telegram — Where output goes"]
+        W["Workdir: ~/projects/app — Project context"]
+        E["Enabled: [x] — Active or paused"]
+    end
+    S --> N --> P --> SK --> MO --> D --> W --> E
+    E -.->|"Result: Hermes wakes up at 9am,\nloads skills, checks inbox,\nwrites digest, delivers to Telegram"| R((📰 Digest))
 ```
 
 ### Schedule Formats
@@ -2428,30 +2402,26 @@ A daily digest might use a fast/cheap model, while a code review job needs the b
 
 Not every scheduled task needs an LLM. **Script-only jobs** run a script and deliver its output verbatim — no agent loop, no tokens, no model call:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│            SCRIPT-ONLY vs AGENT JOBS                        │
-│                                                            │
-│  AGENT JOB                    SCRIPT-ONLY JOB              │
-│  (default)                    (no_agent: true)             │
-│                                                            │
-│  Schedule tick                Schedule tick                │
-│       │                            │                       │
-│       ▼                            ▼                       │
-│  Load agent                  Run script                    │
-│       │                            │                       │
-│       ▼                            ▼                       │
-│  Load skills                 Capture stdout                │
-│       │                            │                       │
-│       ▼                            ▼                       │
-│  Run LLM prompt              ┌─ stdout empty? → SILENT    │
-│       │                      │  stdout has text? → SEND   │
-│       ▼                      │  exit non-zero? → ERROR    │
-│  Deliver response             └                            │
-│                                                            │
-│  ~5-50K tokens/job           ~0 tokens/job                │
-│  Minutes per run             Seconds per run              │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph agent ["AGENT JOB (default)"]
+        A1["Schedule tick"] --> A2["Load agent"]
+        A2 --> A3["Load skills"]
+        A3 --> A4["Run LLM prompt"]
+        A4 --> A5["Deliver response"]
+    end
+
+    subgraph script ["SCRIPT-ONLY JOB (no_agent: true)"]
+        B1["Schedule tick"] --> B2["Run script"]
+        B2 --> B3["Capture stdout"]
+        B3 --> B4{"stdout?"}
+        B4 -->|"empty"| B5["SILENT — nothing sent"]
+        B4 -->|"has text"| B6["SEND — deliver verbatim"]
+        B4 -->|"exit non-zero"| B7["ERROR — alert sent"]
+    end
+
+    A5 -.- NOTE1["~5-50K tokens/job\nMinutes per run"]
+    B5 -.- NOTE2["~0 tokens/job\nSeconds per run"]
 ```
 
 **When to use script-only:**
@@ -2503,24 +2473,17 @@ hermes cron create "every 10m" \
 
 **How it works:**
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              GATEWAY HEARTBEAT (every 10 min)               │
-│                                                            │
-│  1. Check gateway PID — is the process running?            │
-│  2. Check gateway.log — has it been written to recently?   │
-│                                                            │
-│  ┌──────────┐                                              │
-│  │ ALIVE?   │── YES ──► Silent exit (nothing sent)         │
-│  │          │                                              │
-│  │          │── NO ───► Kill zombie PIDs                   │
-│  └──────────┘            │                                 │
-│                          ▼                                 │
-│                    Restart gateway                          │
-│                    Notify you via Telegram                   │
-│                                                            │
-│  Cost: $0.00 — no LLM tokens used. It's a Python script.  │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["GATEWAY HEARTBEAT\nevery 10 min"] --> B{"ALIVE?"}
+    B -->|"YES"| C["Silent exit\n(nothing sent)"]
+    B -->|"NO"| D["Kill zombie PIDs"]
+    D --> E["Restart gateway"]
+    E --> F["Notify you via Telegram"]
+
+    style A fill:#e3f2fd
+    style C fill:#e8f5e9
+    style F fill:#fff3e0
 ```
 
 **Key details:**
@@ -2557,26 +2520,18 @@ This gives you **two safety nets** — the internal cron heartbeat (runs while t
 
 Jobs can chain together — the output of Job A feeds as context into Job B:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                JOB CHAINING WITH context_from               │
-│                                                            │
-│  ┌──────────────┐     ┌──────────────┐     ┌───────────┐  │
-│  │   JOB A      │     │   JOB B      │     │  JOB C    │  │
-│  │              │     │              │     │           │  │
-│  │ Collect data │────►│ Summarize    │────►│ Deliver   │  │
-│  │ (script)     │     │ (LLM agent)  │     │ (telegram)│  │
-│  └──────────────┘     └──────────────┘     └───────────┘  │
-│                                                            │
-│  Job B config:                                             │
-│    context_from: ["job-a-id"]                              │
-│                                                            │
-│  Job C config:                                             │
-│    context_from: ["job-b-id"]                              │  │
-│                                                            │
-│  Note: uses the MOST RECENT completed output,              │
-│  does NOT wait for upstream jobs in the same tick.         │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph chain ["JOB CHAINING WITH context_from"]
+        A["JOB A\nCollect data\n(script)"]
+        B["JOB B\nSummarize\n(LLM agent)"]
+        C["JOB C\nDeliver\n(telegram)"]
+    end
+    A -->|"stdout"| B
+    B -->|"analysis"| C
+
+    B -.- NOTE_B["context_from: [\"job-a-id\"]"]
+    C -.- NOTE_C["context_from: [\"job-b-id\"]"]
 ```
 
 **Practical example — daily competitive intelligence:**
@@ -2621,32 +2576,22 @@ hermes webhook remove deploy-hook
 
 This creates an HTTP endpoint at `/webhooks/deploy-hook`. When an external service (GitHub, Stripe, your CI) sends a POST to that endpoint, Hermes processes it.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                WEBHOOK EVENT FLOW                           │
-│                                                            │
-│  GitHub PR opened          Stripe payment                  │
-│       │                         │                          │
-│       ▼                         ▼                          │
-│  POST /webhooks/pr-hook   POST /webhooks/payment          │
-│       │                         │                          │
-│       └──────────┬──────────────┘                          │
-│                  │                                         │
-│                  ▼                                         │
-│         ┌──────────────┐                                   │
-│         │   GATEWAY    │  Receives HTTP POST               │
-│         │              │  Parses payload                   │
-│         └──────┬───────┘  Triggers agent                   │
-│                │                                           │
-│                ▼                                           │
-│         ┌──────────────┐                                   │
-│         │ AGENT LOOP   │  Processes event                  │
-│         │              │  Runs tools                       │
-│         │              │  Delivers response                │
-│         └──────────────┘                                   │
-│                                                            │
-│  No schedule needed — pure event-driven.                   │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    GH["GitHub PR opened"] --> POST1["POST /webhooks/pr-hook"]
+    SP["Stripe payment"] --> POST2["POST /webhooks/payment"]
+    POST1 --> GW
+    POST2 --> GW
+
+    subgraph gateway ["GATEWAY"]
+        GW["Receives HTTP POST\nParses payload\nTriggers agent"]
+    end
+
+    GW --> AL
+
+    subgraph agentloop ["AGENT LOOP"]
+        AL["Processes event\nRuns tools\nDelivers response"]
+    end
 ```
 
 **Common webhook patterns:**
@@ -2670,30 +2615,14 @@ terminal(command="npm run build", background=True, notify_on_complete=True)
 # You get notified when it finishes
 ```
 
-```
-┌────────────────────────────────────────────────────────────┐
-│            BACKGROUND TASK LIFECYCLE                        │
-│                                                            │
-│  ┌──────────┐     ┌──────────┐     ┌──────────┐          │
-│  │  START   │────►│ RUNNING  │────►│  DONE    │          │
-│  │          │     │          │     │          │          │
-│  │ terminal( │    │ process( │     │  Auto-   │          │
-│  │ bg=true) │     │ poll)    │     │ notify   │          │
-│  └──────────┘     └────┬─────┘     └──────────┘          │
-│                        │                                    │
-│                        ▼                                    │
-│                   ┌──────────┐                              │
-│                   │ CHECK    │  poll → see progress         │
-│                   │ PROGRESS │  log → full output           │
-│                   │          │  wait → block until done     │
-│                   └──────────┘                              │
-│                                                            │
-│  notify_on_complete=True → exact ONE notification at end   │
-│  watch_patterns=["Build OK"] → notify on rare mid-run text │
-│                                                            │
-│  ⚠️ watch_patterns has a rate limit: 1 notification        │
-│     per 15 seconds. Use notify_on_complete for end-of-run. │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    START["START\nterminal(bg=true)"] --> RUNNING["RUNNING\nprocess(poll)"]
+    RUNNING --> DONE["DONE\nAuto-notify"]
+    RUNNING --> CHECK["CHECK PROGRESS\npoll → see progress\nlog → full output\nwait → block until done"]
+
+    DONE -.- NOTE1["notify_on_complete=True →\none notification at end"]
+    CHECK -.- NOTE2["watch_patterns=[\"Build OK\"] →\nnotify on rare mid-run text\n(rate limit: 1 per 15 sec)"]
 ```
 
 **Process management commands:**
@@ -2730,34 +2659,18 @@ process(action="close", session_id="...")
 
 Running autonomous agents on a schedule comes with responsibility. Here's how to keep things safe:
 
-```
-┌────────────────────────────────────────────────────────────┐
-│               CRON SAFETY CHECKLIST                         │
-│                                                            │
-│  ✅ PROMPT: Self-contained — no chat context available     │
-│     Cron jobs run in fresh sessions. Include everything    │
-│     the agent needs to know in the prompt.                 │
-│                                                            │
-│  ✅ SKILLS: Attach the right skills                        │
-│     A cron job has no conversation history to draw from.   │
-│     Skills inject the knowledge it needs.                  │
-│                                                            │
-│  ✅ NO RECURSIVE CRON: Cron jobs must NOT create more      │
-│     cron jobs. Period. This prevents runaway scheduling.   │
-│                                                            │
-│  ✅ TIMEOUT: 3-minute hard limit per run                   │
-│     Hermes enforces this — no infinite loops.              │
-│                                                            │
-│  ✅ DEDUP: .tick.lock prevents duplicate ticks             │
-│     Two gateway processes won't run the same job twice.    │
-│                                                            │
-│  ✅ MEMORY: Cron sessions skip memory by default            │
-│     They don't pollute your memory with scheduled output.  │
-│                                                            │
-│  ✅ SCRIPT JOBS: Design for silence                         │
-│     Empty stdout = nothing sent. Only output alerts,       │
-│     not "everything is fine" noise.                        │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph safety ["CRON SAFETY CHECKLIST"]
+        P["PROMPT: Self-contained — no chat context available\nCron jobs run in fresh sessions.\nInclude everything the agent needs to know."]
+        SK["SKILLS: Attach the right skills\nA cron job has no conversation history.\nSkills inject the knowledge it needs."]
+        NR["NO RECURSIVE CRON: Cron jobs must NOT\ncreate more cron jobs. Prevents runaway scheduling."]
+        TO["TIMEOUT: 3-minute hard limit per run\nHermes enforces this — no infinite loops."]
+        DD["DEDUP: .tick.lock prevents duplicate ticks\nTwo gateway processes won't run the same job twice."]
+        MEM["MEMORY: Cron sessions skip memory by default\nThey don't pollute your memory with scheduled output."]
+        SC["SCRIPT JOBS: Design for silence\nEmpty stdout = nothing sent.\nOnly output alerts, not noise."]
+    end
+    P --> SK --> NR --> TO --> DD --> MEM --> SC
 ```
 
 ### Cost Awareness
@@ -2780,78 +2693,45 @@ Cron jobs consume tokens. Here's a rough guide:
 
 ### Workflow 1: Content Marketing Engine
 
-```
-┌────────────────────────────────────────────────────────────┐
-│           DAILY BLOG PIPELINE (2 articles/day)              │
-│                                                            │
-│  8:00 AM ─► Job "morning-article"                          │
-│             Skills: [blog, marketing-copy, humanizer]       │
-│             Prompt: "Write today's morning article..."      │
-│             Deliver: telegram                               │
-│             │                                               │
-│             ▼                                               │
-│             Hermes researches topics, writes, edits,        │
-│             and publishes. You get a notification.          │
-│                                                            │
-│  6:00 PM ─► Job "evening-article"                          │
-│             Same pipeline, different time slot.             │
-│                                                            │
-│  Weekly  ─► Job "content-digest"                           │
-│             context_from: [morning, evening]                │
-│             Summarizes the week's content performance.      │
-│                                                            │
-│  Cost: ~$1.50-3.00/day                                     │
-│  Value: Replaces $2,000-5,000/mo content writer             │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph pipeline ["DAILY BLOG PIPELINE (2 articles/day)"]
+        M["8:00 AM — Job: morning-article\nSkills: [blog, marketing-copy, humanizer]\nPrompt: Write today's morning article...\nDeliver: telegram"]
+        M --> MH["Hermes researches topics,\nwrites, edits, and publishes.\nYou get a notification."]
+        E["6:00 PM — Job: evening-article\nSame pipeline, different time slot."]
+        W["Weekly — Job: content-digest\ncontext_from: [morning, evening]\nSummarizes the week's content performance."]
+    end
+    M --> MH --> E --> W
+    W -.- COST["Cost: ~$1.50-3.00/day\nValue: Replaces $2,000-5,000/mo content writer"]
 ```
 
 ### Workflow 2: Server Watchdog
 
-```
-┌────────────────────────────────────────────────────────────┐
-│           INFRASTRUCTURE MONITORING                         │
-│                                                            │
-│  Every 5 min ─► Script-only: health_check.py               │
-│                  Checks: API uptime, DB connections,        │
-│                  disk space, memory usage                   │
-│                  Output: silent unless something's wrong    │
-│                  Cost: $0.00 (no LLM)                      │
-│                                                            │
-│  Every 15 min ─► Script-only: gpu_monitor.py               │
-│                   Checks: GPU temp, memory, utilization    │
-│                   Output: alert only if >90%               │
-│                   Cost: $0.00                               │
-│                                                            │
-│  On alert ─► Webhook: auto-remediation                     │
-│              Hermes receives the alert, investigates,       │
-│              attempts fix, notifies if manual action needed │
-│              Cost: ~$0.05-0.10 per incident                │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph infra ["INFRASTRUCTURE MONITORING"]
+        H["Every 5 min — Script-only: health_check.py\nChecks: API uptime, DB connections,\ndisk space, memory usage\nOutput: silent unless something's wrong\nCost: $0.00 (no LLM)"]
+        G["Every 15 min — Script-only: gpu_monitor.py\nChecks: GPU temp, memory, utilization\nOutput: alert only if >90%\nCost: $0.00"]
+        A["On alert — Webhook: auto-remediation\nHermes receives the alert, investigates,\nattempts fix, notifies if manual action needed\nCost: ~$0.05-0.10 per incident"]
+    end
+    H -->|"alert"| A
+    G -->|"alert"| A
 ```
 
 ### Workflow 3: GitHub PR Auto-Review
 
-```
-┌────────────────────────────────────────────────────────────┐
-│           CODE REVIEW AUTOMATION                            │
-│                                                            │
-│  Webhook: /webhooks/pr-review                              │
-│  Trigger: GitHub PR opened or updated                      │
-│                                                            │
-│  Flow:                                                     │
-│  1. GitHub sends PR event to webhook                       │
-│  2. Hermes loads github-code-review skill                  │
-│  3. Agent reads the diff, runs analysis                    │
-│  4. Posts inline review comments on the PR                 │
-│  5. Sends summary to Discord #engineering channel          │
-│                                                            │
-│  Skills: [github-code-review, requesting-code-review]      │
-│  Workdir: ~/projects/myapp                                 │
-│  Deliver: discord:#engineering                              │
-│                                                            │
-│  Cost: ~$0.10-0.50 per review                              │
-│  Value: Catches bugs before production                     │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph review ["CODE REVIEW AUTOMATION"]
+        WH["Webhook: /webhooks/pr-review\nTrigger: GitHub PR opened or updated"]
+        S1["1. GitHub sends PR event to webhook"]
+        S2["2. Hermes loads github-code-review skill"]
+        S3["3. Agent reads the diff, runs analysis"]
+        S4["4. Posts inline review comments on the PR"]
+        S5["5. Sends summary to Discord #engineering channel"]
+    end
+    WH --> S1 --> S2 --> S3 --> S4 --> S5
+    S5 -.- CFG["Skills: [github-code-review, requesting-code-review]\nWorkdir: ~/projects/myapp\nDeliver: discord:#engineering\nCost: ~$0.10-0.50 per review\nValue: Catches bugs before production"]
 ```
 
 ---
@@ -2918,48 +2798,36 @@ You've seen Hermes handle single tasks well — write code, search the web, mana
 
 One agent does these sequentially. Multiple agents do them in parallel — and parallelism is where the real throughput gains live.
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              SEQUENTIAL vs PARALLEL                          │
-│                                                            │
-│  Sequential (1 agent):                                     │
-│  ├── Research: 20 min                                      │
-│  ├── Backend:  45 min                                      │
-│  ├── Frontend: 40 min                                      │
-│  └── Review:   15 min                                     │
-│  Total: ~120 min                                           │
-│                                                            │
-│  Parallel (3 agents):                                      │
-│  ├── Agent A: Research (20 min)                            │
-│  ├── Agent B: Backend  ──────────────┐                     │
-│  └── Agent C: Frontend ──────────────┤                     │
-│      Review (waits for B + C): 15 min│                     │
-│  Total: ~60 min  (2x faster)         │                     │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph seq ["Sequential (1 agent) — Total: ~120 min"]
+        direction TB
+        S1["Research: 20 min"] --> S2["Backend: 45 min"]
+        S2 --> S3["Frontend: 40 min"]
+        S3 --> S4["Review: 15 min"]
+    end
+
+    subgraph par ["Parallel (3 agents) — Total: ~60 min (2x faster)"]
+        direction TB
+        P1["Agent A: Research (20 min)"]
+        P2["Agent B: Backend"]
+        P3["Agent C: Frontend"]
+        P1 --> P4["Review (waits for B + C): 15 min"]
+        P2 --> P4
+        P3 --> P4
+    end
 ```
 
 Hermes gives you **four mechanisms** for multi-agent work, each suited to different scenarios:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              MULTI-AGENT MECHANISMS                           │
-│                                                              │
-│  1. DELEGATION (delegate_task)                               │
-│     Quick synchronous subtasks inside your session            │
-│     Best for: research, code review, file analysis            │
-│                                                              │
-│  2. SPAWNING (tmux + hermes process)                         │
-│     Fully independent Hermes instances                       │
-│     Best for: long autonomous missions, hours/days            │
-│                                                              │
-│  3. KANBAN BOARD (multi-agent work queue)                     │
-│     Durable SQLite-backed task board with profiles            │
-│     Best for: project-scale work, specialist teams            │
-│                                                              │
-│  4. EXTERNAL AGENTS (KiloCode, Claude Code, Codex)            │
-│     Delegate to dedicated coding CLIs                         │
-│     Best for: heavy coding, PRs, refactoring                  │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph mechanisms ["MULTI-AGENT MECHANISMS"]
+        D["1. DELEGATION (delegate_task)\nQuick synchronous subtasks inside your session\nBest for: research, code review, file analysis"]
+        S["2. SPAWNING (tmux + hermes process)\nFully independent Hermes instances\nBest for: long autonomous missions, hours/days"]
+        K["3. KANBAN BOARD (multi-agent work queue)\nDurable SQLite-backed task board with profiles\nBest for: project-scale work, specialist teams"]
+        E["4. EXTERNAL AGENTS (KiloCode, Claude Code, Codex)\nDelegate to dedicated coding CLIs\nBest for: heavy coding, PRs, refactoring"]
+    end
 ```
 
 ---
@@ -3021,23 +2889,17 @@ Hermes: Dispatching 3 subagents in parallel...
 
 ### Delegation Anatomy
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              DELEGATION PARAMETERS                        │
-│                                                          │
-│  goal        What the subagent should accomplish          │
-│  context     Background info the subagent needs          │
-│  toolsets    Which tools to give it (default: inherits   │
-│              parent's tools)                             │
-│  role        'leaf' (default) or 'orchestrator'          │
-│                                                          │
-│  RETURNS: Final summary only.                            │
-│  Intermediate tool output NEVER enters parent context.   │
-│                                                          │
-│  LIFETIME: Bound to parent's turn.                       │
-│  If parent is interrupted → child is cancelled.          │
-│  For durable work, use cronjob or background terminal.   │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph params ["DELEGATION PARAMETERS"]
+        G["goal — What the subagent should accomplish"]
+        CTX["context — Background info the subagent needs"]
+        TS["toolsets — Which tools to give it\n(default: inherits parent's tools)"]
+        R["role — 'leaf' (default) or 'orchestrator'"]
+    end
+    G --> CTX --> TS --> R
+    R -.- RTN["RETURNS: Final summary only.\nIntermediate tool output NEVER enters parent context."]
+    R -.- LIFE["LIFETIME: Bound to parent's turn.\nIf parent is interrupted → child is cancelled.\nFor durable work, use cronjob or background terminal."]
 ```
 
 ### Leaf vs Orchestrator Roles
@@ -3055,23 +2917,23 @@ delegation:
 
 ### Choosing What to Delegate
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              WHEN TO DELEGATE                                 │
-│                                                              │
-│  ✅ DO delegate:                                             │
-│  • Research tasks (web search + synthesis)                   │
-│  • Code review (read files + assess quality)                 │
-│  • File analysis (search + summarize)                        │
-│  • Parallel independent subtasks                             │
-│  • Tasks that would flood your context with data             │
-│                                                              │
-│  ❌ DON'T delegate:                                          │
-│  • Single tool calls (just call the tool directly)           │
-│  • Tasks needing user interaction (subagents can't ask you)  │
-│  • Long-running work (use cronjob or background instead)     │
-│  • Simple questions (answer directly, no overhead)           │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph when ["WHEN TO DELEGATE"]
+        subgraph do ["DO delegate"]
+            D1["Research tasks (web search + synthesis)"]
+            D2["Code review (read files + assess quality)"]
+            D3["File analysis (search + summarize)"]
+            D4["Parallel independent subtasks"]
+            D5["Tasks that would flood your context with data"]
+        end
+        subgraph dont ["DON'T delegate"]
+            N1["Single tool calls (just call the tool directly)"]
+            N2["Tasks needing user interaction (subagents can't ask you)"]
+            N3["Long-running work (use cronjob or background instead)"]
+            N4["Simple questions (answer directly, no overhead)"]
+        end
+    end
 ```
 
 ---
@@ -3119,28 +2981,14 @@ tmux send-keys -t backend '/exit' Enter && sleep 2 && tmux kill-session -t backe
 
 The real power: spawn multiple agents, each on a different workstream, and relay context between them:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              MULTI-AGENT COORDINATION                         │
-│                                                              │
-│  ┌─────────┐                            ┌─────────┐         │
-│  │ BACKEND │◄─── API schema relay ────► │FRONTEND │         │
-│  │ agent   │                            │ agent   │         │
-│  │(tmux:be)│                            │(tmux:fe)│         │
-│  └────┬────┘                            └────┬────┘         │
-│       │                                      │               │
-│       │    ┌─────────┐                        │               │
-│       └───►│  YOU    │◄───────────────────────┘               │
-│            │ (Hermes │                                         │
-│            │  main)  │  Monitor both, relay info              │
-│            └─────────┘                                         │
-│                                                              │
-│  1. Spawn backend agent: "Build REST API"                    │
-│  2. Spawn frontend agent: "Build React dashboard"            │
-│  3. Capture backend API schema                               │
-│  4. Send schema to frontend agent                            │
-│  5. Both work in parallel                                    │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    BE["BACKEND agent\n(tmux:be)"] <-->|"API schema relay"| FE["FRONTEND agent\n(tmux:fe)"]
+    BE --> YOU
+    FE --> YOU
+    YOU["YOU (Hermes main)\nMonitor both, relay info"]
+
+    BE -.- STEP["1. Spawn backend agent: Build REST API\n2. Spawn frontend agent: Build React dashboard\n3. Capture backend API schema\n4. Send schema to frontend agent\n5. Both work in parallel"]
 ```
 
 ```bash
@@ -3161,19 +3009,28 @@ tmux send-keys -t frontend "Here is the API schema from the backend agent:\n$BAC
 
 ### Delegation vs Spawning — Quick Reference
 
-```
-┌──────────────────┬──────────────────┬──────────────────┐
-│                  │ delegate_task    │ Spawn hermes     │
-├──────────────────┼──────────────────┼──────────────────┤
-│ Isolation        │ Separate convo,  │ Fully independent│
-│                  │ shared process   │ process          │
-│ Duration         │ Minutes          │ Hours/days       │
-│ Tool access      │ Subset of parent │ Full access      │
-│ Interactive      │ No               │ Yes (via tmux)   │
-│ Survives restart │ No               │ Yes (tmux)       │
-│ Overhead         │ Low              │ Medium           │
-│ Best for         │ Quick subtasks   │ Long missions    │
-└──────────────────┴──────────────────┴──────────────────┘
+```mermaid
+flowchart TD
+    subgraph comparison ["DELEGATE_TASK vs SPAWN HERMES"]
+        subgraph dt ["delegate_task"]
+            D1["Isolation: Separate convo, shared process"]
+            D2["Duration: Minutes"]
+            D3["Tool access: Subset of parent"]
+            D4["Interactive: No"]
+            D5["Survives restart: No"]
+            D6["Overhead: Low"]
+            D7["Best for: Quick subtasks"]
+        end
+        subgraph sh ["Spawn hermes"]
+            H1["Isolation: Fully independent process"]
+            H2["Duration: Hours/days"]
+            H3["Tool access: Full access"]
+            H4["Interactive: Yes (via tmux)"]
+            H5["Survives restart: Yes (tmux)"]
+            H6["Overhead: Medium"]
+            H7["Best for: Long missions"]
+        end
+    end
 ```
 
 ---
@@ -3192,28 +3049,18 @@ Unlike delegation (ephemeral) or spawning (manual coordination), Kanban provides
 - **Automatic dispatch** — the dispatcher assigns and spawns workers
 - **Audit trail** — every action logged in the board's history
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              KANBAN TASK LIFECYCLE                         │
-│                                                          │
-│  ┌──────┐    ┌───────┐    ┌────────┐    ┌──────┐       │
-│  │ TODO │───►│ READY │───►│CLAIMED │───►│ DONE │       │
-│  │      │    │       │    │(worker │    │      │       │
-│  │      │    │       │    │running)│    │      │       │
-│  └──────┘    └───┬───┘    └───┬────┘    └──────┘       │
-│                  │             │                         │
-│                  │        ┌────┴────┐                    │
-│                  │        │ BLOCKED │                    │
-│                  │        │(waiting │                    │
-│                  │        │for human│                    │
-│                  │        │ input)  │                    │
-│                  │        └─────────┘                    │
-│                                                          │
-│  Parents not done → stays in TODO                        │
-│  All parents done → auto-promote to READY                │
-│  Dispatcher picks up READY tasks → spawns worker         │
-│  Worker finishes → DONE, children auto-promoted          │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> TODO
+    TODO --> READY : All parents done
+    READY --> CLAIMED : Dispatcher picks up
+    CLAIMED --> DONE : Worker finishes
+    CLAIMED --> BLOCKED : Waiting for human input
+    BLOCKED --> READY : Human provides input
+
+    NOTE_RIGHT of TODO: Parents not done → stays here
+    NOTE_RIGHT of READY: Dispatcher spawns worker
+    NOTE_RIGHT of DONE: Children auto-promoted
 ```
 
 ### Setting Up the Board
@@ -3283,29 +3130,26 @@ hermes -p reviewer skills install requesting-code-review
 
 Dependencies are what make Kanban shine for complex projects:
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              DEPENDENCY GRAPH EXAMPLE                      │
-│                                                          │
-│  T1: Design database schema  ──┐                         │
-│  (backend-dev)                  │                         │
-│                                 ├──► T3: Build REST API   │
-│  T2: Design API contract     ──┘    (backend-dev)        │
-│  (backend-dev)                       │                    │
-│                                      ├──► T5: Integration │
-│  T4: Build React UI                  │    testing         │
-│  (frontend-dev)  ────────────────────┘    (reviewer)     │
-│                                                │          │
-│                                                ▼          │
-│                                           T6: Deploy      │
-│                                           (backend-dev)   │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    T1["T1: Design database schema\n(backend-dev)"]
+    T2["T2: Design API contract\n(backend-dev)"]
+    T3["T3: Build REST API\n(backend-dev)"]
+    T4["T4: Build React UI\n(frontend-dev)"]
+    T5["T5: Integration testing\n(reviewer)"]
+    T6["T6: Deploy\n(backend-dev)"]
 
-  T1 + T2 run in parallel (no dependencies)
-  T3 starts when both T1 and T2 complete
-  T4 runs in parallel with T3 (no dependency on backend)
-  T5 starts when both T3 and T4 complete
-  T6 starts when T5 completes
+    T1 --> T3
+    T2 --> T3
+    T3 --> T5
+    T4 --> T5
+    T5 --> T6
+
+    T1 -.- NOTE1["T1 + T2 run in parallel (no dependencies)"]
+    T3 -.- NOTE2["T3 starts when both T1 and T2 complete"]
+    T4 -.- NOTE3["T4 runs in parallel with T3"]
+    T5 -.- NOTE4["T5 starts when both T3 and T4 complete"]
+    T6 -.- NOTE5["T6 starts when T5 completes"]
 ```
 
 ### Managing Tasks
@@ -3335,22 +3179,23 @@ hermes kanban stats
 
 ### When to Use Kanban
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              USE KANBAN WHEN...                                │
-│                                                              │
-│  ✅ Multiple specialists are needed                          │
-│  ✅ Work should survive crashes/restarts                     │
-│  ✅ Human-in-the-loop at any step                            │
-│  ✅ Multiple subtasks can run in parallel                    │
-│  ✅ Review/iteration cycles are expected                     │
-│  ✅ Audit trail matters                                      │
-│                                                              │
-│  ❌ USE delegate_task FOR...                                  │
-│  ❌ Quick one-off subtasks                                    │
-│  ❌ Simple parallel research                                 │
-│  ❌ Tasks that complete in minutes                           │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph when_kanban ["USE KANBAN WHEN..."]
+        subgraph use ["Use Kanban"]
+            K1["Multiple specialists are needed"]
+            K2["Work should survive crashes/restarts"]
+            K3["Human-in-the-loop at any step"]
+            K4["Multiple subtasks can run in parallel"]
+            K5["Review/iteration cycles are expected"]
+            K6["Audit trail matters"]
+        end
+        subgraph use_delegate ["USE delegate_task FOR..."]
+            D1["Quick one-off subtasks"]
+            D2["Simple parallel research"]
+            D3["Tasks that complete in minutes"]
+        end
+    end
 ```
 
 ---
@@ -3478,27 +3323,16 @@ Hermes:
 
 ### Pattern 4: Daily Operations (Cron + Delegation)
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│              DAILY AUTOMATED PIPELINE                         │
-│                                                              │
-│  6:00 AM  Cron: Check server health                         │
-│           → Script-only job, $0, alert if down               │
-│                                                              │
-│  9:00 AM  Cron: Daily competitive digest                     │
-│           → Agent job: web search + summarize                │
-│           → Delegate_task for parallel research               │
-│                                                              │
-│  12:00 PM Cron: Review open PRs                              │
-│           → Agent job: gh pr list + code review               │
-│           → Uses github-code-review skill                    │
-│                                                              │
-│  6:00 PM  Cron: End-of-day report                            │
-│           → Collects results from all previous jobs           │
-│           → Uses context_from to chain outputs                │
-│                                                              │
-│  All automated. You review the 6 PM digest.                  │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph daily ["DAILY AUTOMATED PIPELINE"]
+        C1["6:00 AM — Cron: Check server health\nScript-only job, $0, alert if down"]
+        C2["9:00 AM — Cron: Daily competitive digest\nAgent job: web search + summarize\ndelegate_task for parallel research"]
+        C3["12:00 PM — Cron: Review open PRs\nAgent job: gh pr list + code review\nUses github-code-review skill"]
+        C4["6:00 PM — Cron: End-of-day report\nCollects results from all previous jobs\nUses context_from to chain outputs"]
+    end
+    C1 --> C2 --> C3 --> C4
+    C4 -.- NOTE["All automated. You review the 6 PM digest."]
 ```
 
 ---
@@ -3695,30 +3529,31 @@ hermes --yolo chat -q "Clean up temp files"
 
 ### Security Quick Reference
 
-```
-┌────────────────────────────────────────────────────────────┐
-│              SECURITY LAYERS                                │
-│                                                            │
-│  Layer 1: Secret Redaction                                 │
-│  ├── Masks API keys, tokens in tool output                 │
-│  ├── Config: security.redact_secrets                       │
-│  └── Restart required                                      │
-│                                                            │
-│  Layer 2: PII Redaction                                    │
-│  ├── Hashes user IDs, strips phone numbers                 │
-│  ├── Config: privacy.redact_pii                            │
-│  └── Gateway-only (messaging platforms)                    │
-│                                                            │
-│  Layer 3: Command Approval                                 │
-│  ├── Prompts before destructive commands                   │
-│  ├── Config: approvals.mode (manual/smart/off)             │
-│  └── Per-session: /yolo or --yolo flag                     │
-│                                                            │
-│  Layer 4: Environment Filtering                            │
-│  ├── MCP subprocesses get only safe env vars               │
-│  └── API keys only passed when explicitly configured       │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph security["🔒 SECURITY LAYERS"]
+        direction TB
+        subgraph L1["Layer 1: Secret Redaction"]
+            L1A["Masks API keys, tokens in tool output"]
+            L1B["Config: security.redact_secrets"]
+            L1C["Restart required"]
+        end
+        subgraph L2["Layer 2: PII Redaction"]
+            L2A["Hashes user IDs, strips phone numbers"]
+            L2B["Config: privacy.redact_pii"]
+            L2C["Gateway-only (messaging platforms)"]
+        end
+        subgraph L3["Layer 3: Command Approval"]
+            L3A["Prompts before destructive commands"]
+            L3B["Config: approvals.mode (manual/smart/off)"]
+            L3C["Per-session: /yolo or --yolo flag"]
+        end
+        subgraph L4["Layer 4: Environment Filtering"]
+            L4A["MCP subprocesses get only safe env vars"]
+            L4B["API keys only passed when explicitly configured"]
+        end
+        L1 --> L2 --> L3 --> L4
+    end
 ```
 
 ---
@@ -3731,28 +3566,18 @@ Hermes has 20+ built-in toolsets. But what if you need something it doesn't have
 
 ### How It Works
 
-```
-┌──────────────────────────────────────────────────────────┐
-│           MCP ARCHITECTURE                                │
-│                                                          │
-│  ┌─────────┐    stdio     ┌──────────────┐              │
-│  │         │──────────────│ MCP Server A │              │
-│  │         │              │ (GitHub)     │              │
-│  │         │              └──────────────┘              │
-│  │         │                                            │
-│  │ HERMES  │    HTTP     ┌──────────────┐              │
-│  │  AGENT  │──────────────│ MCP Server B │              │
-│  │         │              │ (Company API)│              │
-│  │         │              └──────────────┘              │
-│  │         │                                            │
-│  │         │    stdio    ┌──────────────┐               │
-│  │         │──────────────│ MCP Server C │              │
-│  └─────────┘              │ (GitNexus)   │              │
-│                           └──────────────┘              │
-│                                                          │
-│  Tools appear as: mcp_github_*, mcp_company_*, etc.     │
-│  Auto-injected into all platform toolsets                │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph hermes["HERMES AGENT"]
+        H["Hermes Agent"]
+    end
+    H -- "stdio" --> A["MCP Server A\n(GitHub)"]
+    H -- "HTTP" --> B["MCP Server B\n(Company API)"]
+    H -- "stdio" --> C["MCP Server C\n(GitNexus)"]
+    
+    subgraph note["Tool Naming"]
+        N["Tools appear as:\nmcp_github_*, mcp_company_*, etc.\nAuto-injected into all platform toolsets"]
+    end
 ```
 
 1. You declare MCP servers in `config.yaml`
@@ -3939,35 +3764,39 @@ Profiles give you completely separate Hermes environments — each with its own 
 
 ### Why Profiles?
 
-```
-┌────────────────────────────────────────────────────────┐
-│           WITHOUT PROFILES                              │
-│                                                        │
-│  ~/.hermes/                                            │
-│  ├── config.yaml    ← One config for everything       │
-│  ├── .env           ← All keys mixed together         │
-│  ├── sessions/      ← Work + personal sessions merged │
-│  ├── skills/        ← All skills in one pool          │
-│  └── state.db       ← One session database            │
-│                                                        │
-│           WITH PROFILES                                 │
-│                                                        │
-│  ~/.hermes/                                            │
-│  ├── config.yaml        ← Default profile             │
-│  ├── profiles/                                         │
-│  │   ├── work/                                         │
-│  │   │   ├── config.yaml  ← Work config, models, keys │
-│  │   │   ├── .env                                         │
-│  │   │   ├── sessions/     ← Work sessions only       │
-│  │   │   ├── skills/       ← Work-specific skills     │
-│  │   │   └── state.db      ← Work session database    │
-│  │   └── client-acme/                                  │
-│  │       ├── config.yaml  ← Client-specific config     │
-│  │       ├── .env                                         │
-│  │       └── ...                                        │
-│  └── ...                                               │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph without["WITHOUT PROFILES"]
+        direction TB
+        W1["~/.hermes/"]
+        W2["config.yaml ← One config for everything"]
+        W3[".env ← All keys mixed together"]
+        W4["sessions/ ← Work + personal sessions merged"]
+        W5["skills/ ← All skills in one pool"]
+        W6["state.db ← One session database"]
+        W1 --> W2 & W3 & W4 & W5 & W6
+    end
+
+    subgraph with["WITH PROFILES"]
+        direction TB
+        P1["~/.hermes/"]
+        P2["config.yaml ← Default profile"]
+        P3["profiles/"]
+        P1 --> P2 & P3
+        subgraph work["work/"]
+            W7["config.yaml ← Work config, models, keys"]
+            W8[".env"]
+            W9["sessions/ ← Work sessions only"]
+            W10["skills/ ← Work-specific skills"]
+            W11["state.db ← Work session database"]
+        end
+        subgraph acme["client-acme/"]
+            A1["config.yaml ← Client-specific config"]
+            A2[".env"]
+            A3["..."]
+        end
+        P3 --> work & acme
+    end
 ```
 
 **Use cases:**
@@ -4065,33 +3894,25 @@ hermes auth reset openrouter
 
 ### How Rotation Works
 
-```
-┌────────────────────────────────────────────────────────┐
-│           CREDENTIAL ROTATION                           │
-│                                                        │
-│  Request arrives for OpenRouter                        │
-│       │                                                │
-│       ▼                                                │
-│  ┌─────────────┐                                      │
-│  │ Key pool:   │                                      │
-│  │ ├── Key 1   │ ← Last used: 2 min ago  ✅ USE THIS │
-│  │ ├── Key 2   │ ← Last used: 30s ago   ⏳ Backoff   │
-│  │ └── Key 3   │ ← Last used: 5 min ago ✅ Available │
-│  └─────────────┘                                      │
-│       │                                                │
-│       ▼                                                │
-│  Pick least-recently-used non-exhausted key            │
-│  Mark used, attach to request                          │
-│       │                                                │
-│       ▼                                                │
-│  If 429 (rate limited):                                │
-│  ├── Mark key as exhausted (cooldown period)           │
-│  └── Retry with next available key                     │
-│                                                        │
-│  If all keys exhausted:                                │
-│  └── Wait for shortest cooldown, then retry            │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Request arrives for OpenRouter"] --> B{"Key pool lookup"}
+    
+    B --> K1["Key 1\nLast used: 2 min ago\n✅ USE THIS"]
+    B --> K2["Key 2\nLast used: 30s ago\n⏳ Backoff"]
+    B --> K3["Key 3\nLast used: 5 min ago\n✅ Available"]
+    
+    K1 --> C["Pick least-recently-used non-exhausted key"]
+    K3 --> C
+    C --> D["Mark used, attach to request"]
+    
+    D --> E{"Response?"}
+    E -- "200 OK" --> F["Request succeeds"]
+    E -- "429 Rate Limited" --> G["Mark key as exhausted\n(cooldown period)"]
+    G --> H{"Retry with next available key"}
+    H -- "Keys available" --> C
+    H -- "All keys exhausted" --> I["Wait for shortest cooldown\nthen retry"]
+    I --> C
 ```
 
 **Key insight:** You don't need to manage rotation manually. Just register multiple keys and Hermes handles the rest — picking the least-recently-used key, respecting cooldowns, and spreading load evenly.
@@ -4405,34 +4226,18 @@ Cloud APIs are great until they're not. Rate limits, outages, pricing changes, d
 
 ### The Hardware Reality
 
-```
-┌──────────────────────────────────────────────────────┐
-│  LOCAL LLM HARDWARE GUIDE                            │
-│                                                      │
-│  Specs            What you can run                   │
-│  ─────────────    ─────────────────                  │
-│  4 GB RAM         1-3B params (Q4)                   │
-│                   → basic chat, formatting            │
-│                   → 15-30 tok/s                      │
-│                                                      │
-│  8 GB RAM         7-8B params (Q4_K_M)              │
-│                   → solid daily assistant             │
-│                   → 8-20 tok/s                       │
-│                                                      │
-│  16 GB RAM        8-14B params (Q4_K_M)             │
-│                   → quality code, analysis            │
-│                   → 5-15 tok/s                       │
-│                                                      │
-│  32 GB RAM        14-32B params (Q4_K_M)            │
-│                   → near-cloud quality                │
-│                   → 3-8 tok/s                        │
-│                                                      │
-│  GPU (8GB VRAM)   7-8B params (Q8)                  │
-│                   → 50-100 tok/s (fast!)              │
-│                                                      │
-│  No GPU? No problem. CPU inference works.            │
-│  Slower, but perfectly usable for batch tasks.       │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph hw["LOCAL LLM HARDWARE GUIDE"]
+        direction TB
+        S4["4 GB RAM\n1-3B params (Q4)\nbasic chat, formatting\n15-30 tok/s"]
+        S8["8 GB RAM\n7-8B params (Q4_K_M)\nsolid daily assistant\n8-20 tok/s"]
+        S16["16 GB RAM\n8-14B params (Q4_K_M)\nquality code, analysis\n5-15 tok/s"]
+        S32["32 GB RAM\n14-32B params (Q4_K_M)\nnear-cloud quality\n3-8 tok/s"]
+        GPU["GPU (8GB VRAM)\n7-8B params (Q8)\n50-100 tok/s (fast!)"]
+        NOTE["No GPU? No problem.\nCPU inference works.\nSlower, but perfectly usable for batch tasks."]
+        S4 --> S8 --> S16 --> S32
+    end
 ```
 
 ### Setup: llama.cpp (Recommended)
@@ -4502,29 +4307,24 @@ hermes -m ollama/llama3.1:8b "Write a Python script to parse CSV files"
 
 ### Hybrid Strategy — Best of Both Worlds
 
-```
-┌──────────────────────────────────────────────────────┐
-│  WHEN TO USE LOCAL vs CLOUD                          │
-│                                                      │
-│  LOCAL (free, private):                              │
-│  ✓ Email triage / categorization                     │
-│  ✓ Document summarization                            │
-│  ✓ Data extraction & formatting                      │
-│  ✓ PII-sensitive tasks                               │
-│  ✓ Bulk batch processing                             │
-│  ✓ Late-night crons (when speed doesn't matter)      │
-│                                                      │
-│  CLOUD (paid, smarter):                              │
-│  ✓ Client-facing content                             │
-│  ✓ Architecture & design decisions                   │
-│  ✓ Code review (needs deep reasoning)                │
-│  ✓ Complex debugging                                 │
-│  ✓ Real-time interactive chat                        │
-│                                                      │
-│  Rule of thumb:                                      │
-│  If nobody sees the output → local                   │
-│  If a human reads the output → cloud                 │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph local["LOCAL (free, private)"]
+        L1["✓ Email triage / categorization"]
+        L2["✓ Document summarization"]
+        L3["✓ Data extraction & formatting"]
+        L4["✓ PII-sensitive tasks"]
+        L5["✓ Bulk batch processing"]
+        L6["✓ Late-night crons (when speed doesn't matter)"]
+    end
+    subgraph cloud["CLOUD (paid, smarter)"]
+        C1["✓ Client-facing content"]
+        C2["✓ Architecture & design decisions"]
+        C3["✓ Code review (needs deep reasoning)"]
+        C4["✓ Complex debugging"]
+        C5["✓ Real-time interactive chat"]
+    end
+    RULE["Rule of thumb:\nIf nobody sees the output → local\nIf a human reads the output → cloud"]
 ```
 
 ### The Cost Difference
@@ -4549,28 +4349,27 @@ Your phone is always with you. Your laptop isn't. Running a local LLM on Android
 
 ### Hardware Requirements
 
-```
-┌──────────────────────────────────────────────────────┐
-│  ANDROID LLM — WHAT YOUR PHONE CAN RUN               │
-│                                                      │
-│  Phone RAM         Model Size         Speed          │
-│  ─────────         ──────────         ─────          │
-│  4 GB              1-1.5B (Q4)        10-20 tok/s    │
-│  6 GB              1.5-3B (Q4)        8-18 tok/s     │
-│  8 GB              3B (Q4_K_M)        10-20 tok/s    │
-│  12 GB             3-7B (Q4_K_M)      5-15 tok/s     │
-│  16 GB             7-8B (Q4_K_M)      3-10 tok/s     │
-│                                                      │
-│  Chipset matters too:                                │
-│  • Snapdragon 8 Gen 2/3 — fastest                   │
-│  • Exynos 1580+ — good                               │
-│  • Older chips — subtract 30-50% speed               │
-│                                                      │
-│  Example: Samsung A56 (12GB, Exynos 1580)            │
-│  → Gemma 2 2B at Q4: ~18-25 tok/s                   │
-│  → Llama 3.1 8B at Q4: ~3-6 tok/s                   │
-│  → Qwen 2.5 3B at Q4: ~12-18 tok/s                  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph android["ANDROID LLM — WHAT YOUR PHONE CAN RUN"]
+        direction TB
+        P4["4 GB RAM\n1-1.5B (Q4)\n10-20 tok/s"]
+        P6["6 GB RAM\n1.5-3B (Q4)\n8-18 tok/s"]
+        P8["8 GB RAM\n3B (Q4_K_M)\n10-20 tok/s"]
+        P12["12 GB RAM\n3-7B (Q4_K_M)\n5-15 tok/s"]
+        P16["16 GB RAM\n7-8B (Q4_K_M)\n3-10 tok/s"]
+        P4 --> P6 --> P8 --> P12 --> P16
+    end
+    subgraph chips["Chipset matters too"]
+        CS1["Snapdragon 8 Gen 2/3 — fastest"]
+        CS2["Exynos 1580+ — good"]
+        CS3["Older chips — subtract 30-50% speed"]
+    end
+    subgraph example["Example: Samsung A56 (12GB, Exynos 1580)"]
+        E1["Gemma 2 2B at Q4: ~18-25 tok/s"]
+        E2["Llama 3.1 8B at Q4: ~3-6 tok/s"]
+        E3["Qwen 2.5 3B at Q4: ~12-18 tok/s"]
+    end
 ```
 
 ### Setup: Termux + llama.cpp
@@ -4632,28 +4431,31 @@ hermes gateway run
 
 ### The Mobile Workflow
 
-```
-┌──────────────────────────────────────────────────────┐
-│  MOBILE HERMES — DAILY WORKFLOW                      │
-│                                                      │
-│  Morning (offline, on train):                        │
-│  → "Summarize my unread emails"                      │
-│  → "Draft replies to the 3 urgent ones"              │
-│  → Local model handles it, no internet needed        │
-│                                                      │
-│  At work (WiFi):                                     │
-│  → Switch to cloud model for quality work            │
-│  → /model anthropic/claude-sonnet-4                  │
-│                                                      │
-│  Evening (offline, at home):                         │
-│  → "Write tomorrow's blog draft"                     │
-│  → Local model drafts it, you refine later           │
-│                                                      │
-│  Travel (no WiFi at all):                            │
-│  → Full Hermes works on phone data                   │
-│  → Local model = zero data usage                     │
-│  → Only Telegram API uses data (minimal)             │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph morning["🌅 Morning (offline, on train)"]
+        M1["→ Summarize my unread emails"]
+        M2["→ Draft replies to the 3 urgent ones"]
+        M3["→ Local model handles it, no internet needed"]
+        M1 --> M2 --> M3
+    end
+    subgraph work["🏢 At work (WiFi)"]
+        W1["→ Switch to cloud model for quality work"]
+        W2["→ /model anthropic/claude-sonnet-4"]
+        W1 --> W2
+    end
+    subgraph evening["🌙 Evening (offline, at home)"]
+        E1["→ Write tomorrow's blog draft"]
+        E2["→ Local model drafts it, you refine later"]
+        E1 --> E2
+    end
+    subgraph travel["✈️ Travel (no WiFi at all)"]
+        T1["→ Full Hermes works on phone data"]
+        T2["→ Local model = zero data usage"]
+        T3["→ Only Telegram API uses data (minimal)"]
+        T1 --> T2 --> T3
+    end
+    morning --> work --> evening --> travel
 ```
 
 ### Tips for Mobile Performance
@@ -4709,21 +4511,23 @@ hermes gateway run
 
 Every time Hermes wants to run a flagged shell command, it pauses and asks for permission. That's safe — but slow. YOLO mode skips all approval prompts.
 
-```
-┌─────────────────────────────────────────────────┐
-│  NORMAL MODE                                    │
-│                                                 │
-│  Hermes: "Run rm -rf node_modules?"             │
-│  You:    [waits... approves]                    │
-│  Hermes: "Run npm install?"                     │
-│  You:    [waits... approves]                    │
-│  → 3 commands = 3 approval pauses               │
-│                                                 │
-│  YOLO MODE                                      │
-│                                                 │
-│  Hermes: [runs all 3 commands back-to-back]     │
-│  → 3 commands = 0 pauses                        │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph normal["NORMAL MODE"]
+        direction TB
+        N1["Hermes: \"Run rm -rf node_modules?\""]
+        N2["You: [waits... approves]"]
+        N3["Hermes: \"Run npm install?\""]
+        N4["You: [waits... approves]"]
+        N5["→ 3 commands = 3 approval pauses"]
+        N1 --> N2 --> N3 --> N4 --> N5
+    end
+    subgraph yolo["YOLO MODE"]
+        direction TB
+        Y1["Hermes: runs all 3 commands back-to-back"]
+        Y2["→ 3 commands = 0 pauses"]
+        Y1 --> Y2
+    end
 ```
 
 ### Three Ways to Activate
@@ -4757,24 +4561,26 @@ export HERMES_YOLO_MODE=1
 
 Sometimes a task takes more than one message. You want Hermes to keep working on something across multiple turns without you repeating the objective every time.
 
-```
-┌─────────────────────────────────────────────────┐
-│  WITHOUT /goal                                  │
-│                                                 │
-│  You: "Refactor the auth module"                │
-│  Hermes: [refactors auth]                       │
-│  You: "Also update the tests"                   │
-│  Hermes: "What tests?" (lost context)           │
-│                                                 │
-│  WITH /goal                                     │
-│                                                 │
-│  You: /goal Refactor auth module to use JWT     │
-│  Hermes: [Goal set. Working on JWT refactor...] │
-│  You: "Also update the tests"                   │
-│  Hermes: [Still in JWT context, updates tests]  │
-│  You: "Check the middleware too"                │
-│  Hermes: [Still in JWT context, checks MW]      │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph without["WITHOUT /goal"]
+        direction TB
+        U1["You: \"Refactor the auth module\""]
+        U2["Hermes: refactors auth"]
+        U3["You: \"Also update the tests\""]
+        U4["Hermes: \"What tests?\" (lost context)"]
+        U1 --> U2 --> U3 --> U4
+    end
+    subgraph with["WITH /goal"]
+        direction TB
+        G1["You: /goal Refactor auth module to use JWT"]
+        G2["Hermes: Goal set. Working on JWT refactor..."]
+        G3["You: \"Also update the tests\""]
+        G4["Hermes: Still in JWT context, updates tests"]
+        G5["You: \"Check the middleware too\""]
+        G6["Hermes: Still in JWT context, checks MW"]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6
+    end
 ```
 
 ### Goal Commands
@@ -4803,16 +4609,10 @@ Hermes is in the middle of a 10-step refactor. You just realized it should also 
 
 `/steer` queues a message that gets injected **after the next tool call completes** — not immediately, not at the end. It's a course correction that doesn't break stride.
 
-```
-Timeline:
-───────────────────────────────────────────────────►
-
-  Step 1    Step 2    Step 3    Step 4    Step 5
-  [done]    [done]    [running] [queued]  [queued]
-                      │
-                      └── /steer injected here
-                          after Step 3's tool call
-                          returns
+```mermaid
+flowchart LR
+    S1["Step 1\ndone"] --> S2["Step 2\ndone"] --> S3["Step 3\nrunning"] --> S4["Step 4\nqueued"] --> S5["Step 5\nqueued"]
+    S3 -.->|"/steer injected here\nafter Step 3's tool call returns"| S4
 ```
 
 ### When to Steer vs. Queue vs. New Message
@@ -4839,16 +4639,16 @@ Hermes is running a long test suite. You have three more things you want done af
 
 Each queued command runs sequentially after the current turn completes. You can stack as many as you want.
 
-```
-┌──────────────────────────────────────────────┐
-│  QUEUE                                        │
-│                                               │
-│  [1] Run linter on auth module     ← next    │
-│  [2] Check Docker build                      │
-│  [3] Update README                           │
-│                                               │
-│  Current task: Running test suite (80%)       │
-└──────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph queue["QUEUE"]
+        Q1["[1] Run linter on auth module ← next"]
+        Q2["[2] Check Docker build"]
+        Q3["[3] Update README"]
+        Q1 --> Q2 --> Q3
+    end
+    CT["Current task: Running test suite (80%)"]
+    CT --> queue
 ```
 
 💡 **Tip:** `/queue` is FIFO (first in, first out). Plan your order — lint before build, build before docs.
@@ -4865,19 +4665,25 @@ You're in the middle of a productive session and want to try a risky approach wi
 
 This creates a **fork** of the current conversation — a new session that starts with the same history. Your original session remains untouched.
 
-```
-        Session A (original)
-        │
-        ├── message 1
-        ├── message 2
-        │
-        ├── /branch ────── Session B (fork)
-        │                  │
-        ├── message 3      ├── risky experiment
-        ├── message 4      ├── didn't work
-        │                  └── /quit (discard)
-        └── continued
-            normally
+```mermaid
+flowchart TD
+    subgraph sessionA["Session A (original)"]
+        A1["message 1"]
+        A2["message 2"]
+        A3["/branch"]
+        A4["message 3"]
+        A5["message 4"]
+        A6["continued normally"]
+        A1 --> A2 --> A3
+        A3 --> A4 --> A5 --> A6
+    end
+    subgraph sessionB["Session B (fork)"]
+        B1["risky experiment"]
+        B2["didn't work"]
+        B3["/quit (discard)"]
+        B1 --> B2 --> B3
+    end
+    A3 -->|fork| sessionB
 ```
 
 Use cases:
@@ -4914,14 +4720,10 @@ hermes config set checkpoints.max_snapshots 50
 /rollback 3
 ```
 
-```
-CHECKPOINT TIMELINE:
-
-  CP0 ──── CP1 ──── CP2 ──── CP3 ──── CP4 (current)
-  (init)   (step1)  (step2)  (step3)  (step4)
-                              │
-                              └── /rollback 1
-                                  restores to CP3
+```mermaid
+flowchart LR
+    CP0["CP0\n(init)"] --> CP1["CP1\n(step1)"] --> CP2["CP2\n(step2)"] --> CP3["CP3\n(step3)"] --> CP4["CP4 (current)\n(step4)"]
+    CP4 -.->|"/rollback 1\nrestores to CP3"| CP3
 ```
 
 Each checkpoint captures file state at that moment. Hermes creates them automatically before each tool call that modifies files when checkpoints are enabled.
@@ -5013,21 +4815,25 @@ Hermes is in the middle of a long operation. You send a message. What happens? T
 /busy status      # Check current mode
 ```
 
-```
-BUSY MODE COMPARISON:
-
-  QUEUE:          STEER:          INTERRUPT:
-  ┌──────┐       ┌──────┐       ┌──────┐
-  │ Work │       │ Work │       │ Work │
-  │  ↓   │       │  ↓   │       │  ✗   │ ← stopped
-  │[wait]│       │inject│       │      │
-  │  ↓   │       │  ↓   │       │ New  │
-  │Your  │       │cont. │       │ msg  │
-  │ msg  │       │      │       │ runs │
-  └──────┘       └──────┘       └──────┘
-
-  Safe, orderly   Mid-flight    Immediate
-  but slowest     course change context switch
+```mermaid
+flowchart TD
+    subgraph q["QUEUE: Safe, orderly but slowest"]
+        Q1["Work"]
+        Q2["[wait]"]
+        Q3["Your msg"]
+        Q1 --> Q2 --> Q3
+    end
+    subgraph s["STEER: Mid-flight course change"]
+        S1["Work"]
+        S2["inject"]
+        S3["cont."]
+        S1 --> S2 --> S3
+    end
+    subgraph i["INTERRUPT: Immediate context switch"]
+        I1["Work ✗ stopped"]
+        I2["New msg runs"]
+        I1 --> I2
+    end
 ```
 
 **Recommendation:**
@@ -5045,15 +4851,23 @@ BUSY MODE COMPARISON:
 
 Runs a prompt in the background inside your session. Hermes processes it independently while you continue chatting normally.
 
-```
-  Main thread:        Background thread:
-  ┌──────────┐       ┌──────────────────────┐
-  │ You: ... │       │ Researching Next.js   │
-  │ Hermes:  │       │ Reading docs...       │
-  │ You: ... │       │ Writing summary...    │
-  │ Hermes:  │       │ ✅ Done → saved to    │
-  │ You: ... │       │    ~/research/        │
-  └──────────┘       └──────────────────────┘
+```mermaid
+flowchart LR
+    subgraph main["Main thread"]
+        M1["You: ..."]
+        M2["Hermes:"]
+        M3["You: ..."]
+        M4["Hermes:"]
+        M5["You: ..."]
+        M1 --> M2 --> M3 --> M4 --> M5
+    end
+    subgraph bg["Background thread"]
+        B1["Researching Next.js"]
+        B2["Reading docs..."]
+        B3["Writing summary..."]
+        B4["✅ Done → saved to\n~/research/"]
+        B1 --> B2 --> B3 --> B4
+    end
 ```
 
 Background prompts:
@@ -5127,17 +4941,20 @@ Hermes keeps the full conversation context. The new model picks up exactly where
 
 ### Strategic Model Switching
 
-```
-Task timeline:
-───────────────────────────────────────────────────►
-
-  [Cheap model]     [Expensive model]    [Cheap model]
-  Boilerplate →     Complex logic →      Write tests
-  scaffolding       implementation        and docs
-
-  deepseek/deepseek  anthropic/claude    deepseek/deepseek
-  -chat              -sonnet-4           -chat
-  ($0.14/M tokens)  ($3/M tokens)       ($0.14/M tokens)
+```mermaid
+flowchart LR
+    subgraph phase1["Cheap model"]
+        A["deepseek/deepseek-chat\n$0.14/M tokens"]
+    end
+    subgraph phase2["Expensive model"]
+        B["anthropic/claude-sonnet-4\n$3/M tokens"]
+    end
+    subgraph phase3["Cheap model"]
+        C["deepseek/deepseek-chat\n$0.14/M tokens"]
+    end
+    A -->|"Boilerplate\nscaffolding"| B
+    B -->|"Complex logic\nimplementation"| C
+    C -->|"Write tests\nand docs"| D["Done"]
 ```
 
 💡 **Tip:** Use cheap models for scaffolding, formatting, and boilerplate. Switch to expensive models only for the hard parts — complex algorithms, architecture decisions, debugging. Switch back for tests and docs.
@@ -5169,20 +4986,18 @@ hermes config set compression.target_ratio 0.20  # Compress to 20% of original (
 hermes config set compression.target_ratio 0.40  # Less aggressive: keep 40%
 ```
 
-```
-CONTEXT WINDOW LIFECYCLE:
-
-  0% ────────────── 50% ────────────── 100%
-  │                   │                  │
-  │  Normal operation │ Auto-compress    │ Hard limit
-  │                   │ triggers here    │ (error)
-  │                   │
-  │    threshold=0.50 ┘
-  │
-  │  After compression:
-  │  0% ────── 10% (target_ratio=0.20)
-  │            │
-  │            Fresh space for continued work
+```mermaid
+flowchart TD
+    subgraph before["Before compression"]
+        Z1["0%"] --> Z2["50% — threshold\nAuto-compress triggers here"] --> Z3["100% — Hard limit (error)"]
+        Z4["Normal operation\n0% → 50%"]
+    end
+    subgraph after["After compression"]
+        A1["0% → 10%\ntarget_ratio=0.20"]
+        A2["Fresh space for\ncontinued work"]
+        A1 --> A2
+    end
+    before --> after
 ```
 
 ### Compression Best Practices
@@ -5202,29 +5017,28 @@ CONTEXT WINDOW LIFECYCLE:
 
 You covered profiles in Chapter 7 for configuration isolation. Here's the **power-user pattern**: using profiles as completely separate workspaces.
 
-```
-┌─────────────────────────────────────────────────┐
-│  HERMES PROFILES                                │
-│                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
-│  │  work    │  │ personal │  │   lab    │     │
-│  │          │  │          │  │          │     │
-│  │ Config:  │  │ Config:  │  │ Config:  │     │
-│  │ Claude   │  │ DeepSeek │  │ Local    │     │
-│  │          │  │          │  │ Ollama   │     │
-│  │ Skills:  │  │ Skills:  │  │ Skills:  │     │
-│  │ GitHub,  │  │ Blog,    │  │ Exper-   │     │
-│  │ review,  │  │ Spotify, │  │ imental  │     │
-│  │ deploy   │  │ home     │  │ only     │     │
-│  │          │  │          │  │          │     │
-│  │ Memory:  │  │ Memory:  │  │ Memory:  │     │
-│  │ Work     │  │ Personal │  │ None     │     │
-│  │ projects │  │ prefs    │  │ (clean)  │     │
-│  │          │  │          │  │          │     │
-│  │ Sessions:│  │ Sessions:│  │ Sessions:│     │
-│  │ Isolated │  │ Isolated │  │ Isolated │     │
-│  └──────────┘  └──────────┘  └──────────┘     │
-└─────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph profiles["HERMES PROFILES"]
+        subgraph work["work"]
+            WC["Config:\nClaude"]
+            WS["Skills:\nGitHub, review, deploy"]
+            WM["Memory:\nWork projects"]
+            WS2["Sessions:\nIsolated"]
+        end
+        subgraph personal["personal"]
+            PC["Config:\nDeepSeek"]
+            PS["Skills:\nBlog, Spotify, home"]
+            PM["Memory:\nPersonal prefs"]
+            PS2["Sessions:\nIsolated"]
+        end
+        subgraph lab["lab"]
+            LC["Config:\nLocal Ollama"]
+            LS["Skills:\nExperimental only"]
+            LM["Memory:\nNone (clean)"]
+            LS2["Sessions:\nIsolated"]
+        end
+    end
 ```
 
 ### The Three-Profile Setup
@@ -5353,30 +5167,15 @@ This is the most underused power technique. When Hermes hits an error, crashes, 
 
 Hermes has access to the same tools you do. It can read logs, inspect config, search files, run commands, and read its own source code. It knows more about its own internals than you do. Use that.
 
-```
-┌──────────────────────────────────────────────────────┐
-│  THE SELF-DEBUG LOOP                                 │
-│                                                      │
-│  You: "Fix it"                                       │
-│      │                                               │
-│      ▼                                               │
-│  Hermes reads the error message                      │
-│      │                                               │
-│      ▼                                               │
-│  Hermes reads the relevant config / code             │
-│      │                                               │
-│      ▼                                               │
-│  Hermes diagnoses the root cause                     │
-│      │                                               │
-│      ▼                                               │
-│  Hermes applies the fix                              │
-│      │                                               │
-│      ▼                                               │
-│  Hermes verifies the fix worked                      │
-│      │                                               │
-│      ▼                                               │
-│  Done. You watched.                                  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["You: \"Fix it\""]
+    A --> B["Hermes reads the error message"]
+    B --> C["Hermes reads the relevant config / code"]
+    C --> D["Hermes diagnoses the root cause"]
+    D --> E["Hermes applies the fix"]
+    E --> F["Hermes verifies the fix worked"]
+    F --> G["Done. You watched."]
 ```
 
 ### The Magic Phrases
@@ -5483,23 +5282,23 @@ The average business blog post costs $150-$500 when outsourced. A content schedu
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  CONTENT MARKETING ENGINE                             │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Cron    │───►│ Hermes   │───►│ Blog     │       │
-│  │ 7am WIB │    │ Agent    │    │ Platform │       │
-│  └─────────┘    │          │    └──────────┘       │
-│  ┌─────────┐    │ Skills:  │                       │
-│  │ Cron    │───►│ • blog   │    ┌──────────┐       │
-│  │ 7pm WIB │    │ • human- │───►│ Social   │       │
-│  └─────────┘    │   izer   │    │ cross-   │       │
-│                 │ • market-│    │ post     │       │
-│                 │   ing-   │    └──────────┘       │
-│                 │   copy   │                       │
-│                 └──────────┘                       │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Engine["Content Marketing Engine"]
+        subgraph Triggers["Scheduled Triggers"]
+            C1["Cron\n7am WIB"]
+            C2["Cron\n7pm WIB"]
+        end
+        subgraph Agent["Hermes Agent"]
+            S1["blog"]
+            S2["humanizer"]
+            S3["marketing-copy"]
+        end
+        C1 --> Agent
+        C2 --> Agent
+        Agent --> Blog["Blog Platform"]
+        Agent --> Social["Social cross-post"]
+    end
 ```
 
 ### Setup
@@ -5552,30 +5351,15 @@ Your customers ask questions at 2am. Your support team sleeps. Hermes doesn't.
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  CUSTOMER SUPPORT SYSTEM                             │
-│                                                      │
-│  Customer ──► Telegram/WhatsApp                      │
-│                  │                                   │
-│                  ▼                                   │
-│           ┌──────────┐                               │
-│           │ Gateway  │                               │
-│           │ (24/7)   │                               │
-│           └────┬─────┘                               │
-│                │                                     │
-│         ┌──────┴──────┐                              │
-│         ▼             ▼                              │
-│   ┌──────────┐  ┌──────────┐                        │
-│   │ FAQ Bot  │  │ Complex  │                        │
-│   │ (auto)   │  │ Escalate │──► Human agent         │
-│   │          │  │          │    (Telegram DM)        │
-│   │ Skills:  │  │ Skills:  │                        │
-│   │ • custom │  │ • browse │                        │
-│   │   faq-   │  │ • search │                        │
-│   │   router │  │ • doc    │                        │
-│   └──────────┘  └──────────┘                        │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph System["Customer Support System"]
+        Customer["Customer"] --> Channel["Telegram / WhatsApp"]
+        Channel --> Gateway["Gateway\n(24/7)"]
+        Gateway --> FAQ["FAQ Bot\n(auto)\n\nSkills:\n• custom-faq-router"]
+        Gateway --> Escalate["Complex Escalate\n\nSkills:\n• browse\n• search\n• doc"]
+        Escalate --> Human["Human Agent\n(Telegram DM)"]
+    end
 ```
 
 ### Setup
@@ -5647,34 +5431,16 @@ A production bug costs an average of $10,000-$50,000 in lost revenue, customer t
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  AUTOMATED CODE REVIEW PIPELINE                      │
-│                                                      │
-│  Developer pushes PR                                 │
-│         │                                            │
-│         ▼                                            │
-│  ┌──────────┐                                        │
-│  │ GitHub   │──── Webhook ────► Hermes               │
-│  │ PR Event │                  │                     │
-│  └──────────┘                  │                     │
-│                         ┌──────┴──────┐              │
-│                         ▼             ▼              │
-│                  ┌──────────┐  ┌──────────┐         │
-│                  │ Security │  │ Quality  │         │
-│                  │ Scan     │  │ Review   │         │
-│                  │          │  │          │         │
-│                  │ • secrets│  │ • style  │         │
-│                  │ • vulns  │  │ • logic  │         │
-│                  │ • deps   │  │ • tests  │         │
-│                  └────┬─────┘  └────┬─────┘         │
-│                       │            │                 │
-│                       ▼            ▼                 │
-│                  ┌─────────────────────┐             │
-│                  │ PR Comment           │             │
-│                  │ (inline review)      │             │
-│                  └─────────────────────┘             │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Pipeline["Automated Code Review Pipeline"]
+        Dev["Developer pushes PR"] --> GitHub["GitHub PR Event"]
+        GitHub -- "Webhook" --> Hermes["Hermes"]
+        Hermes --> Security["Security Scan\n\n• secrets\n• vulns\n• deps"]
+        Hermes --> Quality["Quality Review\n\n• style\n• logic\n• tests"]
+        Security --> Comment["PR Comment\n(inline review)"]
+        Quality --> Comment
+    end
 ```
 
 ### Setup
@@ -5735,26 +5501,19 @@ Missed restocks cost sales. Wrong pricing loses margin. Manual monitoring eats h
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  E-COMMERCE OPS ENGINE                               │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Cron    │──► Check inventory levels               │
-│  │ 6am     │    │                                    │
-│  └─────────┘    ├── Low stock? ──► Alert + auto-     │
-│                 │               reorder suggestion    │
-│  ┌─────────┐    │                                    │
-│  │ Cron    │──► ├── Out of stock? ──► Urgent alert   │
-│  │ hourly  │    │                                   │
-│  └─────────┘    └── Price change? ─► Competitor     │
-│                      comparison alert                │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Cron    │──► Daily sales report → Telegram        │
-│  │ 9pm     │                                         │
-│  └─────────┘                                         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["E-Commerce Ops Engine"]
+        Cron1["Cron 6am"] --> Check["Check inventory levels"]
+        Check --> Low{"Low stock?"}
+        Low -->|"Yes"| Alert1["Alert + auto-reorder suggestion"]
+        Cron2["Cron hourly"] --> Check
+        Check --> OOS{"Out of stock?"}
+        OOS -->|"Yes"| Alert2["Urgent alert"]
+        Check --> Price{"Price change?"}
+        Price -->|"Yes"| Alert3["Competitor comparison alert"]
+        Cron3["Cron 9pm"] --> Report["Daily sales report → Telegram"]
+    end
 ```
 
 ### Setup
@@ -5830,26 +5589,14 @@ Your competitors publish, patent, and launch while you sleep. A daily digest of 
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  COMPETITIVE INTELLIGENCE ENGINE                     │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Cron    │───►│ Collect  │───►│ Analyze  │       │
-│  │ 8am     │    │          │    │          │       │
-│  └─────────┘    │ Sources: │    │ Skills:  │       │
-│                 │ • blogs  │    │ • blog-  │       │
-│  ┌─────────┐    │ • arxiv  │    │   watcher│       │
-│  │ Cron    │───►│ • news   │    │ • arxiv  │       │
-│  │ weekly  │    │ • Reddit │    │          │       │
-│  └─────────┘    └──────────┘    └────┬─────┘       │
-│                                      │              │
-│                                      ▼              │
-│                               ┌──────────┐         │
-│                               │ Digest   │         │
-│                               │ Telegram │         │
-│                               └──────────┘         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Competitive Intelligence Engine"]
+        Cron1["Cron 8am"] --> Collect["Collect\n\nSources:\n• blogs\n• arxiv\n• news\n• Reddit"]
+        Cron2["Cron weekly"] --> Collect
+        Collect --> Analyze["Analyze\n\nSkills:\n• blog-watcher\n• arxiv"]
+        Analyze --> Digest["Digest → Telegram"]
+    end
 ```
 
 ### Setup
@@ -5906,29 +5653,22 @@ You're a solo freelancer with 3 active clients. Each wants daily progress. You'r
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  FREELANCER ACCELERATION                             │
-│                                                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
-│  │ Client A │  │ Client B │  │ Client C │          │
-│  │ Profile  │  │ Profile  │  │ Profile  │          │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘          │
-│       │              │              │                │
-│       ▼              ▼              ▼                │
-│  ┌────────────────────────────────────────────┐     │
-│  │  Parallel Subagents (delegate_task)        │     │
-│  │                                            │     │
-│  │  Agent A ──► Build feature    (leaf)       │     │
-│  │  Agent B ──► Write tests     (leaf)        │     │
-│  │  Agent C ──► Deploy staging   (leaf)       │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  ┌──────────┐                                        │
-│  │ Cron     │──► Daily client update → Telegram      │
-│  │ 6pm      │   (auto-generated progress report)    │
-│  └──────────┘                                        │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Accel["Freelancer Acceleration"]
+        subgraph Clients["Client Profiles"]
+            A["Client A\nProfile"]
+            B["Client B\nProfile"]
+            C["Client C\nProfile"]
+        end
+        Clients --> Subagents["Parallel Subagents\n(delegate_task)"]
+        subgraph Subagents
+            SA["Agent A → Build feature\n(leaf)"]
+            SB["Agent B → Write tests\n(leaf)"]
+            SC["Agent C → Deploy staging\n(leaf)"]
+        end
+        Cron["Cron 6pm"] --> Update["Daily client update → Telegram\n(auto-generated progress report)"]
+    end
 ```
 
 ### Setup
@@ -5998,27 +5738,19 @@ Your SaaS goes down at 3am. Your customers notice at 3:05am. By morning, you've 
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  SaaS MONITORING SYSTEM                              │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Script  │──► curl health endpoint                 │
-│  │ (1 min) │    │                                    │
-│  └─────────┘    ├── 200 OK → silent (no output)      │
-│                 ├── 500   → alert + auto-restart      │
-│                 └── timeout → urgent alert            │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Script  │──► Check disk/memory/CPU                │
-│  │ (5 min) │    │                                    │
-│  └─────────┘    └── threshold breach → alert         │
-│                                                      │
-│  ┌─────────┐                                         │
-│  │ Cron    │──► Weekly metrics summary               │
-│  │ Monday  │    (uses LLM for analysis)              │
-│  └─────────┘                                         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Monitor["SaaS Monitoring System"]
+        Script1["Script\n(every 1 min)"] --> Curl["curl health endpoint"]
+        Curl --> OK{"200 OK?"}
+        OK -->|"Yes"| Silent["Silent — no output"]
+        OK -->|"500"| Alert1["Alert + auto-restart"]
+        OK -->|"Timeout"| Alert2["Urgent alert"]
+        Script2["Script\n(every 5 min)"] --> Resources["Check disk / memory / CPU"]
+        Resources --> Breach{"Threshold\nbreach?"}
+        Breach -->|"Yes"| Alert3["Alert"]
+        Cron["Cron Monday"] --> Summary["Weekly metrics summary\n(uses LLM for analysis)"]
+    end
 ```
 
 ### Setup
@@ -6094,27 +5826,14 @@ Your analytics dashboard shows numbers. It doesn't tell you *why* revenue droppe
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  DATA ANALYSIS ENGINE                                │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Cron    │───►│ Fetch    │───►│ Analyze  │       │
-│  │ weekly  │    │ Data     │    │          │       │
-│  └─────────┘    │          │    │ Skills:  │       │
-│                 │ Sources: │    │ • jupyter│       │
-│  ┌─────────┐    │ • DB     │    │ • term-  │       │
-│  │ Cron    │───►│ • API    │    │   inal   │       │
-│  │ ad-hoc  │    │ • CSV    │    │          │       │
-│  └─────────┘    └──────────┘    └────┬─────┘       │
-│                                      │              │
-│                                      ▼              │
-│                               ┌──────────┐         │
-│                               │ Report   │         │
-│                               │ + Charts │         │
-│                               │ Telegram │         │
-│                               └──────────┘         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Data Analysis Engine"]
+        Cron1["Cron weekly"] --> Fetch["Fetch Data\n\nSources:\n• DB\n• API\n• CSV"]
+        Cron2["Cron ad-hoc"] --> Fetch
+        Fetch --> Analyze["Analyze\n\nSkills:\n• jupyter\n• terminal"]
+        Analyze --> Report["Report + Charts\n→ Telegram"]
+    end
 ```
 
 ### Setup
@@ -6170,29 +5889,13 @@ You get 150 emails a day. 120 are noise. 25 need replies. 5 are urgent. Hermes s
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  EMAIL TRIAGE ENGINE                                 │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐                        │
-│  │ Cron    │───►│ Fetch    │                        │
-│  │ 7am     │    │ Email    │                        │
-│  └─────────┘    │ (IMAP)   │                        │
-│                 └────┬─────┘                        │
-│                      │                              │
-│              ┌───────┴───────┐                      │
-│              ▼               ▼                      │
-│       ┌──────────┐   ┌──────────┐                  │
-│       │ Categorize│   │ Draft    │                  │
-│       │          │   │ Replies  │                  │
-│       │ • urgent │   │          │                  │
-│       │ • reply  │   │ Skills:  │                  │
-│       │ • FYI    │   │ • hima-  │                  │
-│       │ • spam   │   │   laya   │                  │
-│       │ • action │   │ • term-  │                  │
-│       └──────────┘   │   inal   │                  │
-│                      └──────────┘                  │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Email Triage Engine"]
+        Cron["Cron 7am"] --> Fetch["Fetch Email\n(IMAP)"]
+        Fetch --> Categorize["Categorize\n\n• urgent\n• reply\n• FYI\n• spam\n• action"]
+        Fetch --> Drafts["Draft Replies\n\nSkills:\n• himalaya\n• terminal"]
+    end
 ```
 
 ### Setup
@@ -6245,25 +5948,14 @@ Speed-to-lead is the #1 predictor of conversion. A lead responded to in 5 minute
 
 ### The Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  LEAD GENERATION ENGINE                              │
-│                                                      │
-│  ┌─────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ Browser │───►│ Scrape   │───►│ Qualify  │       │
-│  │ Cron    │    │ Leads    │    │          │       │
-│  └─────────┘    │          │    │ • Score  │       │
-│                 │ Skills:  │    │ • Enrich │       │
-│  ┌─────────┐    │ • browse │    │ • Route  │       │
-│  │ Webhook │───►│ • search │    └────┬─────┘       │
-│  │ (form)  │    └──────────┘         │              │
-│  └─────────┘                         ▼              │
-│                               ┌──────────┐         │
-│                               │ Auto-    │         │
-│                               │ respond  │         │
-│                               │ Telegram │         │
-│                               └──────────┘         │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Engine["Lead Generation Engine"]
+        Browser["Browser Cron"] --> Scrape["Scrape Leads\n\nSkills:\n• browse\n• search"]
+        Webhook["Webhook\n(form)"] --> Scrape
+        Scrape --> Qualify["Qualify\n\n• Score\n• Enrich\n• Route"]
+        Qualify --> Respond["Auto-respond\n→ Telegram"]
+    end
 ```
 
 ### Setup
@@ -6320,29 +6012,28 @@ hermes webhook subscribe lead-form \
 
 ## Master ROI Summary — All 10 Scenarios
 
-```
-┌──────────────────────────────────────────────────────┐
-│  TOTAL IMPACT: 10 HERMES BUSINESS USE CASES          │
-│                                                      │
-│  #  Scenario              Monthly Savings            │
-│  ─  ───────────────────   ────────────────           │
-│  1  Content Marketing      $21,000                   │
-│  2  Customer Support        $5,000                   │
-│  3  Code Review             $6,200                   │
-│  4  E-Commerce Ops          $5,950                   │
-│  5  Competitive Intel       $4,200                   │
-│  6  Freelancer Accel.      $15,000 (revenue gain)    │
-│  7  SaaS Monitoring        $14,650                   │
-│  8  Data Analysis           $4,500                   │
-│  9  Email Management        $3,000                   │
-│  10 Lead Generation        +150% pipeline             │
-│  ────────────────────────────────────────            │
-│  TOTAL ESTIMATED VALUE   ~$79,500/month              │
-│                                                      │
-│  Hermes API cost:       ~$20-50/month                │
-│                                                      │
-│  ROI: 1,590x – 3,975x                               │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Total Impact: 10 Hermes Business Use Cases"]:1
+    block:stats
+        columns 2
+        "1. Content Marketing" "$21,000"
+        "2. Customer Support" "$5,000"
+        "3. Code Review" "$6,200"
+        "4. E-Commerce Ops" "$5,950"
+        "5. Competitive Intel" "$4,200"
+        "6. Freelancer Accel." "$15,000 (revenue gain)"
+        "7. SaaS Monitoring" "$14,650"
+        "8. Data Analysis" "$4,500"
+        "9. Email Management" "$3,000"
+        "10. Lead Generation" "+150% pipeline"
+    end
+    block:totals
+        "Total Estimated Value: ~$79,500/month"
+        "Hermes API Cost: ~$20–50/month"
+        "ROI: 1,590x – 3,975x"
+    end
 ```
 
 ### Hermes Cost Breakdown
@@ -6428,25 +6119,15 @@ Before you price your services, you need to know your costs. Every Hermes invoca
 
 Every time Hermes thinks, it consumes tokens. Here's what that means in dollars:
 
-```
-┌──────────────────────────────────────────────────────┐
-│  TOKEN FLOW — EVERY HERMES TURN                      │
-│                                                      │
-│  System prompt  ──►  ~2,000-8,000 tokens (input)     │
-│  + User message                      (input)         │
-│  + Tool definitions                  (input)         │
-│  + Skill content                     (input)         │
-│  + Memory                            (input)         │
-│  ════════════════════════════════════                │
-│  = Total input tokens                                │
-│                                                      │
-│  LLM processes ──►  reasoning tokens (hidden)        │
-│                                                      │
-│  Response       ──►  ~500-3,000 tokens (output)      │
-│  + Tool calls                        (output)        │
-│                                                      │
-│  Cost = (input × $in) + (output × $out)              │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph TokenFlow["Token Flow — Every Hermes Turn"]
+        Input["System prompt → ~2,000–8,000 tokens (input)\n+ User message (input)\n+ Tool definitions (input)\n+ Skill content (input)\n+ Memory (input)"]
+        Input --> Total["= Total input tokens"]
+        Total --> LLM["LLM processes → reasoning tokens (hidden)"]
+        LLM --> Output["Response → ~500–3,000 tokens (output)\n+ Tool calls (output)"]
+        Output --> Cost["Cost = (input × $in) + (output × $out)"]
+    end
 ```
 
 ### Model Pricing Comparison
@@ -6480,31 +6161,22 @@ Every time Hermes thinks, it consumes tokens. Here's what that means in dollars:
 
 When does Hermes pay for itself?
 
-```
-┌──────────────────────────────────────────────────────┐
-│  BREAK-EVEN POINTS                                   │
-│                                                      │
-│  Scenario          Monthly Cost    Replaces          │
-│  ──────────────    ────────────    ─────────────     │
-│  Content writer    $20/mo (API)    $3,000/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Support agent     $30/mo (API)    $2,500/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Data analyst      $40/mo (API)    $4,500/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Monitoring tool   $0 (scripts)    $150/mo SaaS      │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Full-time dev     $200/mo (API)   $8,000/mo human   │
-│                     → break-even: DAY 1              │
-│                                                      │
-│  Conclusion: Hermes ALWAYS pays for itself.          │
-│  The question isn't "should I?"                      │
-│  The question is "how much should I spend?"          │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Break-Even Points"]:1
+    block:rows
+        columns 3
+        "Content writer" "$20/mo (API)" "$3,000/mo human → break-even: Day 1"
+        "Support agent" "$30/mo (API)" "$2,500/mo human → break-even: Day 1"
+        "Data analyst" "$40/mo (API)" "$4,500/mo human → break-even: Day 1"
+        "Monitoring tool" "$0 (scripts)" "$150/mo SaaS → break-even: Day 1"
+        "Full-time dev" "$200/mo (API)" "$8,000/mo human → break-even: Day 1"
+    end
+    block:conclusion
+        "Conclusion: Hermes ALWAYS pays for itself."
+        "The question isn't \"should I?\" — it's \"how much should I spend?\""
+    end
 ```
 
 ---
@@ -6515,30 +6187,26 @@ You've automated your workflow. Now sell it. Here's how to price AI-powered serv
 
 ### Pricing Models
 
-```
-┌──────────────────────────────────────────────────────┐
-│  FOUR PRICING MODELS                                 │
-│                                                      │
-│  1. RETAINER          2. PER-DELIVERABLE             │
-│  ┌──────────────┐     ┌──────────────┐              │
-│  │ $2-5K/mo     │     │ $200-500 ea  │              │
-│  │              │     │              │              │
-│  │ Ongoing      │     │ Per article  │              │
-│  │ monitoring,  │     │ Per review   │              │
-│  │ reports,     │     │ Per audit    │              │
-│  │ support      │     │ Per analysis │              │
-│  └──────────────┘     └──────────────┘              │
-│                                                      │
-│  3. VALUE-BASED       4. WHITE-LABEL                 │
-│  ┌──────────────┐     ┌──────────────┐              │
-│  │ % of savings │     │ $500-2K/mo   │              │
-│  │              │     │              │              │
-│  │ "I saved you │     │ Hermes as    │              │
-│  │  $10K/mo,    │     │ your company │              │
-│  │  my fee is   │     │ AI assistant │              │
-│  │  $2K/mo"     │     │ (hosted)     │              │
-│  └──────────────┘     └──────────────┘              │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Pricing["Four Pricing Models"]
+        subgraph M1["1. Retainer"]
+            R1["$2–5K/mo"]
+            R2["Ongoing monitoring,\nreports, support"]
+        end
+        subgraph M2["2. Per-Deliverable"]
+            P1["$200–500 ea"]
+            P2["Per article\nPer review\nPer audit\nPer analysis"]
+        end
+        subgraph M3["3. Value-Based"]
+            V1["% of savings"]
+            V2["\"I saved you $10K/mo,\nmy fee is $2K/mo\""]
+        end
+        subgraph M4["4. White-Label"]
+            W1["$500–2K/mo"]
+            W2["Hermes as your\ncompany AI assistant\n(hosted)"]
+        end
+    end
 ```
 
 ### Pricing by Service Type
@@ -6580,22 +6248,24 @@ Skills aren't just for your own use. Package them as products.
 
 A sellable skill solves a specific, painful, expensive problem:
 
-```
-┌──────────────────────────────────────────────────────┐
-│  SELLABLE SKILL CHECKLIST                            │
-│                                                      │
-│  ✅ Solves a specific pain point                     │
-│  ✅ Saves 5+ hours per week                          │
-│  ✅ Works out of the box (minimal config)            │
-│  ✅ Has clear ROI the client can measure             │
-│  ✅ Doesn't require technical knowledge to use       │
-│  ✅ Can be demonstrated in 5 minutes                 │
-│                                                      │
-│  ❌ Generic (e.g., "write better code")              │
-│  ❌ Requires custom setup per client                 │
-│  ❌ Vague ROI ("saves time")                         │
-│  ❌ Needs a developer to operate                     │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Sellable Skill Checklist"]:1
+    block:good["✅ Must Have"]
+        "✅ Solves a specific pain point"
+        "✅ Saves 5+ hours per week"
+        "✅ Works out of the box (minimal config)"
+        "✅ Has clear ROI the client can measure"
+        "✅ Doesn't require technical knowledge to use"
+        "✅ Can be demonstrated in 5 minutes"
+    end
+    block:bad["❌ Red Flags"]
+        "❌ Generic (e.g., \"write better code\")"
+        "❌ Requires custom setup per client"
+        "❌ Vague ROI (\"saves time\")"
+        "❌ Needs a developer to operate"
+    end
 ```
 
 ### Example: The "Auto-SEO Blog" Skill Package
@@ -6655,32 +6325,19 @@ You don't sell "Hermes." You sell "Your AI Assistant." The client never needs to
 
 ### The White-Label Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  WHITE-LABEL SETUP                                   │
-│                                                      │
-│  Client sees:                                        │
-│  ┌──────────────────────────────┐                   │
-│  │  "Acme Corp AI Assistant"    │                   │
-│  │  (Telegram bot with their    │                   │
-│  │   branding, name, avatar)    │                   │
-│  └──────────────┬───────────────┘                   │
-│                 │                                    │
-│                 ▼                                    │
-│  You manage:                                         │
-│  ┌──────────────────────────────┐                   │
-│  │  Hermes Profile: acme-corp   │                   │
-│  │  • Custom skills (FAQ, etc.) │                   │
-│  │  • Company knowledge base    │                   │
-│  │  • Approved actions only     │                   │
-│  │  • Memory scoped to Acme     │                   │
-│  │  • Your API key (not theirs) │                   │
-│  └──────────────────────────────┘                   │
-│                                                      │
-│  Client pays: $1,000-3,000/mo                       │
-│  Your cost:  $30-100/mo (API)                       │
-│  Your margin: 90-97%                                │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph WhiteLabel["White-Label Setup"]
+        subgraph ClientView["Client Sees"]
+            Bot["\"Acme Corp AI Assistant\"\n(Telegram bot with their\nbranding, name, avatar)"]
+        end
+        Bot --> Managed["You Manage"]
+        subgraph Managed["You Manage"]
+            Profile["Hermes Profile: acme-corp\n• Custom skills (FAQ, etc.)\n• Company knowledge base\n• Approved actions only\n• Memory scoped to Acme\n• Your API key (not theirs)"]
+        end
+    end
+
+    Finances["Client pays: $1,000–3,000/mo\nYour cost: $30–100/mo (API)\nYour margin: 90–97%"]
 ```
 
 ### Setup Steps
@@ -6744,35 +6401,22 @@ When you handle client data, compliance isn't optional. Here's how to stay safe.
 
 ### The Privacy Stack
 
-```
-┌──────────────────────────────────────────────────────┐
-│  PRIVACY LAYERS                                      │
-│                                                      │
-│  Layer 1: PII Redaction (automatic)                  │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Hermes strips: emails, phones, SSNs,       │     │
-│  │ credit cards, addresses BEFORE sending     │     │
-│  │ to the LLM API                            │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  Layer 2: Memory Scoping (per-profile)               │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Client A's data stays in Client A's        │     │
-│  │ profile memory. Never shared.              │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  Layer 3: Local Models (for sensitive data)           │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Run llama.cpp locally. Zero data leaves    │     │
-│  │ your machine. Full GDPR compliance.        │     │
-│  └────────────────────────────────────────────┘     │
-│                                                      │
-│  Layer 4: Approval Mode (human-in-the-loop)          │
-│  ┌────────────────────────────────────────────┐     │
-│  │ Sensitive actions require your approval    │     │
-│  │ before execution.                          │     │
-│  └────────────────────────────────────────────┘     │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Privacy["Privacy Layers"]
+        subgraph L1["Layer 1: PII Redaction (automatic)"]
+            P1["Hermes strips: emails, phones, SSNs,\ncredit cards, addresses BEFORE sending\nto the LLM API"]
+        end
+        subgraph L2["Layer 2: Memory Scoping (per-profile)"]
+            P2["Client A's data stays in Client A's\nprofile memory. Never shared."]
+        end
+        subgraph L3["Layer 3: Local Models (for sensitive data)"]
+            P3["Run llama.cpp locally. Zero data leaves\nyour machine. Full GDPR compliance."]
+        end
+        subgraph L4["Layer 4: Approval Mode (human-in-the-loop)"]
+            P4["Sensitive actions require your approval\nbefore execution."]
+        end
+    end
 ```
 
 ### Configuration
@@ -6828,40 +6472,36 @@ You have 10 clients. Each has their own Hermes profile, skills, and crons. You n
 
 ### The Agency Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│  AGENCY SETUP — MANAGING 10+ CLIENTS                │
-│                                                      │
-│  ┌─────────────────────────────────────────────┐    │
-│  │  MASTER PROFILE (you)                        │    │
-│  │  • Monitors all client profiles              │    │
-│  │  • Weekly agency dashboard cron              │    │
-│  │  • Cost tracking across profiles             │    │
-│  └──────────────┬──────────────────────────────┘    │
-│                  │                                    │
-│       ┌──────────┼──────────┐                       │
-│       ▼          ▼          ▼                       │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐              │
-│  │Client A │ │Client B │ │Client C │  × 10        │
-│  │ Profile │ │ Profile │ │ Profile │              │
-│  │         │ │         │ │         │              │
-│  │ Skills: │ │ Skills: │ │ Skills: │              │
-│  │ support │ │ blog    │ │ monitor │              │
-│  │ faq-a   │ │ seo     │ │ health  │              │
-│  │         │ │         │ │         │              │
-│  │ Cron:   │ │ Cron:   │ │ Cron:   │              │
-│  │ 24/7    │ │ 2x/day  │ │ 1/min   │              │
-│  │ support │ │ article │ │ watchdog│              │
-│  └─────────┘ └─────────┘ └─────────┘              │
-│                                                      │
-│  ┌─────────────────────────────────────────────┐    │
-│  │  WEEKLY AGENCY REPORT (cron)                 │    │
-│  │  • Total API cost per client                 │    │
-│  │  • Issues/escalations per client             │    │
-│  │  • Uptime stats                              │    │
-│  │  • Revenue vs cost per client                │    │
-│  └─────────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Agency["Agency Setup — Managing 10+ Clients"]
+        subgraph Master["Master Profile (you)"]
+            M1["• Monitors all client profiles"]
+            M2["• Weekly agency dashboard cron"]
+            M3["• Cost tracking across profiles"]
+        end
+        Master --> A
+        Master --> B
+        Master --> C
+        subgraph A["Client A Profile"]
+            A1["Skills: support, faq-a"]
+            A2["Cron: 24/7 support"]
+        end
+        subgraph B["Client B Profile"]
+            B1["Skills: blog, seo"]
+            B2["Cron: 2x/day article"]
+        end
+        subgraph C["Client C Profile × 10"]
+            C1["Skills: monitor, health"]
+            C2["Cron: 1/min watchdog"]
+        end
+        subgraph Report["Weekly Agency Report (cron)"]
+            R1["• Total API cost per client"]
+            R2["• Issues/escalations per client"]
+            R3["• Uptime stats"]
+            R4["• Revenue vs cost per client"]
+        end
+    end
 ```
 
 ### Setup Script
@@ -6949,32 +6589,26 @@ API costs will fluctuate. Providers will change pricing. The only hedge? Local m
 
 ### The Local Model Stack
 
-```
-┌──────────────────────────────────────────────────────┐
-│  LOCAL MODEL OPTIONS                                 │
-│                                                      │
-│  ┌──────────────────────────────────────────┐       │
-│  │  llama.cpp (recommended)                  │       │
-│  │  • Runs on CPU, no GPU needed             │       │
-│  │  • Supports GGUF format                   │       │
-│  │  • 2-50 tok/s depending on model size     │       │
-│  │  • Full offline capability                │       │
-│  └──────────────────────────────────────────┘       │
-│                                                      │
-│  ┌──────────────────────────────────────────┐       │
-│  │  Ollama (easiest setup)                   │       │
-│  │  • One-command install                    │       │
-│  │  • Automatic model management             │       │
-│  │  • OpenAI-compatible API server           │       │
-│  └──────────────────────────────────────────┘       │
-│                                                      │
-│  ┌──────────────────────────────────────────┐       │
-│  │  vLLM (highest performance)               │       │
-│  │  • Requires GPU                           │       │
-│  │  • Production-grade serving               │       │
-│  │  • Best for high-throughput agency use    │       │
-│  └──────────────────────────────────────────┘       │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Local Model Options"]:1
+    block:opt1["llama.cpp (recommended)"]
+        "• Runs on CPU, no GPU needed"
+        "• Supports GGUF format"
+        "• 2–50 tok/s depending on model size"
+        "• Full offline capability"
+    end
+    block:opt2["Ollama (easiest setup)"]
+        "• One-command install"
+        "• Automatic model management"
+        "• OpenAI-compatible API server"
+    end
+    block:opt3["vLLM (highest performance)"]
+        "• Requires GPU"
+        "• Production-grade serving"
+        "• Best for high-throughput agency use"
+    end
 ```
 
 ### Setting Up llama.cpp with Hermes
@@ -7000,27 +6634,26 @@ hermes -m deepseek/deepseek-chat "..."       # Cloud, smarter
 
 ### Hybrid Strategy: Cloud + Local
 
-```
-┌──────────────────────────────────────────────────────┐
-│  HYBRID MODEL STRATEGY                               │
-│                                                      │
-│  LOCAL (free, private, slower):                      │
-│  • Email triage and categorization                   │
-│  • Document summarization                            │
-│  • Data extraction and formatting                    │
-│  • Watchdog alert evaluation                        │
-│  • PII-heavy tasks                                   │
-│                                                      │
-│  CLOUD (paid, smart, fast):                          │
-│  • Content creation (needs quality)                  │
-│  • Architecture decisions                            │
-│  • Code review (needs reasoning)                     │
-│  • Client-facing responses                           │
-│  • Complex data analysis                             │
-│                                                      │
-│  Rule: If it touches client output → cloud.          │
-│        If it's internal processing → local.          │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 2
+    block:local["LOCAL (free, private, slower)"]
+        "• Email triage and categorization"
+        "• Document summarization"
+        "• Data extraction and formatting"
+        "• Watchdog alert evaluation"
+        "• PII-heavy tasks"
+    end
+    block:cloud["CLOUD (paid, smart, fast)"]
+        "• Content creation (needs quality)"
+        "• Architecture decisions"
+        "• Code review (needs reasoning)"
+        "• Client-facing responses"
+        "• Complex data analysis"
+    end
+    block:rule["Rule"]:2
+        "If it touches client output → cloud.\nIf it's internal processing → local."
+    end
 ```
 
 ### Edge Deployment — Hermes on a Phone
@@ -7044,32 +6677,32 @@ hermes config set providers.phone.base_url http://192.168.1.100:8080/v1
 
 ## The Business of Hermes — Decision Framework
 
-```
-┌──────────────────────────────────────────────────────┐
-│  SHOULD YOU BUILD A BUSINESS AROUND HERMES?          │
-│                                                      │
-│  YES, if you:                                        │
-│  • Already use Hermes daily                          │
-│  • Have 3+ skills you built for yourself             │
-│  • Know businesses that waste time on manual work    │
-│  • Can explain AI value in plain language            │
-│                                                      │
-│  START HERE:                                         │
-│  1. Pick ONE service (Chapter 9 scenarios)           │
-│  2. Build it for yourself first (dogfood it)         │
-│  3. Find 1 client who needs it                       │
-│  4. Deliver results, measure ROI                     │
-│  5. Use that case study to get 3 more clients        │
-│  6. Systematize with profiles and crons              │
-│  7. Hire VA when you hit 20 clients                  │
-│                                                      │
-│  DON'T:                                              │
-│  • Build the agency before having clients            │
-│  • Over-promise what Hermes can do                   │
-│  • Ignore compliance (GDPR, PII)                     │
-│  • Price based on your cost (price on value)         │
-│  • Scale before the system is stable                 │
-└──────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:title["Should You Build a Business Around Hermes?"]:1
+    block:yes["YES, if you:"]
+        "• Already use Hermes daily"
+        "• Have 3+ skills you built for yourself"
+        "• Know businesses that waste time on manual work"
+        "• Can explain AI value in plain language"
+    end
+    block:start["START HERE:"]
+        "1. Pick ONE service (Chapter 9 scenarios)"
+        "2. Build it for yourself first (dogfood it)"
+        "3. Find 1 client who needs it"
+        "4. Deliver results, measure ROI"
+        "5. Use that case study to get 3 more clients"
+        "6. Systematize with profiles and crons"
+        "7. Hire VA when you hit 20 clients"
+    end
+    block:dont["DON'T:"]
+        "• Build the agency before having clients"
+        "• Over-promise what Hermes can do"
+        "• Ignore compliance (GDPR, PII)"
+        "• Price based on your cost (price on value)"
+        "• Scale before the system is stable"
+    end
 ```
 
 ---
