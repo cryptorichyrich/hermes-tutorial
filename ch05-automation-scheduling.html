@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation — Cron Jobs, Webhooks, and Background Tasks | Hermes Agent Tutorial</title>
+    <meta name="description" content="Automate everything with Hermes. Cron scheduling, webhook integrations, background processes, job chaining, and the zero-cost gateway heartbeat that keeps your agent alive 24/7.">
+    <meta name="keywords" content="Hermes cron jobs, AI automation, webhook integration, background tasks, gateway heartbeat, zero-token watchdog">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch05-automation-scheduling.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Automation — Cron Jobs, Webhooks, and Background Tasks">
+    <meta property="og:description" content="Automate everything with Hermes. Cron scheduling, webhook integrations, background processes, job chaining, and the zero-cost gateway heartbeat that keeps your agent alive 24/7.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch05-automation-scheduling.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 5">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Automation — Cron Jobs, Webhooks, and Background Tasks">
+    <meta name="twitter:description" content="Automate everything with Hermes. Cron scheduling, webhook integrations, background processes, job chaining, and the zero-cost gateway heartbeat that keeps your agent alive 24/7.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Automation \u2014 Cron Jobs, Webhooks, and Background Tasks",
+  "description": "Automate everything with Hermes. Cron scheduling, webhook integrations, background processes, job chaining, and the zero-cost gateway heartbeat that keeps your agent alive 24/7.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch05-automation-scheduling.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch05-automation-scheduling.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html" class="active">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 5</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-5-automation-scheduling-hermes-never-sleeps">Chapter 5: Automation &amp; Scheduling — Hermes Never Sleeps</h1>
+<blockquote>
+<p><strong>The real power of an AI agent isn't in answering questions — it's in running tasks on autopilot. Cron jobs, webhooks, background processes, and job chaining turn Hermes from a chat partner into a 24/7 operations engine.</strong></p>
+</blockquote>
+<hr />
+<h2 id="51-why-automation-matters">5.1 Why Automation Matters</h2>
+<p>You've set up Hermes, connected it to Telegram, built up skills and memory. But you're still <em>driving</em> every interaction manually. Automation changes the game:</p>
+<ul>
+<li><strong>Consistency</strong> — tasks run at the same time, every time, without you remembering</li>
+<li><strong>Speed</strong> — Hermes reacts to events the moment they happen</li>
+<li><strong>Scale</strong> — one Hermes can monitor 10 systems, write 2 blog posts a day, and review every PR</li>
+<li><strong>Freedom</strong> — you sleep, Hermes works. You code, Hermes handles ops.</li>
+</ul>
+<div class="mermaid">flowchart LR
+    subgraph spectrum ["THE AUTOMATION SPECTRUM — LOW AUTONOMY → HIGH AUTONOMY"]
+        M["MANUAL\n(you type)\nYou → Hermes\n\"Write this\""]
+        S["SCHEDULED\n(cron jobs)\nScheduler → Hermes\n\"Every day at 9am\""]
+        E["EVENT-DRIVEN\n(webhooks)\nHook → Hermes\n\"When PR is opened\""]
+    end
+    M --> S --> E</div>
+<p>Hermes gives you four automation mechanisms, each with a different trigger:</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Trigger</th>
+<th>Duration</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cron jobs</strong></td>
+<td>Time-based schedule</td>
+<td>Minutes to hours</td>
+<td>Daily digests, periodic checks, content pipeline</td>
+</tr>
+<tr>
+<td><strong>Script-only jobs</strong></td>
+<td>Time-based schedule</td>
+<td>Seconds</td>
+<td>Watchdogs, health checks, threshold alerts</td>
+</tr>
+<tr>
+<td><strong>Webhooks</strong></td>
+<td>External HTTP event</td>
+<td>Minutes</td>
+<td>CI/CD, GitHub events, payment notifications</td>
+</tr>
+<tr>
+<td><strong>Background tasks</strong></td>
+<td>Manual kick-off</td>
+<td>Minutes to hours</td>
+<td>Long builds, test suites, data processing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="52-cron-jobs-scheduled-intelligence">5.2 Cron Jobs — Scheduled Intelligence</h2>
+<p>Cron jobs are the backbone of Hermes automation. They run a full agent loop on a schedule — the same Hermes brain, same tools, same memory, just autonomous.</p>
+<h3 id="creating-a-cron-job">Creating a Cron Job</h3>
+<pre class="highlight"><code class="language-bash"># Interactive creation (recommended)
+hermes cron create &quot;0 9 * * *&quot;
+
+# Or use natural language
+hermes cron create &quot;every day at 9am&quot;
+hermes cron create &quot;every 2 hours&quot;
+hermes cron create &quot;30m&quot;
+</code></pre>
+
+<p>During creation, Hermes walks you through the key settings:</p>
+<div class="mermaid">flowchart TD
+    subgraph anatomy ["CRON JOB ANATOMY"]
+        direction TB
+        S["Schedule: \"0 9 * * *\" — When it runs"]
+        N["Name: \"morning-digest\" — Human label"]
+        P["Prompt: \"Check emails...\" — What Hermes does"]
+        SK["Skills: [email, summary] — Preloaded knowledge"]
+        MO["Model: claude-sonnet-4 — Optional override"]
+        D["Deliver: telegram — Where output goes"]
+        W["Workdir: ~/projects/app — Project context"]
+        E["Enabled: [x] — Active or paused"]
+    end
+    S --> N --> P --> SK --> MO --> D --> W --> E
+    E -.->|"Result: Hermes wakes up at 9am,\nloads skills, checks inbox,\nwrites digest, delivers to Telegram"| R((📰 Digest))</div>
+<h3 id="schedule-formats">Schedule Formats</h3>
+<p>Hermes supports four schedule formats:</p>
+<pre class="highlight"><code class="language-bash"># 1. Duration — runs every N minutes/hours
+&quot;30m&quot;           # Every 30 minutes
+&quot;2h&quot;            # Every 2 hours
+
+# 2. &quot;Every&quot; phrase — natural language
+&quot;every monday 9am&quot;
+&quot;every weekday at 8:30&quot;
+&quot;every 6 hours&quot;
+
+# 3. Standard cron — 5-field expression
+&quot;0 9 * * *&quot;     # Every day at 9:00
+&quot;*/15 * * * *&quot;  # Every 15 minutes
+&quot;0 9 * * 1-5&quot;   # Weekdays at 9:00
+
+# 4. One-shot — ISO timestamp
+&quot;2026-06-01T09:00:00&quot;   # Once, at a specific time
+</code></pre>
+
+<h3 id="managing-cron-jobs">Managing Cron Jobs</h3>
+<pre class="highlight"><code class="language-bash"># List all jobs
+hermes cron list
+
+# List including disabled/paused jobs
+hermes cron list --all
+
+# Pause a job (stop it from running)
+hermes cron pause &lt;job_id&gt;
+
+# Resume a paused job
+hermes cron resume &lt;job_id&gt;
+
+# Trigger a job manually (run on next tick)
+hermes cron run &lt;job_id&gt;
+
+# Edit a job's schedule, prompt, or delivery
+hermes cron edit &lt;job_id&gt;
+
+# Delete a job
+hermes cron remove &lt;job_id&gt;
+
+# Check scheduler status
+hermes cron status
+</code></pre>
+
+<p>Inside a session, use <code>/cron</code> to manage jobs from chat.</p>
+<h3 id="delivery-targets">Delivery Targets</h3>
+<p>Cron job output needs to go somewhere. Hermes supports multiple delivery targets:</p>
+<pre class="highlight"><code class="language-bash"># Default: deliver back to the current chat
+deliver: &quot;origin&quot;
+
+# Deliver to all connected channels
+deliver: &quot;all&quot;
+
+# Deliver to a specific platform chat
+deliver: &quot;telegram&quot;
+deliver: &quot;discord:#engineering&quot;
+deliver: &quot;telegram:-1001234567890:17585&quot;
+
+# Combine targets
+deliver: &quot;origin,all&quot;
+</code></pre>
+
+<h3 id="model-overrides">Model Overrides</h3>
+<p>Different jobs may need different models. Override per-job without changing your default:</p>
+<pre class="highlight"><code class="language-yaml">model:
+  model: &quot;anthropic/claude-sonnet-4&quot;
+  provider: &quot;anthropic&quot;
+</code></pre>
+
+<p>A daily digest might use a fast/cheap model, while a code review job needs the best reasoning. You control this per-job.</p>
+<hr />
+<h2 id="53-script-only-jobs-lightweight-watchdogs">5.3 Script-Only Jobs — Lightweight Watchdogs</h2>
+<p>Not every scheduled task needs an LLM. <strong>Script-only jobs</strong> run a script and deliver its output verbatim — no agent loop, no tokens, no model call:</p>
+<div class="mermaid">flowchart TD
+    subgraph agent ["AGENT JOB (default)"]
+        A1["Schedule tick"] --> A2["Load agent"]
+        A2 --> A3["Load skills"]
+        A3 --> A4["Run LLM prompt"]
+        A4 --> A5["Deliver response"]
+    end
+
+    subgraph script ["SCRIPT-ONLY JOB (no_agent: true)"]
+        B1["Schedule tick"] --> B2["Run script"]
+        B2 --> B3["Capture stdout"]
+        B3 --> B4{"stdout?"}
+        B4 -->|"empty"| B5["SILENT — nothing sent"]
+        B4 -->|"has text"| B6["SEND — deliver verbatim"]
+        B4 -->|"exit non-zero"| B7["ERROR — alert sent"]
+    end
+
+    A5 -.- NOTE1["~5-50K tokens/job\nMinutes per run"]
+    B5 -.- NOTE2["~0 tokens/job\nSeconds per run"]</div>
+<p><strong>When to use script-only:</strong>
+- Server uptime checks (<code>curl -sf https://api.example.com/health</code>)
+- Disk/memory/GPU threshold alerts
+- Git repo status checks
+- Any fixed-output health check where the script IS the message</p>
+<pre class="highlight"><code class="language-bash"># Example: a GPU memory watchdog
+hermes cron create &quot;5m&quot; \
+  --script scripts/gpu_watchdog.py \
+  --no-agent \
+  --deliver telegram
+</code></pre>
+
+<p>The script at <code>~/.hermes/scripts/gpu_watchdog.py</code> might look like:</p>
+<pre class="highlight"><code class="language-python">#!/usr/bin/env python3
+import subprocess, sys
+result = subprocess.run([&quot;nvidia-smi&quot;, &quot;--query-gpu=memory.used&quot;, &quot;--format=csv,noheader,nounits&quot;],
+                       capture_output=True, text=True)
+used = int(result.stdout.strip().split(&quot;\n&quot;)[0])
+if used &gt; 90:
+    print(f&quot;⚠️ GPU memory at {used}% — over 90% threshold!&quot;)
+# No output = silent (nothing sent)
+</code></pre>
+
+<p><strong>Key behavior:</strong>
+- Empty stdout → nothing sent (you won't even know it ran)
+- Non-empty stdout → delivered verbatim as the message
+- Non-zero exit → error alert sent
+- Maximum efficiency — zero tokens, zero model cost</p>
+<h3 id="real-world-example-gateway-heartbeat">Real-World Example: Gateway Heartbeat</h3>
+<p>The most important script-only job is one that keeps Hermes itself alive. System failures happen — Windows sleep/hibernate kills processes, OOM killers strike on Linux, unexpected crashes occur at 3 AM. Without a heartbeat, your gateway silently dies and you lose hours of coverage.</p>
+<p>Hermes ships with a built-in heartbeat script at <code>~/.hermes/scripts/heartbeat.py</code>:</p>
+<pre class="highlight"><code class="language-bash"># Set up the gateway heartbeat — runs every 10 minutes, zero tokens
+hermes cron create &quot;every 10m&quot; \
+  --script scripts/heartbeat.py \
+  --no-agent \
+  --deliver origin
+</code></pre>
+
+<p><strong>How it works:</strong></p>
+<div class="mermaid">flowchart TD
+    A["GATEWAY HEARTBEAT\nevery 10 min"] --> B{"ALIVE?"}
+    B -->|"YES"| C["Silent exit\n(nothing sent)"]
+    B -->|"NO"| D["Kill zombie PIDs"]
+    D --> E["Restart gateway"]
+    E --> F["Notify you via Telegram"]
+
+    style A fill:#e3f2fd
+    style C fill:#e8f5e9
+    style F fill:#fff3e0</div>
+<p><strong>Key details:</strong>
+- <strong>Zero tokens.</strong> The heartbeat is a pure Python script (<code>no_agent: true</code>). It checks processes and log files locally — no API calls, no model involved. Your LLM bill is unaffected.
+- <strong>Silent when healthy.</strong> If the gateway is running fine, the script prints nothing and exits with code 0. You never see a message. Only problems get reported.
+- <strong>Auto-restart.</strong> When the gateway is down, the script kills any zombie processes and starts a fresh instance.
+- <strong>Survives sleep/hibernate.</strong> On Windows, pair this with a Scheduled Task (every 10 min + at logon, with <code>StartWhenAvailable</code>). On Linux, use systemd timers. The watchdog catches up after wake.</p>
+<p><strong>On Windows — add a Scheduled Task for extra reliability:</strong></p>
+<pre class="highlight"><code class="language-powershell"># Run as admin in PowerShell
+$action = New-ScheduledTaskAction -Execute &quot;python&quot; `
+  -Argument &quot;$env:LOCALAPPDATA\hermes\scripts\heartbeat.py --restart&quot;
+$trigger1 = New-ScheduledTaskTrigger -Once -At (Get-Date) `
+  -RepetitionInterval (New-Timespan -Minutes 10) `
+  -RepetitionDuration (New-Timespan -Days 365)
+$trigger2 = New-ScheduledTaskTrigger -AtLogOn
+$settings = New-ScheduledTaskSettingsSet `
+  -StartWhenAvailable -DontStopOnIdleEnd `
+  -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+Register-ScheduledTask -TaskName &quot;HermesHeartbeat&quot; `
+  -Action $action -Trigger $trigger1,$trigger2 `
+  -Settings $settings -Description &quot;Restarts Hermes gateway if down&quot;
+</code></pre>
+
+<p>This gives you <strong>two safety nets</strong> — the internal cron heartbeat (runs while the gateway is alive) and the OS-level Scheduled Task (runs even when the gateway is dead). Maximum downtime after any failure: ~15 minutes.</p>
+<blockquote>
+<p><strong>💡 Cost clarification:</strong> The heartbeat costs <strong>nothing</strong> in LLM tokens. It's a <code>no_agent: true</code> cron job running a local Python script. No model is invoked. The only cost is ~2 seconds of CPU every 10 minutes — negligible on any machine.</p>
+</blockquote>
+<hr />
+<h2 id="54-job-chaining-output-pipelines">5.4 Job Chaining — Output Pipelines</h2>
+<p>Jobs can chain together — the output of Job A feeds as context into Job B:</p>
+<div class="mermaid">flowchart LR
+    subgraph chain ["JOB CHAINING WITH context_from"]
+        A["JOB A\nCollect data\n(script)"]
+        B["JOB B\nSummarize\n(LLM agent)"]
+        C["JOB C\nDeliver\n(telegram)"]
+    end
+    A -->|"stdout"| B
+    B -->|"analysis"| C
+
+    B -.- NOTE_B["context_from: [\"job-a-id\"]"]
+    C -.- NOTE_C["context_from: [\"job-b-id\"]"]</div>
+<p><strong>Practical example — daily competitive intelligence:</strong></p>
+<pre class="highlight"><code class="language-bash"># Job 1: Collect competitor updates (script-only, zero tokens)
+hermes cron create &quot;0 8 * * *&quot; \
+  --name &quot;competitor-collect&quot; \
+  --script scripts/competitor_check.py \
+  --no-agent
+
+# Job 2: Analyze and summarize (agent, uses Job 1 output)
+hermes cron create &quot;0 8 * * *&quot; \
+  --name &quot;competitor-analysis&quot; \
+  --prompt &quot;Analyze the competitor updates below. Flag any threats or opportunities. Be concise.&quot; \
+  --context-from &quot;competitor-collect&quot; \
+  --skills &quot;research,marketing-copy&quot; \
+  --deliver &quot;telegram&quot;
+</code></pre>
+
+<p>Job 1 runs at 8am, collects raw data. Job 2 runs at 8am on the same tick, but uses Job 1's <em>most recent completed output</em> as injected context. The result: a smart analysis delivered to your Telegram, powered by free data collection + paid LLM reasoning only where it adds value.</p>
+<hr />
+<h2 id="55-webhooks-event-driven-automation">5.5 Webhooks — Event-Driven Automation</h2>
+<p>Webhooks flip the model: instead of Hermes checking on a schedule, external systems <em>push</em> events to Hermes:</p>
+<pre class="highlight"><code class="language-bash"># Subscribe to a webhook route
+hermes webhook subscribe deploy-hook
+
+# List active webhooks
+hermes webhook list
+
+# Test a webhook
+hermes webhook test deploy-hook
+
+# Remove a webhook
+hermes webhook remove deploy-hook
+</code></pre>
+
+<p>This creates an HTTP endpoint at <code>/webhooks/deploy-hook</code>. When an external service (GitHub, Stripe, your CI) sends a POST to that endpoint, Hermes processes it.</p>
+<div class="mermaid">flowchart TD
+    GH["GitHub PR opened"] --> POST1["POST /webhooks/pr-hook"]
+    SP["Stripe payment"] --> POST2["POST /webhooks/payment"]
+    POST1 --> GW
+    POST2 --> GW
+
+    subgraph gateway ["GATEWAY"]
+        GW["Receives HTTP POST\nParses payload\nTriggers agent"]
+    end
+
+    GW --> AL
+
+    subgraph agentloop ["AGENT LOOP"]
+        AL["Processes event\nRuns tools\nDelivers response"]
+    end</div>
+<p><strong>Common webhook patterns:</strong>
+- <strong>CI/CD</strong> — auto-review code when a PR opens
+- <strong>Payments</strong> — log transactions, send confirmations
+- <strong>Monitoring</strong> — PagerDuty alert → Hermes investigates
+- <strong>Forms</strong> — new submission → CRM update + notification</p>
+<hr />
+<h2 id="56-background-tasks-long-running-work">5.6 Background Tasks — Long-Running Work</h2>
+<p>For tasks too long for a single turn but not recurring enough for cron, use <strong>background terminal processes</strong>:</p>
+<pre class="highlight"><code class="language-bash"># Start a long-running build
+terminal(command=&quot;npm run build&quot;, background=True, notify_on_complete=True)
+
+# The process runs in the background
+# Hermes is free to work on other things
+# You get notified when it finishes
+</code></pre>
+
+<div class="mermaid">flowchart TD
+    START["START\nterminal(bg=true)"] --> RUNNING["RUNNING\nprocess(poll)"]
+    RUNNING --> DONE["DONE\nAuto-notify"]
+    RUNNING --> CHECK["CHECK PROGRESS\npoll → see progress\nlog → full output\nwait → block until done"]
+
+    DONE -.- NOTE1["notify_on_complete=True →\none notification at end"]
+    CHECK -.- NOTE2["watch_patterns=[\"Build OK\"] →\nnotify on rare mid-run text\n(rate limit: 1 per 15 sec)"]</div>
+<p><strong>Process management commands:</strong></p>
+<pre class="highlight"><code class="language-bash"># List all background processes
+process(action=&quot;list&quot;)
+
+# Check status + new output
+process(action=&quot;poll&quot;, session_id=&quot;...&quot;)
+
+# Full output with pagination
+process(action=&quot;log&quot;, session_id=&quot;...&quot;, offset=0, limit=200)
+
+# Block until done (with timeout)
+process(action=&quot;wait&quot;, session_id=&quot;...&quot;, timeout=300)
+
+# Send input to a running process
+process(action=&quot;submit&quot;, session_id=&quot;...&quot;, data=&quot;y&quot;)
+
+# Kill a running process
+process(action=&quot;kill&quot;, session_id=&quot;...&quot;)
+
+# Send raw stdin without newline
+process(action=&quot;write&quot;, session_id=&quot;...&quot;, data=&quot;partial input&quot;)
+
+# Close stdin / send EOF
+process(action=&quot;close&quot;, session_id=&quot;...&quot;)
+</code></pre>
+
+<hr />
+<h2 id="57-cron-safety-best-practices">5.7 Cron Safety &amp; Best Practices</h2>
+<p>Running autonomous agents on a schedule comes with responsibility. Here's how to keep things safe:</p>
+<div class="mermaid">flowchart TD
+    subgraph safety ["CRON SAFETY CHECKLIST"]
+        P["PROMPT: Self-contained — no chat context available\nCron jobs run in fresh sessions.\nInclude everything the agent needs to know."]
+        SK["SKILLS: Attach the right skills\nA cron job has no conversation history.\nSkills inject the knowledge it needs."]
+        NR["NO RECURSIVE CRON: Cron jobs must NOT\ncreate more cron jobs. Prevents runaway scheduling."]
+        TO["TIMEOUT: 3-minute hard limit per run\nHermes enforces this — no infinite loops."]
+        DD["DEDUP: .tick.lock prevents duplicate ticks\nTwo gateway processes won't run the same job twice."]
+        MEM["MEMORY: Cron sessions skip memory by default\nThey don't pollute your memory with scheduled output."]
+        SC["SCRIPT JOBS: Design for silence\nEmpty stdout = nothing sent.\nOnly output alerts, not noise."]
+    end
+    P --> SK --> NR --> TO --> DD --> MEM --> SC</div>
+<h3 id="cost-awareness">Cost Awareness</h3>
+<p>Cron jobs consume tokens. Here's a rough guide:</p>
+<table>
+<thead>
+<tr>
+<th>Job Type</th>
+<th>Tokens/Run</th>
+<th>Runs/Day</th>
+<th>Est. Daily Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Script-only (no_agent)</td>
+<td>0</td>
+<td>288 (every 5min)</td>
+<td>$0.00</td>
+</tr>
+<tr>
+<td>Simple digest (short prompt)</td>
+<td>~2-5K</td>
+<td>1</td>
+<td>~$0.01-0.05</td>
+</tr>
+<tr>
+<td>Research + summary</td>
+<td>~10-30K</td>
+<td>2</td>
+<td>~$0.10-0.30</td>
+</tr>
+<tr>
+<td>Code review (full PR)</td>
+<td>~20-50K</td>
+<td>5</td>
+<td>~$0.50-2.50</td>
+</tr>
+<tr>
+<td>Blog article generation</td>
+<td>~30-80K</td>
+<td>2</td>
+<td>~$0.60-3.20</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tip:</strong> Use script-only jobs for data collection (free), reserve LLM agent jobs for tasks that actually need reasoning.</p>
+<hr />
+<h2 id="58-automation-in-practice-three-real-workflows">5.8 Automation in Practice — Three Real Workflows</h2>
+<h3 id="workflow-1-content-marketing-engine">Workflow 1: Content Marketing Engine</h3>
+<div class="mermaid">flowchart TD
+    subgraph pipeline ["DAILY BLOG PIPELINE (2 articles/day)"]
+        M["8:00 AM — Job: morning-article\nSkills: [blog, marketing-copy, humanizer]\nPrompt: Write today's morning article...\nDeliver: telegram"]
+        M --> MH["Hermes researches topics,\nwrites, edits, and publishes.\nYou get a notification."]
+        E["6:00 PM — Job: evening-article\nSame pipeline, different time slot."]
+        W["Weekly — Job: content-digest\ncontext_from: [morning, evening]\nSummarizes the week's content performance."]
+    end
+    M --> MH --> E --> W
+    W -.- COST["Cost: ~$1.50-3.00/day\nValue: Replaces $2,000-5,000/mo content writer"]</div>
+<h3 id="workflow-2-server-watchdog">Workflow 2: Server Watchdog</h3>
+<div class="mermaid">flowchart TD
+    subgraph infra ["INFRASTRUCTURE MONITORING"]
+        H["Every 5 min — Script-only: health_check.py\nChecks: API uptime, DB connections,\ndisk space, memory usage\nOutput: silent unless something's wrong\nCost: $0.00 (no LLM)"]
+        G["Every 15 min — Script-only: gpu_monitor.py\nChecks: GPU temp, memory, utilization\nOutput: alert only if >90%\nCost: $0.00"]
+        A["On alert — Webhook: auto-remediation\nHermes receives the alert, investigates,\nattempts fix, notifies if manual action needed\nCost: ~$0.05-0.10 per incident"]
+    end
+    H -->|"alert"| A
+    G -->|"alert"| A</div>
+<h3 id="workflow-3-github-pr-auto-review">Workflow 3: GitHub PR Auto-Review</h3>
+<p><div class="mermaid">flowchart TD
+    subgraph anatomy ["CRON JOB ANATOMY"]
+        direction TB
+        S["Schedule: \"0 9 * * *\" — When it runs"]
+        N["Name: \"morning-digest\" — Human label"]
+        P["Prompt: \"Check emails...\" — What Hermes does"]
+        SK["Skills: [email, summary] — Preloaded knowledge"]
+        MO["Model: claude-sonnet-4 — Optional override"]
+        D["Deliver: telegram — Where output goes"]
+        W["Workdir: ~/projects/app — Project context"]
+        E["Enabled: [x] — Active or paused"]
+    end
+    S --> N --> P --> SK --> MO --> D --> W --> E
+    E -.->|"Result: Hermes wakes up at 9am,\nloads skills, checks inbox,\nwrites digest, delivers to Telegram"| R((📰 Digest))</div>0</p>
+<hr />
+<h2 id="chapter-5-key-vocabulary">Chapter 5 Key Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cron job</strong></td>
+<td>A scheduled task that runs a full agent loop on a time-based schedule</td>
+</tr>
+<tr>
+<td><strong>Schedule</strong></td>
+<td>When a cron job runs — supports duration, natural language, cron expression, or ISO timestamp</td>
+</tr>
+<tr>
+<td><strong>Script-only job</strong></td>
+<td>A cron job with <code>no_agent=True</code> — runs a script, no LLM, zero token cost</td>
+</tr>
+<tr>
+<td><strong>Job chaining</strong></td>
+<td>Connecting jobs via <code>context_from</code> so Job B receives Job A's output as context</td>
+</tr>
+<tr>
+<td><strong>Webhook</strong></td>
+<td>An HTTP endpoint that triggers Hermes when an external event occurs</td>
+</tr>
+<tr>
+<td><strong>Delivery target</strong></td>
+<td>Where cron job output is sent — Telegram, Discord, Slack, or any connected platform</td>
+</tr>
+<tr>
+<td><strong>Background task</strong></td>
+<td>A terminal process started with <code>background=True</code> that runs while you continue working</td>
+</tr>
+<tr>
+<td><strong>Model override</strong></td>
+<td>Per-job model/provider setting independent of your default configuration</td>
+</tr>
+<tr>
+<td><strong>Workdir</strong></td>
+<td>The working directory for a cron job — loads project context files (AGENTS.md, etc.)</td>
+</tr>
+<tr>
+<td><strong>.tick.lock</strong></td>
+<td>Lock file preventing duplicate cron ticks across multiple processes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chapter-5-summary">Chapter 5 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>What You Learned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Why automation</td>
+<td>From manual to autonomous — consistency, speed, scale, freedom</td>
+</tr>
+<tr>
+<td>Cron jobs</td>
+<td>Full agent loop on schedule, multiple schedule formats, delivery targets</td>
+</tr>
+<tr>
+<td>Script-only jobs</td>
+<td>Zero-token watchdogs — script output delivered verbatim, silent when empty</td>
+</tr>
+<tr>
+<td>Gateway heartbeat</td>
+<td>Built-in heartbeat.py keeps gateway alive after crashes, sleep, hibernation — zero cost</td>
+</tr>
+<tr>
+<td>Job chaining</td>
+<td><code>context_from</code> pipeline — data collection → analysis → delivery</td>
+</tr>
+<tr>
+<td>Webhooks</td>
+<td>Event-driven triggers — external systems push events to Hermes</td>
+</tr>
+<tr>
+<td>Background tasks</td>
+<td>Long-running processes with <code>notify_on_complete</code> for non-blocking work</td>
+</tr>
+<tr>
+<td>Safety</td>
+<td>Self-contained prompts, no recursive cron, 3-min timeout, dedup locks</td>
+</tr>
+<tr>
+<td>Cost awareness</td>
+<td>Script-only = free, simple = pennies, complex = dollars — design accordingly</td>
+</tr>
+<tr>
+<td>Real workflows</td>
+<td>Content engine, server watchdog, PR auto-review — end-to-end examples</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next:</strong> <a href="ch06-multi-agent.md">Chapter 6: Multi-Agent Orchestration →</a></p>
+<hr />
+<!-- SCREENSHOT: hermes cron list showing active jobs -->
+<!-- SCREENSHOT: Cron job creation interactive flow -->
+<!-- SCREENSHOT: Webhook POST in browser devtools -->
+<!-- SCREENSHOT: Background task notification in Telegram -->
+<!-- SCREENSHOT: process(action="log") output showing build progress -->
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch04-skills-memory.html" class="prev">← Ch 4: Skills & Memory</a><a href="ch06-multi-agent.html" class="next">Ch 6: Multi-Agent Orchestration →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

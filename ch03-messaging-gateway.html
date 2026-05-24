@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging Gateway — AI Everywhere, Always Online | Hermes Agent Tutorial</title>
+    <meta name="description" content="Connect Hermes Agent to Telegram, Discord, Slack, WhatsApp, and 14 platforms. Voice messages, slash commands, deployment costs, and production hardening.">
+    <meta name="keywords" content="Hermes Telegram bot, AI agent Discord, messaging gateway, voice transcription, Hermes deployment cost, VPS setup">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch03-messaging-gateway.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Messaging Gateway — AI Everywhere, Always Online">
+    <meta property="og:description" content="Connect Hermes Agent to Telegram, Discord, Slack, WhatsApp, and 14 platforms. Voice messages, slash commands, deployment costs, and production hardening.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch03-messaging-gateway.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 3">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Messaging Gateway — AI Everywhere, Always Online">
+    <meta name="twitter:description" content="Connect Hermes Agent to Telegram, Discord, Slack, WhatsApp, and 14 platforms. Voice messages, slash commands, deployment costs, and production hardening.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Messaging Gateway \u2014 AI Everywhere, Always Online",
+  "description": "Connect Hermes Agent to Telegram, Discord, Slack, WhatsApp, and 14 platforms. Voice messages, slash commands, deployment costs, and production hardening.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch03-messaging-gateway.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch03-messaging-gateway.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html" class="active">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 3</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-3-messaging-gateway-ai-everywhere">Chapter 3: Messaging Gateway — AI Everywhere</h1>
+<blockquote>
+<p><strong>Your AI agent shouldn't live in a terminal. The gateway connects Hermes to Telegram, Discord, Slack, and 10+ platforms — full tools, full memory, everywhere you chat.</strong></p>
+</blockquote>
+<hr />
+<h2 id="31-what-is-the-gateway">3.1 What is the Gateway?</h2>
+<p>The <strong>gateway</strong> is a long-running background process that connects your Hermes agent to messaging platforms. It's the bridge between your chat apps and the AI brain:</p>
+<div class="mermaid">flowchart TD
+    subgraph platforms["Messaging Platforms"]
+        direction LR
+        T["💬 Telegram"]
+        D["💬 Discord"]
+        S["💬 Slack"]
+        W["💬 WhatsApp"]
+    end
+
+    platforms -->|"messages"| GW["🔄 GATEWAY<br/><b>Scheduler</b><br/>Routes messages<br/>Manages sessions<br/>Handles platform auth"]
+
+    GW -->|"routes to"| AL["🧠 AGENT LOOP<br/>Same brain<br/>Same memory<br/>Same tools"]
+
+    classDef platform fill:#4a9eff,color:#fff,stroke:#2d7dd2
+    classDef gateway fill:#ff6b35,color:#fff,stroke:#cc5529
+    classDef agent fill:#2ecc71,color:#fff,stroke:#25a25a
+    class T,D,S,W platform
+    class GW gateway
+    class AL agent</div>
+<p><em>One session per conversation — switch platforms freely.</em></p>
+<p><strong>Key insight:</strong> The gateway doesn't create a separate Hermes — it connects your existing agent to messaging platforms. Same memory, same tools, same sessions. Start a conversation on Telegram, continue on CLI — it's one agent.</p>
+<h3 id="supported-platforms">Supported Platforms</h3>
+<div class="mermaid">flowchart LR
+    subgraph platforms["SUPPORTED MESSAGING PLATFORMS"]
+        direction TB
+        subgraph chat["💬 Chat Apps"]
+            direction TB
+            C1["Telegram"]
+            C2["Discord"]
+            C3["WhatsApp"]
+            C4["WeChat (Weixin)"]
+            C5["iMessage*"]
+        end
+        subgraph biz["🏢 Business"]
+            direction TB
+            B1["Slack"]
+            B2["Microsoft Teams"]
+            B3["DingTalk"]
+            B4["Feishu (Lark)"]
+            B5["WeCom"]
+        end
+        subgraph other["📱 Other"]
+            direction TB
+            O1["Signal"]
+            O2["Matrix"]
+            O3["Mattermost"]
+            O4["SMS"]
+            O5["Email"]
+        end
+        subgraph home["🏠 Smart Home"]
+            direction TB
+            H1["Home Assistant"]
+        end
+        subgraph integ["🔌 Integrations"]
+            direction TB
+            I1["API Server (REST)"]
+            I2["Webhooks"]
+            I3["Open WebUI"]
+        end
+    end
+
+    classDef cat fill:#4a9eff,color:#fff,stroke:#2d7dd2
+    class C1,C2,C3,C4,C5,B1,B2,B3,B4,B5,O1,O2,O3,O4,O5,H1,I1,I2,I3 cat</div>
+<p><em>* iMessage via BlueBubbles (requires Mac)</em></p>
+<p>That's <strong>17+ platforms</strong> — and they all have access to the same tools (terminal, files, web search, browser automation, etc.).</p>
+<hr />
+<h2 id="32-setting-up-telegram-the-deep-dive">3.2 Setting Up Telegram — The Deep Dive</h2>
+<p>Telegram is the most popular platform for Hermes. It supports text, voice, images, files, slash commands, topics, and inline keyboards — everything you need for a full AI agent experience.</p>
+<h3 id="step-1-create-your-bot">Step 1: Create Your Bot</h3>
+<ol>
+<li>Open Telegram, search for <strong>@BotFather</strong></li>
+<li>Send <code>/newbot</code></li>
+<li>Choose a name (e.g., "My Hermes Agent")</li>
+<li>Choose a username (e.g., <code>my_hermes_agent_bot</code>)</li>
+<li>BotFather responds with your <strong>bot token</strong> — it looks like:
+   <code>7123456789:AAHfG3k9dBz8vN2mX5pLqRtWyUiOoP0aBcD</code>
+   <strong>Save this.</strong> You'll need it in Step 2.</li>
+</ol>
+<h3 id="step-2-configure-hermes">Step 2: Configure Hermes</h3>
+<pre class="highlight"><code class="language-bash"># Interactive setup — walks you through everything
+hermes gateway setup
+
+# Or set directly in config.yaml
+hermes config set telegram.token &quot;YOUR_BOT_TOKEN&quot;
+</code></pre>
+
+<p>The interactive setup will ask:
+- Which platforms to enable
+- Bot tokens / OAuth credentials for each
+- Whether to enable voice (STT/TTS)
+- Home channel (which chat receives notifications)</p>
+<h3 id="step-3-start-the-gateway">Step 3: Start the Gateway</h3>
+<pre class="highlight"><code class="language-bash"># Run in foreground (good for testing)
+hermes gateway run
+
+# Install as a background service (production)
+hermes gateway install
+hermes gateway start
+
+# Check it's running
+hermes gateway status
+</code></pre>
+
+<p>Foreground mode shows you every message as it arrives — great for debugging. Once everything works, switch to the background service.</p>
+<h3 id="step-4-verify">Step 4: Verify</h3>
+<p>Send a message to your bot on Telegram:</p>
+<pre class="highlight"><code>You: Hello Hermes, what can you do?
+
+Hermes: Hey! I'm your Hermes agent. I can:
+• Read and write files on your machine
+• Run terminal commands
+• Search the web
+• Manage your schedule with cron jobs
+• Remember things across sessions
+• ...and much more. Just ask!
+</code></pre>
+
+<p><strong>It's alive.</strong> Same agent as your CLI, now in your pocket.</p>
+<h3 id="telegram-specific-features">Telegram-Specific Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>How It Works</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Voice messages</strong></td>
+<td>Auto-transcribed via STT, Hermes responds with text or voice</td>
+</tr>
+<tr>
+<td><strong>Images</strong></td>
+<td>Send a photo → Hermes analyzes it with vision tools</td>
+</tr>
+<tr>
+<td><strong>Files</strong></td>
+<td>Send documents → Hermes reads, edits, and sends them back</td>
+</tr>
+<tr>
+<td><strong>Topics</strong></td>
+<td>Separate conversations per topic in group chats</td>
+</tr>
+<tr>
+<td><strong>Group chats</strong></td>
+<td>Mention <code>@YourBot</code> to trigger (or DM directly)</td>
+</tr>
+<tr>
+<td><strong>Inline commands</strong></td>
+<td>Slash command menu built into the chat input</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="33-slash-commands-your-in-chat-control-panel">3.3 Slash Commands — Your In-Chat Control Panel</h2>
+<p>Slash commands work identically across all messaging platforms and the CLI. They're how you control Hermes without leaving the conversation.</p>
+<h3 id="essential-commands">Essential Commands</h3>
+<pre class="highlight"><code>/new (/reset)        Start a fresh session
+/model [name]        Show or switch model
+/tools               Manage enabled toolsets
+/yolo                Toggle command approval bypass
+/voice [on|off|tts]  Control voice mode
+/compress            Manually compress context
+/stop                Kill background processes
+/status              Show session info
+/help                Show all commands
+</code></pre>
+
+<h3 id="workflow-commands">Workflow Commands</h3>
+<pre class="highlight"><code>/background &lt;prompt&gt; Run a task in the background while you keep chatting
+/queue &lt;prompt&gt;      Queue a task for the next turn
+/steer &lt;prompt&gt;      Inject context mid-task without interrupting
+/goal [text]         Set a standing objective across turns
+/branch              Fork the conversation for exploration
+</code></pre>
+
+<h3 id="how-background-works">How <code>/background</code> Works</h3>
+<pre class="highlight"><code>You: /background research the top 10 React state management libraries in 2026
+
+Hermes: ✅ Background task started. I'll notify you when it's done.
+
+[You keep chatting normally...]
+
+Hermes: ✅ Background task complete
+Prompt: &quot;research the top 10 React state management libraries in 2026&quot;
+Result: Here's the research summary...
+1. Zustand — Lightweight, TypeScript-first...
+2. Jotai — Atomic state management...
+[etc.]
+</code></pre>
+
+<p><strong>The key insight:</strong> <code>/background</code> lets you fire off tasks without waiting. Keep working, get notified when it's done.</p>
+<h3 id="how-steer-works">How <code>/steer</code> Works</h3>
+<pre class="highlight"><code>You: Build me a FastAPI project with auth
+
+Hermes: [working on project structure...]
+
+You: /steer Use SQLAlchemy 2.0 with async, not Tortoise ORM
+
+Hermes: [receives the steer after the next tool call, adjusts course]
+✓ Using SQLAlchemy 2.0 with async engine...
+</code></pre>
+
+<p><code>/steer</code> injects your message <em>after</em> the next tool call completes — it doesn't interrupt the current operation, but course-corrects before the next one.</p>
+<h3 id="discovery-commands">Discovery Commands</h3>
+<pre class="highlight"><code>/skills              Browse and install skills
+/skill &lt;name&gt;        Load a skill into the current session
+/curator status      Check skill maintenance status
+/cron                Manage scheduled jobs
+/plugins             List installed plugins
+/kanban              Multi-agent work queue
+</code></pre>
+
+<h3 id="info-commands">Info Commands</h3>
+<pre class="highlight"><code>/usage               Token usage for this session
+/insights [days]     Usage analytics over time
+/debug               Upload debug report for support
+/profile             Show active profile info
+/platforms           Show all connected platforms
+</code></pre>
+
+<hr />
+<h2 id="34-voice-mode-talk-to-your-agent">3.4 Voice Mode — Talk to Your Agent</h2>
+<p>Hermes can <strong>listen</strong> and <strong>speak</strong>. This turns Telegram (or any platform) into a voice-to-voice AI assistant.</p>
+<h3 id="enabling-voice">Enabling Voice</h3>
+<pre class="highlight"><code>/voice on            # Voice input → text response (default voice mode)
+/voice tts           # Voice input → voice response (full voice-to-voice)
+/voice off           # Disable voice mode
+</code></pre>
+
+<p>Or configure permanently:</p>
+<pre class="highlight"><code class="language-bash">hermes config set stt.enabled true
+hermes config set tts.provider edge     # Free, no API key needed
+</code></pre>
+
+<h3 id="stt-speech-to-text">STT — Speech to Text</h3>
+<p>When you send a voice message, Hermes transcribes it automatically:</p>
+<div class="mermaid">flowchart TD
+    VM["🎤 Voice message"] --> STT["STT Provider<br/><i>priority order:</i>"]
+
+    STT --> P1["1. Local faster-whisper<br/><i>free</i>"]
+    STT --> P2["2. Groq Whisper<br/><i>free tier</i>"]
+    STT --> P3["3. OpenAI Whisper<br/><i>paid</i>"]
+    STT --> P4["4. Mistral Voxtral<br/><i>paid</i>"]
+
+    P1 & P2 & P3 & P4 --> RESULT["Transcribed text → Agent loop → Response"]
+
+    classDef voice fill:#9b59b6,color:#fff,stroke:#7d3c98
+    classDef provider fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef result fill:#2ecc71,color:#fff,stroke:#25a25a
+    class VM voice
+    class P1,P2,P3,P4 provider
+    class RESULT result</div>
+<p><strong>Setup local transcription (free, recommended):</strong></p>
+<pre class="highlight"><code class="language-bash">pip install faster-whisper
+hermes config set stt.provider local
+</code></pre>
+
+<p>No API key needed. Runs locally on your machine. Model sizes:</p>
+<table>
+<thead>
+<tr>
+<th>Size</th>
+<th>VRAM</th>
+<th>Speed</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tiny</code></td>
+<td>~1 GB</td>
+<td>Fastest</td>
+<td>Good</td>
+</tr>
+<tr>
+<td><code>base</code></td>
+<td>~1 GB</td>
+<td>Fast</td>
+<td>Great</td>
+</tr>
+<tr>
+<td><code>small</code></td>
+<td>~2 GB</td>
+<td>Medium</td>
+<td>Very good</td>
+</tr>
+<tr>
+<td><code>medium</code></td>
+<td>~5 GB</td>
+<td>Slower</td>
+<td>Excellent</td>
+</tr>
+<tr>
+<td><code>large-v3</code></td>
+<td>~10 GB</td>
+<td>Slowest</td>
+<td>Best</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tts-text-to-speech">TTS — Text to Speech</h3>
+<p>Hermes can respond with voice messages instead of text:</p>
+<pre class="highlight"><code>You: /voice tts
+
+You: [voice message] &quot;Summarize my unread emails&quot;
+
+Hermes: 🔊 [voice message] &quot;You have 12 unread emails. The most urgent is
+from your client about the deployment timeline...&quot;
+</code></pre>
+
+<p><strong>TTS providers:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Cost</th>
+<th>Quality</th>
+<th>Setup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Edge TTS</strong></td>
+<td>Free</td>
+<td>Good</td>
+<td>No config needed (default)</td>
+</tr>
+<tr>
+<td>ElevenLabs</td>
+<td>Free tier</td>
+<td>Excellent</td>
+<td>Set <code>ELEVENLABS_API_KEY</code></td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>Paid</td>
+<td>Great</td>
+<td>Set <code>VOICE_TOOLS_OPENAI_KEY</code></td>
+</tr>
+<tr>
+<td>MiniMax</td>
+<td>Paid</td>
+<td>Great</td>
+<td>Set <code>MINIMAX_API_KEY</code></td>
+</tr>
+<tr>
+<td>NeuTTS (local)</td>
+<td>Free</td>
+<td>Good</td>
+<td><code>pip install neutts[all]</code> + <code>espeak-ng</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Edge TTS is the zero-config default</strong> — it's free and works immediately. Upgrade to ElevenLabs if you want natural-sounding voices.</p>
+<hr />
+<h2 id="35-other-platforms-quick-setup">3.5 Other Platforms — Quick Setup</h2>
+<p>While Telegram is the most feature-rich, Hermes works across all major platforms. Here's how to set up the most common ones:</p>
+<h3 id="discord">Discord</h3>
+<pre class="highlight"><code class="language-bash">hermes gateway setup    # Select Discord
+</code></pre>
+
+<p><strong>Requirements:</strong>
+1. Create a bot at <a href="https://discord.com/developers">discord.com/developers</a>
+2. Enable <strong>Message Content Intent</strong> (Bot → Privileged Gateway Intents) — <em>this is the #1 reason Discord bots go silent</em>
+3. Generate a bot token and paste during setup</p>
+<pre class="highlight"><code>⚠️  Discord gotcha: Without Message Content Intent enabled, your bot
+    will receive events but can't read message content. It will appear
+    online but never respond. Enable it in the Discord Developer Portal.
+</code></pre>
+
+<h3 id="slack">Slack</h3>
+<pre class="highlight"><code class="language-bash">hermes gateway setup    # Select Slack
+</code></pre>
+
+<p><strong>Requirements:</strong>
+1. Create a Slack App at <a href="https://api.slack.com">api.slack.com</a>
+2. Subscribe to <code>message.channels</code> event — <em>without this, the bot only works in DMs</em>
+3. Install to your workspace and copy the bot token</p>
+<h3 id="whatsapp">WhatsApp</h3>
+<p>Hermes supports WhatsApp via the WhatsApp Business API or third-party bridges. Setup varies by provider — <code>hermes gateway setup</code> will walk you through the options.</p>
+<h3 id="signal-matrix-email-sms">Signal, Matrix, Email, SMS</h3>
+<p>All follow the same pattern: <code>hermes gateway setup</code> → select platform → enter credentials. Each has platform-specific requirements documented at:</p>
+<pre class="highlight"><code>https://hermes-agent.nousresearch.com/docs/user-guide/messaging/
+</code></pre>
+
+<h3 id="multi-platform-simultaneous-connections">Multi-Platform Simultaneous Connections</h3>
+<p>You can connect <strong>multiple platforms at once</strong>:</p>
+<pre class="highlight"><code class="language-yaml"># config.yaml
+telegram:
+  token: &quot;your-telegram-token&quot;
+
+discord:
+  token: &quot;your-discord-token&quot;
+
+slack:
+  token: &quot;xoxb-your-slack-token&quot;
+</code></pre>
+
+<p>All platforms route to the same agent. One brain, many faces.</p>
+<hr />
+<h2 id="36-gateway-lifecycle">3.6 Gateway Lifecycle</h2>
+<p>The gateway is a persistent service. Here's how to manage it:</p>
+<h3 id="commands">Commands</h3>
+<pre class="highlight"><code class="language-bash">hermes gateway run        # Foreground (testing, debugging)
+hermes gateway install    # Install as system service
+hermes gateway start      # Start the background service
+hermes gateway stop       # Stop the background service
+hermes gateway restart    # Restart (picks up config changes)
+hermes gateway status     # Check running status + connected platforms
+hermes gateway setup      # Reconfigure platforms
+</code></pre>
+
+<h3 id="in-chat-gateway-commands">In-Chat Gateway Commands</h3>
+<p>These work inside any connected messaging platform:</p>
+<pre class="highlight"><code>/restart              Restart the gateway (picks up config changes)
+/sethome              Set this chat as the home channel
+/update               Update Hermes to latest version
+/platforms            Show all connected platforms
+/approve              Approve a pending command
+/deny                 Deny a pending command
+</code></pre>
+
+<h3 id="checking-logs">Checking Logs</h3>
+<p>When something goes wrong, check the gateway logs:</p>
+<pre class="highlight"><code class="language-bash"># View recent errors
+grep -i &quot;error\|failed&quot; ~/.hermes/logs/gateway.log | tail -20
+
+# Follow live
+tail -f ~/.hermes/logs/gateway.log
+</code></pre>
+
+<h3 id="restarting-from-chat">Restarting from Chat</h3>
+<p>No need to SSH into your server to restart:</p>
+<pre class="highlight"><code>You: /restart
+
+Hermes: 🔄 Gateway restarting...
+✓ Gateway restarted. All platforms reconnected.
+</code></pre>
+
+<hr />
+<h2 id="37-the-approval-system-safety-first">3.7 The Approval System — Safety First</h2>
+<p>When Hermes wants to run a potentially dangerous command (like <code>rm -rf</code>, <code>git push --force</code>, or writing to system files), it asks for your permission first.</p>
+<h3 id="how-approvals-work">How Approvals Work</h3>
+<pre class="highlight"><code>Hermes: ⚠️ I need to run a potentially destructive command:
+        rm -rf /tmp/old-builds/
+
+        /approve to allow, /deny to reject
+
+You: /approve
+
+Hermes: ✓ Command executed. Removed /tmp/old-builds/
+</code></pre>
+
+<p>This only triggers for commands flagged as <strong>destructive</strong> — normal operations (reading files, searching, creating projects) run without approval.</p>
+<h3 id="approval-modes">Approval Modes</h3>
+<pre class="highlight"><code class="language-bash"># Manual — always ask (default)
+hermes config set approvals.mode manual
+
+# Smart — AI auto-approves low-risk, asks on high-risk
+hermes config set approvals.mode smart
+
+# Off — skip all approvals (use at your own risk)
+hermes config set approvals.mode off
+</code></pre>
+
+<p><strong>Recommendation:</strong> Use <code>smart</code> mode. It blocks dangerous operations but doesn't waste your time on safe ones.</p>
+<h3 id="yolo-mode-skip-everything">YOLO Mode — Skip Everything</h3>
+<p>For when you trust Hermes completely (or are in a rush):</p>
+<pre class="highlight"><code class="language-bash"># Per-session (in chat)
+/yolo
+
+# Per-invocation (CLI)
+hermes --yolo
+
+# Environment variable
+export HERMES_YOLO_MODE=1
+</code></pre>
+
+<p>YOLO mode skips <em>all</em> approval prompts. Use it when you know what you're doing.</p>
+<hr />
+<h2 id="38-practical-patterns">3.8 Practical Patterns</h2>
+<p>Here's how people actually use the gateway day-to-day:</p>
+<h3 id="pattern-1-phone-driven-development">Pattern 1: Phone-Driven Development</h3>
+<pre class="highlight"><code>[On the bus, Telegram]
+
+You: What's the status of the auth module?
+
+Hermes: The auth module is 80% complete. Remaining:
+- JWT refresh token rotation
+- Rate limiting on /login
+- Unit tests for password reset
+
+Want me to continue?
+
+You: Yes, finish the JWT refresh tokens
+
+Hermes: ✓ JWT refresh token rotation implemented.
+Added to auth/routes.py and auth/tests/test_refresh.py.
+3 tests passing.
+</code></pre>
+
+<h3 id="pattern-2-voice-powered-research">Pattern 2: Voice-Powered Research</h3>
+<pre class="highlight"><code>[Driving, voice message]
+
+You: 🔊 &quot;What were our top 3 selling products last month?&quot;
+
+Hermes: 🔊 &quot;Your top 3 sellers in April were:
+1. Premium Widget — 2,340 units, $47K revenue
+2. Standard Gadget — 1,890 units, $28K revenue  
+3. Mega Pack Bundle — 670 units, $33K revenue&quot;
+</code></pre>
+
+<h3 id="pattern-3-multi-platform-workflow">Pattern 3: Multi-Platform Workflow</h3>
+<pre class="highlight"><code>[Morning: Telegram]
+You: Start the daily blog pipeline
+
+Hermes: ✓ Blog pipeline started. 2 articles queued.
+Topic 1: &quot;5 Python Patterns Every Senior Dev Should Know&quot;
+Topic 2: &quot;Docker Multi-Stage Builds: A Practical Guide&quot;
+
+[Afternoon: CLI]
+You: hermes
+Hermes: Welcome back! Both blog articles are drafted and ready for review.
+       Want me to show them?
+
+[Evening: Telegram]
+You: Publish both articles
+
+Hermes: ✓ Both articles published to your blog.
+</code></pre>
+
+<p><strong>Same agent. Same context. Different platforms.</strong></p>
+<h3 id="deployment-cost-quick-reference">Deployment Cost Quick-Reference</h3>
+<p>How much does it actually cost to run Hermes 24/7?</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Monthly Cost</th>
+<th>RAM</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>$5 VPS</strong> (Hetzner CX22, Vultr, DigitalOcean)</td>
+<td>$4–6</td>
+<td>&lt;500MB without local LLM</td>
+<td>Most users — always-on Telegram bot</td>
+</tr>
+<tr>
+<td><strong>Serverless</strong> (Daytona, Modal)</td>
+<td>~$0 idle, pay-per-wake</td>
+<td>Scales to zero</td>
+<td>Infrequent use — hibernates between messages</td>
+</tr>
+<tr>
+<td><strong>Privacy VPS</strong> (local Ollama)</td>
+<td>$15–30 (16GB+ RAM VPS)</td>
+<td>4–16GB</td>
+<td>Zero API cost, full data privacy</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Typical monthly total:</strong> $5 VPS + $5 API calls = <strong>~$10/month</strong> for a personal 24/7 AI agent. Compare: Claude Code Pro is $20/mo, Max is $200/mo. Different tools, but the barrier to entry is remarkably low.</p>
+<blockquote>
+<p><strong>💡 Tip:</strong> Start with the cheapest $5 VPS + OpenRouter. You can always scale up later. The gateway uses minimal resources — most of the cost is LLM API calls, not hosting.</p>
+</blockquote>
+<hr />
+<h2 id="39-troubleshooting-the-gateway">3.9 Troubleshooting the Gateway</h2>
+<h3 id="gateway-wont-start">Gateway won't start</h3>
+<pre class="highlight"><code class="language-bash">hermes doctor           # Check dependencies and config
+hermes gateway status   # See what's happening
+tail -20 ~/.hermes/logs/gateway.log   # Check error logs
+</code></pre>
+
+<h3 id="bot-is-silent-on-telegram">Bot is silent on Telegram</h3>
+<ol>
+<li>Check gateway is running: <code>hermes gateway status</code></li>
+<li>Check logs for errors: <code>grep -i "telegram\|error" ~/.hermes/logs/gateway.log</code></li>
+<li>Verify bot token: <code>hermes config</code> → look for <code>telegram.token</code></li>
+<li>Make sure you're messaging the right bot</li>
+</ol>
+<h3 id="bot-is-silent-on-discord">Bot is silent on Discord</h3>
+<ol>
+<li><strong>Enable Message Content Intent</strong> — this is the #1 cause</li>
+<li>Check bot has permissions to read messages in the channel</li>
+<li>Verify gateway is running</li>
+</ol>
+<h3 id="bot-is-silent-on-slack">Bot is silent on Slack</h3>
+<ol>
+<li>Subscribe to <code>message.channels</code> event — without it, bot only works in DMs</li>
+<li>Check bot is invited to the channel</li>
+<li>Verify token starts with <code>xoxb-</code></li>
+</ol>
+<h3 id="voice-not-working">Voice not working</h3>
+<pre class="highlight"><code class="language-bash"># Check STT is enabled
+hermes config get stt.enabled
+
+# Check provider
+hermes config get stt.provider
+
+# Install local transcription
+pip install faster-whisper
+
+# Restart gateway
+hermes gateway restart
+</code></pre>
+
+<h3 id="gateway-dies-on-server-logout">Gateway dies on server logout</h3>
+<pre class="highlight"><code class="language-bash"># Linux: enable linger so the service persists after logout
+sudo loginctl enable-linger $USER
+
+# WSL2: enable systemd in /etc/wsl.conf
+[boot]
+systemd=true
+</code></pre>
+
+<hr />
+<h2 id="chapter-3-key-vocabulary">Chapter 3 Key Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gateway</strong></td>
+<td>The background service connecting Hermes to messaging platforms</td>
+</tr>
+<tr>
+<td><strong>Home channel</strong></td>
+<td>The default chat where notifications and cron deliveries are sent</td>
+</tr>
+<tr>
+<td><strong>Slash command</strong></td>
+<td>An in-chat command prefixed with <code>/</code> (e.g., <code>/model</code>, <code>/yolo</code>)</td>
+</tr>
+<tr>
+<td><strong>STT</strong></td>
+<td>Speech-to-Text — transcribes voice messages into text</td>
+</tr>
+<tr>
+<td><strong>TTS</strong></td>
+<td>Text-to-Speech — converts responses into voice messages</td>
+</tr>
+<tr>
+<td><strong>Approval</strong></td>
+<td>Safety mechanism requiring user confirmation for dangerous commands</td>
+</tr>
+<tr>
+<td><strong>YOLO mode</strong></td>
+<td>Bypasses all approval prompts for faster execution</td>
+</tr>
+<tr>
+<td><strong>Topic</strong></td>
+<td>Telegram's thread-like feature for separate conversations in one group</td>
+</tr>
+<tr>
+<td><code>/background</code></td>
+<td>Runs a task asynchronously while you continue chatting</td>
+</tr>
+<tr>
+<td><code>/steer</code></td>
+<td>Injects context mid-task without interrupting the current operation</td>
+</tr>
+<tr>
+<td><code>/queue</code></td>
+<td>Stacks a command for the next agent turn</td>
+</tr>
+<tr>
+<td><code>/goal</code></td>
+<td>Sets a standing objective Hermes works on across multiple turns</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chapter-3-summary">Chapter 3 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>What You Learned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gateway architecture</td>
+<td>Background service bridging platforms → agent loop</td>
+</tr>
+<tr>
+<td>Telegram setup</td>
+<td>BotFather → token → <code>hermes gateway setup</code> → live</td>
+</tr>
+<tr>
+<td>Slash commands</td>
+<td>30+ commands for session control, config, and workflow</td>
+</tr>
+<tr>
+<td>Voice mode</td>
+<td>STT (faster-whisper free) + TTS (Edge TTS free)</td>
+</tr>
+<tr>
+<td>Other platforms</td>
+<td>Discord, Slack, WhatsApp, Signal, Matrix, 17+ total</td>
+</tr>
+<tr>
+<td>Gateway lifecycle</td>
+<td><code>run</code>, <code>install</code>, <code>start</code>, <code>stop</code>, <code>restart</code>, <code>status</code></td>
+</tr>
+<tr>
+<td>Approval system</td>
+<td>Manual / Smart / YOLO — safety vs speed tradeoff</td>
+</tr>
+<tr>
+<td>Troubleshooting</td>
+<td>Doctor, logs, platform-specific gotchas</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next:</strong> <a href="ch04-skills-memory.md">Chapter 4: Skills &amp; Memory →</a></p>
+<hr />
+<!-- SCREENSHOT: Gateway startup output in terminal -->
+<!-- SCREENSHOT: Telegram bot conversation showing slash command menu -->
+<!-- SCREENSHOT: Voice message transcription in Telegram -->
+<!-- SCREENSHOT: /background task notification in Telegram -->
+<!-- SCREENSHOT: Approval prompt with /approve / /deny buttons -->
+<!-- SCREENSHOT: hermes gateway status output -->
+<!-- SCREENSHOT: Discord bot responding in a channel -->
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch02-core-concepts.html" class="prev">← Ch 2: Core Concepts</a><a href="ch04-skills-memory.html" class="next">Ch 4: Skills & Memory →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building a Business Around Hermes — Pricing, White-Label, and Scaling | Hermes Agent Tutorial</title>
+    <meta name="description" content="Turn Hermes Agent into a business. Pricing models, white-label solutions, agency setup, scaling strategies, and cost optimization for AI agent services.">
+    <meta name="keywords" content="Hermes business model, AI agent pricing, white-label AI, AI agency, Hermes scaling, AI agent costs">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch10-business-around-hermes.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Building a Business Around Hermes — Pricing, White-Label, and Scaling">
+    <meta property="og:description" content="Turn Hermes Agent into a business. Pricing models, white-label solutions, agency setup, scaling strategies, and cost optimization for AI agent services.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch10-business-around-hermes.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 10">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Building a Business Around Hermes — Pricing, White-Label, and Scaling">
+    <meta name="twitter:description" content="Turn Hermes Agent into a business. Pricing models, white-label solutions, agency setup, scaling strategies, and cost optimization for AI agent services.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Building a Business Around Hermes \u2014 Pricing, White-Label, and Scaling",
+  "description": "Turn Hermes Agent into a business. Pricing models, white-label solutions, agency setup, scaling strategies, and cost optimization for AI agent services.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch10-business-around-hermes.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch10-business-around-hermes.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html" class="active">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 10</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-10-building-a-business-around-hermes-costs-pricing-and-scaling">Chapter 10: Building a Business Around Hermes — Costs, Pricing, and Scaling</h1>
+<blockquote>
+<p><strong>You've seen what Hermes can do. Now learn how to turn it into revenue — whether you're a freelancer pricing AI services, an agency scaling with automation, or an entrepreneur building a product on top of Hermes. This chapter covers every dollar, every model, every scale strategy.</strong></p>
+</blockquote>
+<hr />
+<h2 id="101-cost-analysis-what-hermes-actually-costs">10.1 Cost Analysis — What Hermes Actually Costs</h2>
+<p>Before you price your services, you need to know your costs. Every Hermes invocation has a price tag. Let's break it down.</p>
+<h3 id="the-token-economics">The Token Economics</h3>
+<p>Every time Hermes thinks, it consumes tokens. Here's what that means in dollars:</p>
+<div class="mermaid">flowchart TD
+    subgraph TokenFlow["Token Flow — Every Hermes Turn"]
+        Input["System prompt → ~2,000–8,000 tokens (input)\n+ User message (input)\n+ Tool definitions (input)\n+ Skill content (input)\n+ Memory (input)"]
+        Input --> Total["= Total input tokens"]
+        Total --> LLM["LLM processes → reasoning tokens (hidden)"]
+        LLM --> Output["Response → ~500–3,000 tokens (output)\n+ Tool calls (output)"]
+        Output --> Cost["Cost = (input × $in) + (output × $out)"]
+    end</div>
+<h3 id="model-pricing-comparison">Model Pricing Comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Input ($/M tokens)</th>
+<th>Output ($/M tokens)</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deepseek/deepseek-chat</td>
+<td>$0.14</td>
+<td>$0.28</td>
+<td>Daily crons, bulk work</td>
+</tr>
+<tr>
+<td>google/gemini-2.0-flash</td>
+<td>$0.10</td>
+<td>$0.40</td>
+<td>Fast, cheap tasks</td>
+</tr>
+<tr>
+<td>openai/gpt-4o-mini</td>
+<td>$0.15</td>
+<td>$0.60</td>
+<td>Balanced daily use</td>
+</tr>
+<tr>
+<td>anthropic/claude-haiku-4</td>
+<td>$0.80</td>
+<td>$4.00</td>
+<td>Quality daily work</td>
+</tr>
+<tr>
+<td>openai/gpt-4o</td>
+<td>$2.50</td>
+<td>$10.00</td>
+<td>Complex analysis</td>
+</tr>
+<tr>
+<td>anthropic/claude-sonnet-4</td>
+<td>$3.00</td>
+<td>$15.00</td>
+<td>Architecture, review</td>
+</tr>
+<tr>
+<td>openai/gpt-5.4-mini</td>
+<td>$0.60</td>
+<td>$2.40</td>
+<td>Good middle ground</td>
+</tr>
+</tbody>
+</table>
+<h3 id="real-world-monthly-cost-scenarios">Real-World Monthly Cost Scenarios</h3>
+<table>
+<thead>
+<tr>
+<th>Usage Pattern</th>
+<th>Model</th>
+<th>Monthly API Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Light: 20 messages/day</td>
+<td>deepseek-chat</td>
+<td>~$2-5</td>
+</tr>
+<tr>
+<td>Light: 20 messages/day</td>
+<td>claude-sonnet-4</td>
+<td>~$30-60</td>
+</tr>
+<tr>
+<td>Medium: 5 crons + 50 msgs/day</td>
+<td>gpt-4o-mini</td>
+<td>~$15-30</td>
+</tr>
+<tr>
+<td>Medium: 5 crons + 50 msgs/day</td>
+<td>claude-sonnet-4</td>
+<td>~$80-150</td>
+</tr>
+<tr>
+<td>Heavy: 10 crons + 100 msgs/day</td>
+<td>deepseek-chat</td>
+<td>~$20-40</td>
+</tr>
+<tr>
+<td>Heavy: 10 crons + 100 msgs/day</td>
+<td>gpt-4o</td>
+<td>~$100-250</td>
+</tr>
+<tr>
+<td>Agency: 20 crons + 200 msgs/day</td>
+<td>deepseek-chat</td>
+<td>~$40-80</td>
+</tr>
+<tr>
+<td>Agency: 20 crons + 200 msgs/day</td>
+<td>claude-sonnet-4</td>
+<td>~$300-600</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> The cheapest model that does the job is the right model. Use DeepSeek for bulk crons and GPT-4o-mini for daily chat. Reserve Claude Sonnet for complex architecture decisions only.</p>
+<h3 id="break-even-analysis">Break-Even Analysis</h3>
+<p>When does Hermes pay for itself?</p>
+<div class="mermaid">block-beta
+    columns 1
+    block:title["Break-Even Points"]:1
+    block:rows
+        columns 3
+        "Content writer" "$20/mo (API)" "$3,000/mo human → break-even: Day 1"
+        "Support agent" "$30/mo (API)" "$2,500/mo human → break-even: Day 1"
+        "Data analyst" "$40/mo (API)" "$4,500/mo human → break-even: Day 1"
+        "Monitoring tool" "$0 (scripts)" "$150/mo SaaS → break-even: Day 1"
+        "Full-time dev" "$200/mo (API)" "$8,000/mo human → break-even: Day 1"
+    end
+    block:conclusion
+        "Conclusion: Hermes ALWAYS pays for itself."
+        "The question isn't \"should I?\" — it's \"how much should I spend?\""
+    end</div>
+<hr />
+<h2 id="102-pricing-your-ai-powered-services">10.2 Pricing Your AI-Powered Services</h2>
+<p>You've automated your workflow. Now sell it. Here's how to price AI-powered services for profit.</p>
+<h3 id="pricing-models">Pricing Models</h3>
+<div class="mermaid">flowchart LR
+    subgraph Pricing["Four Pricing Models"]
+        subgraph M1["1. Retainer"]
+            R1["$2–5K/mo"]
+            R2["Ongoing monitoring,\nreports, support"]
+        end
+        subgraph M2["2. Per-Deliverable"]
+            P1["$200–500 ea"]
+            P2["Per article\nPer review\nPer audit\nPer analysis"]
+        end
+        subgraph M3["3. Value-Based"]
+            V1["% of savings"]
+            V2["\"I saved you $10K/mo,\nmy fee is $2K/mo\""]
+        end
+        subgraph M4["4. White-Label"]
+            W1["$500–2K/mo"]
+            W2["Hermes as your\ncompany AI assistant\n(hosted)"]
+        end
+    end</div>
+<h3 id="pricing-by-service-type">Pricing by Service Type</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Your Cost (API)</th>
+<th>Price to Client</th>
+<th>Margin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Blog article (SEO, 2000 words)</td>
+<td>$0.05</td>
+<td>$200-500</td>
+<td>99.9%</td>
+</tr>
+<tr>
+<td>Daily social media (5 posts)</td>
+<td>$0.10/day</td>
+<td>$500/mo</td>
+<td>99%</td>
+</tr>
+<tr>
+<td>Weekly analytics report</td>
+<td>$0.50</td>
+<td>$500-1,000/mo</td>
+<td>99%</td>
+</tr>
+<tr>
+<td>PR code review (per PR)</td>
+<td>$0.02</td>
+<td>$50-100</td>
+<td>99.9%</td>
+</tr>
+<tr>
+<td>24/7 customer support chatbot</td>
+<td>$30/mo</td>
+<td>$1,000-3,000/mo</td>
+<td>97-99%</td>
+</tr>
+<tr>
+<td>Competitive intelligence weekly</td>
+<td>$1/mo</td>
+<td>$500-1,500/mo</td>
+<td>99%</td>
+</tr>
+<tr>
+<td>Full monitoring + alerting</td>
+<td>$0 (scripts)</td>
+<td>$500-1,000/mo</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>Lead qualification pipeline</td>
+<td>$5/mo</td>
+<td>$1,000-2,000/mo</td>
+<td>99%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-profit-formula">The Profit Formula</h3>
+<pre class="highlight"><code>Revenue = Clients × Services × Price
+Cost    = API calls + Your time (setup + maintenance)
+Profit  = Revenue - Cost
+
+Example agency setup:
+  5 clients × 3 services × $500 avg = $7,500/mo revenue
+  API costs: ~$100/mo
+  Your time: ~10 hrs/mo (setup + monitoring)
+  Profit: $7,400/mo at $740/hr effective rate
+</code></pre>
+
+<p>💡 <strong>Tip:</strong> Never price based on your API cost. Price based on the <strong>value delivered</strong>. A blog article that generates $5,000 in sales is worth $500 regardless of whether it cost you $0.05 or $50 to produce.</p>
+<hr />
+<h2 id="103-building-reusable-skill-packages-to-sell">10.3 Building Reusable Skill Packages to Sell</h2>
+<p>Skills aren't just for your own use. Package them as products.</p>
+<h3 id="what-makes-a-sellable-skill">What Makes a Sellable Skill</h3>
+<p>A sellable skill solves a specific, painful, expensive problem:</p>
+<div class="mermaid">block-beta
+    columns 1
+    block:title["Sellable Skill Checklist"]:1
+    block:good["✅ Must Have"]
+        "✅ Solves a specific pain point"
+        "✅ Saves 5+ hours per week"
+        "✅ Works out of the box (minimal config)"
+        "✅ Has clear ROI the client can measure"
+        "✅ Doesn't require technical knowledge to use"
+        "✅ Can be demonstrated in 5 minutes"
+    end
+    block:bad["❌ Red Flags"]
+        "❌ Generic (e.g., \"write better code\")"
+        "❌ Requires custom setup per client"
+        "❌ Vague ROI (\"saves time\")"
+        "❌ Needs a developer to operate"
+    end</div>
+<h3 id="example-the-auto-seo-blog-skill-package">Example: The "Auto-SEO Blog" Skill Package</h3>
+<pre class="highlight"><code class="language-bash"># What the client gets:
+~/skills/auto-seo-blog/
+├── SKILL.md              # Core skill logic
+├── templates/
+│   ├── article.md        # Article template
+│   ├── meta-tags.md      # SEO meta template
+│   └── social-snippets.md # Cross-post templates
+├── scripts/
+│   ├── publish.sh        # Auto-publish script
+│   └── analytics.sh      # Track performance
+└── references/
+    ├── style-guide.md    # Brand voice guide
+    └── keyword-strategy.md # SEO keywords
+</code></pre>
+
+<h3 id="how-to-package-it">How to Package It</h3>
+<pre class="highlight"><code class="language-bash"># 1. Build the skill locally
+hermes skills create auto-seo-blog
+
+# 2. Test it thoroughly on your own content first
+
+# 3. Document the ROI
+# &quot;This skill generates 2 SEO-optimized articles/day.
+#  At $200/article market rate, that's $12,000/mo value.
+#  API cost: $3/mo.&quot;
+
+# 4. Publish to skills hub
+hermes skills publish auto-seo-blog
+
+# 5. Or sell directly as a package
+# Bundle: skill + setup + 1 month support = $500-2,000
+</code></pre>
+
+<h3 id="skill-package-pricing">Skill Package Pricing</h3>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Includes</th>
+<th>Price</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic skill</td>
+<td>SKILL.md + templates</td>
+<td>$100-300</td>
+</tr>
+<tr>
+<td>Pro package</td>
+<td>Skill + scripts + references</td>
+<td>$300-800</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>Pro package + setup + 3 months support</td>
+<td>$1,000-3,000</td>
+</tr>
+<tr>
+<td>Custom build</td>
+<td>Bespoke skill built for client's workflow</td>
+<td>$2,000-10,000</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> The best marketing is a live demo. Set up the skill on a prospect's Hermes instance, run it in front of them, and show the results in real-time. The ROI sells itself.</p>
+<hr />
+<h2 id="104-white-labeling-hermes-for-clients">10.4 White-Labeling Hermes for Clients</h2>
+<p>You don't sell "Hermes." You sell "Your AI Assistant." The client never needs to know what's under the hood.</p>
+<h3 id="the-white-label-architecture">The White-Label Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph WhiteLabel["White-Label Setup"]
+        subgraph ClientView["Client Sees"]
+            Bot["\"Acme Corp AI Assistant\"\n(Telegram bot with their\nbranding, name, avatar)"]
+        end
+        Bot --> Managed["You Manage"]
+        subgraph Managed["You Manage"]
+            Profile["Hermes Profile: acme-corp\n• Custom skills (FAQ, etc.)\n• Company knowledge base\n• Approved actions only\n• Memory scoped to Acme\n• Your API key (not theirs)"]
+        end
+    end
+
+    Finances["Client pays: $1,000–3,000/mo\nYour cost: $30–100/mo (API)\nYour margin: 90–97%"]</div>
+<h3 id="setup-steps">Setup Steps</h3>
+<pre class="highlight"><code class="language-bash"># 1. Create an isolated profile for the client
+hermes profile create acme-corp
+
+# 2. Configure with scoped skills and knowledge
+hermes -p acme-corp skills create acme-support
+# Build the FAQ skill with their support docs
+
+# 3. Set up their Telegram bot
+# Create a new bot via @BotFather with their branding
+# Configure the gateway to use this bot for acme-corp profile
+
+# 4. Lock down permissions
+hermes -p acme-corp config set approvals.mode strict
+hermes -p acme-corp config set privacy.redact_pii true
+hermes -p acme-corp config set tools.enabled &quot;terminal,file,browser,search&quot;
+
+# 5. Pre-load company knowledge into memory
+hermes -p acme-corp memory add \
+  &quot;Acme Corp sells widgets. Support email: support@acme.com.
+   Refund policy: 30 days. Shipping: 3-5 business days.
+   API docs at docs.acme.com&quot;
+
+# 6. Start the gateway
+hermes -p acme-corp gateway run
+</code></pre>
+
+<h3 id="client-onboarding-checklist">Client Onboarding Checklist</h3>
+<ul>
+<li>[ ] Create client profile with <code>--clone</code></li>
+<li>[ ] Create branded Telegram bot via BotFather</li>
+<li>[ ] Build custom FAQ skill from their support docs</li>
+<li>[ ] Load company knowledge into profile memory</li>
+<li>[ ] Configure approval mode (<code>strict</code> for new clients)</li>
+<li>[ ] Enable PII redaction</li>
+<li>[ ] Set up monitoring cron (health check on their gateway)</li>
+<li>[ ] Test with 20 real support questions</li>
+<li>[ ] Hand over the Telegram bot link to client</li>
+<li>[ ] Schedule weekly review of unanswered questions</li>
+</ul>
+<h3 id="white-label-pricing-tiers">White-Label Pricing Tiers</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Features</th>
+<th>Price/mo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Starter</td>
+<td>FAQ bot (50 Q&amp;As), Telegram only</td>
+<td>$500-800</td>
+</tr>
+<tr>
+<td>Professional</td>
+<td>Full support + email triage + reports</td>
+<td>$1,000-2,000</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>Custom skills + monitoring + Slack + WhatsApp</td>
+<td>$2,000-5,000</td>
+</tr>
+<tr>
+<td>Managed</td>
+<td>Full operations — you handle everything</td>
+<td>$3,000-10,000</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> Start clients on the Starter tier. Let them see results for 2 weeks, then upsell to Professional. The upgrade pays for itself when they see the weekly analytics report showing how many support tickets Hermes handled.</p>
+<hr />
+<h2 id="105-compliance-data-privacy">10.5 Compliance &amp; Data Privacy</h2>
+<p>When you handle client data, compliance isn't optional. Here's how to stay safe.</p>
+<h3 id="the-privacy-stack">The Privacy Stack</h3>
+<div class="mermaid">flowchart TD
+    subgraph Privacy["Privacy Layers"]
+        subgraph L1["Layer 1: PII Redaction (automatic)"]
+            P1["Hermes strips: emails, phones, SSNs,\ncredit cards, addresses BEFORE sending\nto the LLM API"]
+        end
+        subgraph L2["Layer 2: Memory Scoping (per-profile)"]
+            P2["Client A's data stays in Client A's\nprofile memory. Never shared."]
+        end
+        subgraph L3["Layer 3: Local Models (for sensitive data)"]
+            P3["Run llama.cpp locally. Zero data leaves\nyour machine. Full GDPR compliance."]
+        end
+        subgraph L4["Layer 4: Approval Mode (human-in-the-loop)"]
+            P4["Sensitive actions require your approval\nbefore execution."]
+        end
+    end</div>
+<h3 id="configuration">Configuration</h3>
+<pre class="highlight"><code class="language-bash"># Enable all privacy layers
+hermes config set privacy.redact_pii true          # Layer 1
+hermes config set privacy.redact_patterns          # Custom patterns
+  &quot;email,phone,ssn,credit_card,iban,ip_address&quot;
+
+# Profile isolation is automatic (Layer 2)
+# Each profile has its own memory, sessions, and skills
+
+# Local model for sensitive clients (Layer 3)
+hermes config set providers.local.type llama-cpp
+hermes config set providers.local.model ~/models/llama-3-8b-q4_k_m.gguf
+
+# Approval mode (Layer 4)
+hermes config set approvals.mode strict
+# Options: off (YOLO), smart (auto-approve low-risk), strict (ask always)
+</code></pre>
+
+<h3 id="gdpr-compliance-checklist">GDPR Compliance Checklist</h3>
+<ul>
+<li>[ ] PII redaction enabled on all profiles</li>
+<li>[ ] Client data isolated per profile (no cross-contamination)</li>
+<li>[ ] Session data stored locally (not in cloud)</li>
+<li>[ ] LLM provider has data processing agreement (DPA)</li>
+<li>[ ] Client can request data deletion (<code>hermes profile delete</code>)</li>
+<li>[ ] Audit trail enabled (<code>hermes config set audit.enabled true</code>)</li>
+<li>[ ] Local model option available for high-sensitivity clients</li>
+<li>[ ] Memory export available for data portability requests</li>
+</ul>
+<h3 id="when-to-use-local-models">When to Use Local Models</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Cloud Model</th>
+<th>Local Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Public content (blog, social)</td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Internal analytics</td>
+<td>✅</td>
+<td>⚠️ (if data is sensitive)</td>
+</tr>
+<tr>
+<td>Customer PII (names, emails)</td>
+<td>⚠️ (with redaction)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Financial data (transactions)</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Healthcare/medical data</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Legal documents</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Government/classified</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> For clients with strict compliance requirements, run a local model via <code>llama-cpp</code> skill. Zero data leaves their infrastructure. Slower, but bulletproof for GDPR, HIPAA, and SOC2.</p>
+<hr />
+<h2 id="106-scaling-the-multi-profile-agency">10.6 Scaling — The Multi-Profile Agency</h2>
+<p>You have 10 clients. Each has their own Hermes profile, skills, and crons. You need a system to manage it all without drowning.</p>
+<h3 id="the-agency-architecture">The Agency Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Agency["Agency Setup — Managing 10+ Clients"]
+        subgraph Master["Master Profile (you)"]
+            M1["• Monitors all client profiles"]
+            M2["• Weekly agency dashboard cron"]
+            M3["• Cost tracking across profiles"]
+        end
+        Master --> A
+        Master --> B
+        Master --> C
+        subgraph A["Client A Profile"]
+            A1["Skills: support, faq-a"]
+            A2["Cron: 24/7 support"]
+        end
+        subgraph B["Client B Profile"]
+            B1["Skills: blog, seo"]
+            B2["Cron: 2x/day article"]
+        end
+        subgraph C["Client C Profile × 10"]
+            C1["Skills: monitor, health"]
+            C2["Cron: 1/min watchdog"]
+        end
+        subgraph Report["Weekly Agency Report (cron)"]
+            R1["• Total API cost per client"]
+            R2["• Issues/escalations per client"]
+            R3["• Uptime stats"]
+            R4["• Revenue vs cost per client"]
+        end
+    end</div>
+<h3 id="setup-script">Setup Script</h3>
+<pre class="highlight"><code class="language-bash">#!/bin/bash
+# agency-setup.sh — bootstrap a new client in 5 minutes
+
+CLIENT_NAME=$1
+CLIENT_INDUSTRY=$2
+
+if [ -z &quot;$CLIENT_NAME&quot; ]; then
+  echo &quot;Usage: ./agency-setup.sh &lt;client-name&gt; &lt;industry&gt;&quot;
+  exit 1
+fi
+
+echo &quot;Setting up $CLIENT_NAME...&quot;
+
+# 1. Create profile
+hermes profile create &quot;$CLIENT_NAME&quot; --clone
+
+# 2. Create client directory
+mkdir -p ~/clients/$CLIENT_NAME/{skills,reports,leads}
+
+# 3. Copy industry-specific skill template
+cp -r ~/.hermes/skills/templates/$CLIENT_INDUSTRY/* \
+      ~/.hermes/profiles/$CLIENT_NAME/skills/
+
+# 4. Set up monitoring cron
+hermes cron create &quot;*/5 * * * *&quot; \
+  --profile &quot;$CLIENT_NAME&quot; \
+  --name &quot;$CLIENT_NAME-monitor&quot; \
+  --script ~/clients/$CLIENT_NAME/scripts/monitor.sh \
+  --no-agent \
+  --deliver telegram
+
+# 5. Set up weekly report
+hermes cron create &quot;0 9 * * 1&quot; \
+  --profile &quot;$CLIENT_NAME&quot; \
+  --name &quot;$CLIENT_NAME-weekly&quot; \
+  --deliver telegram \
+  --prompt &quot;Generate weekly report for $CLIENT_NAME.
+    Include: API costs, issues handled, uptime, suggestions.&quot;
+
+echo &quot;✅ $CLIENT_NAME profile created and crons active.&quot;
+echo &quot;Next: customize skills and load knowledge base.&quot;
+</code></pre>
+
+<h3 id="cost-tracking">Cost Tracking</h3>
+<pre class="highlight"><code class="language-bash"># Add to your master profile cron — track costs across all clients
+hermes cron create &quot;0 8 * * 1&quot; \
+  --name &quot;agency-costs&quot; \
+  --skills terminal,file \
+  --deliver telegram \
+  --prompt &quot;Generate the weekly agency cost report.
+    For each client profile, check:
+    1. API token usage (from logs)
+    2. Cron execution count
+    3. Errors and escalations
+
+    Format as a table:
+    Client | API Cost | Revenue | Margin | Issues
+
+    Flag any client where margin drops below 80%.&quot;
+</code></pre>
+
+<h3 id="scaling-limits">Scaling Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Clients</th>
+<th>API Cost/mo</th>
+<th>Your Time/mo</th>
+<th>Revenue/mo</th>
+<th>Profit/mo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1-3</td>
+<td>$50-150</td>
+<td>5 hrs</td>
+<td>$2,000-6,000</td>
+<td>$1,850-5,850</td>
+</tr>
+<tr>
+<td>4-10</td>
+<td>$150-500</td>
+<td>15 hrs</td>
+<td>$8,000-20,000</td>
+<td>$7,500-19,500</td>
+</tr>
+<tr>
+<td>10-20</td>
+<td>$500-1,000</td>
+<td>25 hrs</td>
+<td>$20,000-50,000</td>
+<td>$19,000-49,000</td>
+</tr>
+<tr>
+<td>20+</td>
+<td>$1,000+</td>
+<td>40+ hrs</td>
+<td>$50,000+</td>
+<td>Need VA/helper</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> At 20+ clients, hire a virtual assistant to handle first-line support and client communication. You focus on building skills and onboarding. Hermes handles the automation. The VA handles the humans.</p>
+<hr />
+<h2 id="107-future-proofing-local-models-edge-deployment">10.7 Future-Proofing — Local Models &amp; Edge Deployment</h2>
+<p>API costs will fluctuate. Providers will change pricing. The only hedge? Local models that you control completely.</p>
+<h3 id="the-local-model-stack">The Local Model Stack</h3>
+<div class="mermaid">block-beta
+    columns 1
+    block:title["Local Model Options"]:1
+    block:opt1["llama.cpp (recommended)"]
+        "• Runs on CPU, no GPU needed"
+        "• Supports GGUF format"
+        "• 2–50 tok/s depending on model size"
+        "• Full offline capability"
+    end
+    block:opt2["Ollama (easiest setup)"]
+        "• One-command install"
+        "• Automatic model management"
+        "• OpenAI-compatible API server"
+    end
+    block:opt3["vLLM (highest performance)"]
+        "• Requires GPU"
+        "• Production-grade serving"
+        "• Best for high-throughput agency use"
+    end</div>
+<h3 id="setting-up-llamacpp-with-hermes">Setting Up llama.cpp with Hermes</h3>
+<pre class="highlight"><code class="language-bash"># 1. Install llama.cpp
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp &amp;&amp; make
+
+# 2. Download a model (example: Llama 3 8B quantized)
+# From huggingface.co — search for &quot;llama 3 8b gguf q4_k_m&quot;
+# Save to ~/models/
+
+# 3. Configure Hermes to use local model
+hermes config set providers.local.type llama-cpp
+hermes config set providers.local.model ~/models/llama-3-8b-q4_k_m.gguf
+hermes config set providers.local.context_size 4096
+
+# 4. Switch to local model for specific tasks
+hermes -m local &quot;Summarize this document&quot;   # Free, private
+hermes -m deepseek/deepseek-chat &quot;...&quot;       # Cloud, smarter
+</code></pre>
+
+<h3 id="hybrid-strategy-cloud-local">Hybrid Strategy: Cloud + Local</h3>
+<div class="mermaid">block-beta
+    columns 2
+    block:local["LOCAL (free, private, slower)"]
+        "• Email triage and categorization"
+        "• Document summarization"
+        "• Data extraction and formatting"
+        "• Watchdog alert evaluation"
+        "• PII-heavy tasks"
+    end
+    block:cloud["CLOUD (paid, smart, fast)"]
+        "• Content creation (needs quality)"
+        "• Architecture decisions"
+        "• Code review (needs reasoning)"
+        "• Client-facing responses"
+        "• Complex data analysis"
+    end
+    block:rule["Rule"]:2
+        "If it touches client output → cloud.\nIf it's internal processing → local."
+    end</div>
+<h3 id="edge-deployment-hermes-on-a-phone">Edge Deployment — Hermes on a Phone</h3>
+<p>Yes, you can run a local LLM on your phone and Hermes can connect to it:</p>
+<pre class="highlight"><code class="language-bash"># On Android (Termux):
+pkg install llama-cpp
+# Download model (Q4 quantized for mobile)
+llama-cli -m ~/models/gemma-2b-q4.gguf -c 2048 --host 0.0.0.0 --port 8080
+
+# Configure Hermes to use your phone as provider
+hermes config set providers.phone.type openai-compatible
+hermes config set providers.phone.base_url http://192.168.1.100:8080/v1
+</code></pre>
+
+<p>💡 <strong>Tip:</strong> A 2B-parameter model at Q4 quantization runs at 15-25 tokens/second on a modern phone (Snapdragon 8 Gen 3, Exynos 1580). Not fast enough for complex tasks, but perfect for simple triage and categorization — and completely free.</p>
+<hr />
+<h2 id="the-business-of-hermes-decision-framework">The Business of Hermes — Decision Framework</h2>
+<div class="mermaid">block-beta
+    columns 1
+    block:title["Should You Build a Business Around Hermes?"]:1
+    block:yes["YES, if you:"]
+        "• Already use Hermes daily"
+        "• Have 3+ skills you built for yourself"
+        "• Know businesses that waste time on manual work"
+        "• Can explain AI value in plain language"
+    end
+    block:start["START HERE:"]
+        "1. Pick ONE service (Chapter 9 scenarios)"
+        "2. Build it for yourself first (dogfood it)"
+        "3. Find 1 client who needs it"
+        "4. Deliver results, measure ROI"
+        "5. Use that case study to get 3 more clients"
+        "6. Systematize with profiles and crons"
+        "7. Hire VA when you hit 20 clients"
+    end
+    block:dont["DON'T:"]
+        "• Build the agency before having clients"
+        "• Over-promise what Hermes can do"
+        "• Ignore compliance (GDPR, PII)"
+        "• Price based on your cost (price on value)"
+        "• Scale before the system is stable"
+    end</div>
+<hr />
+<h2 id="chapter-10-key-vocabulary">Chapter 10 Key Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>White-label</strong></td>
+<td>Selling a product under your brand that's built on another platform</td>
+</tr>
+<tr>
+<td><strong>Retainer</strong></td>
+<td>Monthly fee for ongoing services</td>
+</tr>
+<tr>
+<td><strong>Value-based pricing</strong></td>
+<td>Charging based on the outcome delivered, not hours spent</td>
+</tr>
+<tr>
+<td><strong>PII</strong></td>
+<td>Personally Identifiable Information — names, emails, phone numbers</td>
+</tr>
+<tr>
+<td><strong>GDPR</strong></td>
+<td>General Data Protection Regulation — EU data privacy law</td>
+</tr>
+<tr>
+<td><strong>GGUF</strong></td>
+<td>Model format for llama.cpp — quantized for efficient CPU inference</td>
+</tr>
+<tr>
+<td><strong>Edge deployment</strong></td>
+<td>Running models on local/endpoint devices instead of cloud</td>
+</tr>
+<tr>
+<td><strong>Margin</strong></td>
+<td>Revenue minus costs — your actual profit percentage</td>
+</tr>
+<tr>
+<td><strong>Break-even</strong></td>
+<td>The point where revenue covers all costs</td>
+</tr>
+<tr>
+<td><strong>Dogfooding</strong></td>
+<td>Using your own product before selling it to others</td>
+</tr>
+</tbody>
+</table>
+<h2 id="chapter-10-summary">Chapter 10 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>What You Learned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.1 Cost Analysis</td>
+<td>Real API costs per model — $2/mo (DeepSeek) to $600/mo (Claude heavy)</td>
+</tr>
+<tr>
+<td>10.2 Pricing</td>
+<td>Four pricing models — retainer, per-deliverable, value-based, white-label</td>
+</tr>
+<tr>
+<td>10.3 Skill Packages</td>
+<td>How to package and sell reusable skills at $100-$10,000</td>
+</tr>
+<tr>
+<td>10.4 White-Labeling</td>
+<td>Profile-per-client setup — 90-97% margins at $500-$10K/mo</td>
+</tr>
+<tr>
+<td>10.5 Compliance</td>
+<td>PII redaction, memory scoping, local models, GDPR checklist</td>
+</tr>
+<tr>
+<td>10.6 Scaling</td>
+<td>Agency architecture for 10-20 clients — $19K-$49K/mo profit</td>
+</tr>
+<tr>
+<td>10.7 Future-Proofing</td>
+<td>Hybrid cloud + local strategy, edge deployment, phone-based LLMs</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Progress: Chapter 10 complete. All 10 chapters done.</strong> 🎉</p>
+<p>You've gone from zero to building a business around Hermes. The appendices cover reference material — CLI commands, provider configs, troubleshooting, and the full skills catalog.</p>
+<hr />
+<p><em>Previous: <a href="ch09-business-use-cases.md">Chapter 9 — Real Business Use Cases</a> · Next: <a href="appendix-a-cli-reference.md">Appendix A — CLI Reference →</a></em></p>
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch09-business-use-cases.html" class="prev">← Ch 9: Real Business Use Cases</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

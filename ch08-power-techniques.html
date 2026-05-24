@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Techniques — YOLO Mode, Goals, and Self-Debugging | Hermes Agent Tutorial</title>
+    <meta name="description" content="Expert techniques for power users. YOLO mode for autonomous execution, goal-driven conversations, steering mid-task, model switching, context management, and self-debugging.">
+    <meta name="keywords" content="Hermes YOLO mode, AI agent goals, self-debugging AI, context window management, model switching, power user techniques">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch08-power-techniques.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Power Techniques — YOLO Mode, Goals, and Self-Debugging">
+    <meta property="og:description" content="Expert techniques for power users. YOLO mode for autonomous execution, goal-driven conversations, steering mid-task, model switching, context management, and self-debugging.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch08-power-techniques.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 8">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Power Techniques — YOLO Mode, Goals, and Self-Debugging">
+    <meta name="twitter:description" content="Expert techniques for power users. YOLO mode for autonomous execution, goal-driven conversations, steering mid-task, model switching, context management, and self-debugging.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Power Techniques \u2014 YOLO Mode, Goals, and Self-Debugging",
+  "description": "Expert techniques for power users. YOLO mode for autonomous execution, goal-driven conversations, steering mid-task, model switching, context management, and self-debugging.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch08-power-techniques.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch08-power-techniques.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html" class="active">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 8</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-8-power-techniques-the-experts-toolkit">Chapter 8: Power Techniques — The Expert's Toolkit</h1>
+<blockquote>
+<p><strong>You've configured Hermes. You've automated workflows. Now learn the shortcuts, steering wheels, and escape hatches that separate power users from everyone else. This chapter is your black belt.</strong></p>
+</blockquote>
+<hr />
+<h2 id="81-yolo-mode-skip-approvals-for-speed">8.1 YOLO Mode — Skip Approvals for Speed</h2>
+<p>Every time Hermes wants to run a flagged shell command, it pauses and asks for permission. That's safe — but slow. YOLO mode skips all approval prompts.</p>
+<div class="mermaid">flowchart TD
+    subgraph normal["NORMAL MODE"]
+        direction TB
+        N1["Hermes: \"Run rm -rf node_modules?\""]
+        N2["You: [waits... approves]"]
+        N3["Hermes: \"Run npm install?\""]
+        N4["You: [waits... approves]"]
+        N5["→ 3 commands = 3 approval pauses"]
+        N1 --> N2 --> N3 --> N4 --> N5
+    end
+    subgraph yolo["YOLO MODE"]
+        direction TB
+        Y1["Hermes: runs all 3 commands back-to-back"]
+        Y2["→ 3 commands = 0 pauses"]
+        Y1 --> Y2
+    end</div>
+<h3 id="three-ways-to-activate">Three Ways to Activate</h3>
+<pre class="highlight"><code class="language-bash"># 1. Per-invocation flag
+hermes --yolo
+
+# 2. Toggle mid-session
+/yolo          # toggles on/off
+
+# 3. Environment variable
+export HERMES_YOLO_MODE=1
+</code></pre>
+
+<h3 id="when-to-use-it">When to Use It</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>YOLO?</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local development, trusted codebase</td>
+<td>✅</td>
+<td>You wrote the code, you trust it</td>
+</tr>
+<tr>
+<td>CI/CD pipeline scripts</td>
+<td>✅</td>
+<td>Automated, no human in the loop</td>
+</tr>
+<tr>
+<td>Exploring a new repo</td>
+<td>⚠️</td>
+<td>Risky — Hermes might modify unknown files</td>
+</tr>
+<tr>
+<td>Production servers</td>
+<td>❌</td>
+<td>Always review before touching prod</td>
+</tr>
+<tr>
+<td>Cron jobs / background tasks</td>
+<td>✅</td>
+<td>Unattended — needs to run autonomously</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> The sweet spot is <code>approvals.mode: smart</code> (covered in Chapter 7) — auto-approves low-risk commands, still prompts on destructive ones. Reserve full YOLO for trusted environments.</p>
+<hr />
+<h2 id="82-goal-standing-objectives-across-turns">8.2 <code>/goal</code> — Standing Objectives Across Turns</h2>
+<p>Sometimes a task takes more than one message. You want Hermes to keep working on something across multiple turns without you repeating the objective every time.</p>
+<div class="mermaid">flowchart TD
+    subgraph without["WITHOUT /goal"]
+        direction TB
+        U1["You: \"Refactor the auth module\""]
+        U2["Hermes: refactors auth"]
+        U3["You: \"Also update the tests\""]
+        U4["Hermes: \"What tests?\" (lost context)"]
+        U1 --> U2 --> U3 --> U4
+    end
+    subgraph with["WITH /goal"]
+        direction TB
+        G1["You: /goal Refactor auth module to use JWT"]
+        G2["Hermes: Goal set. Working on JWT refactor..."]
+        G3["You: \"Also update the tests\""]
+        G4["Hermes: Still in JWT context, updates tests"]
+        G5["You: \"Check the middleware too\""]
+        G6["Hermes: Still in JWT context, checks MW"]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6
+    end</div>
+<h3 id="goal-commands">Goal Commands</h3>
+<pre class="highlight"><code>/goal Refactor auth module to use JWT tokens     # Set a new goal
+/goal status                                      # Check current goal
+/goal pause                                       # Pause (keeps goal, stops steering)
+/goal resume                                      # Resume a paused goal
+/goal clear                                       # Clear the goal entirely
+</code></pre>
+
+<p>The goal gets injected into every subsequent turn until you clear it. It's like giving Hermes a north star — every action it takes should move toward that objective.</p>
+<p>💡 <strong>Tip:</strong> Use <code>/goal</code> for multi-step refactors, research projects, or any task where you'll send 3+ follow-up messages. It prevents context drift.</p>
+<hr />
+<h2 id="83-steer-inject-context-mid-task-without-interrupting">8.3 <code>/steer</code> — Inject Context Mid-Task Without Interrupting</h2>
+<p>Hermes is in the middle of a 10-step refactor. You just realized it should also update the TypeScript types. But you don't want to interrupt the current step.</p>
+<pre class="highlight"><code>/steer Also update the TypeScript type definitions when you modify the interfaces
+</code></pre>
+
+<p><code>/steer</code> queues a message that gets injected <strong>after the next tool call completes</strong> — not immediately, not at the end. It's a course correction that doesn't break stride.</p>
+<div class="mermaid">flowchart LR
+    S1["Step 1\ndone"] --> S2["Step 2\ndone"] --> S3["Step 3\nrunning"] --> S4["Step 4\nqueued"] --> S5["Step 5\nqueued"]
+    S3 -.->|"/steer injected here\nafter Step 3's tool call returns"| S4</div>
+<h3 id="when-to-steer-vs-queue-vs-new-message">When to Steer vs. Queue vs. New Message</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>When to use</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/steer</code></td>
+<td>Course-correct without stopping</td>
+<td>Injects after next tool call</td>
+</tr>
+<tr>
+<td><code>/queue</code></td>
+<td>Add a follow-up task for after</td>
+<td>Waits until current turn ends</td>
+</tr>
+<tr>
+<td>New message</td>
+<td>Change direction entirely</td>
+<td>Interrupts current work</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> <code>/steer</code> is perfect for "also do X" and "don't forget about Y" — small additions that shouldn't derail the current operation.</p>
+<hr />
+<h2 id="84-queue-stack-commands-while-hermes-works">8.4 <code>/queue</code> — Stack Commands While Hermes Works</h2>
+<p>Hermes is running a long test suite. You have three more things you want done after it finishes. Instead of waiting, queue them:</p>
+<pre class="highlight"><code>/queue Run the linter on the auth module
+/queue Check if the Docker build still works
+/queue Update the README with the new env vars
+</code></pre>
+
+<p>Each queued command runs sequentially after the current turn completes. You can stack as many as you want.</p>
+<div class="mermaid">flowchart TD
+    subgraph queue["QUEUE"]
+        Q1["[1] Run linter on auth module ← next"]
+        Q2["[2] Check Docker build"]
+        Q3["[3] Update README"]
+        Q1 --> Q2 --> Q3
+    end
+    CT["Current task: Running test suite (80%)"]
+    CT --> queue</div>
+<p>💡 <strong>Tip:</strong> <code>/queue</code> is FIFO (first in, first out). Plan your order — lint before build, build before docs.</p>
+<hr />
+<h2 id="85-branch-fork-conversations-for-exploration">8.5 <code>/branch</code> — Fork Conversations for Exploration</h2>
+<p>You're in the middle of a productive session and want to try a risky approach without losing your current state. Branch it.</p>
+<pre class="highlight"><code>/branch
+</code></pre>
+
+<p>This creates a <strong>fork</strong> of the current conversation — a new session that starts with the same history. Your original session remains untouched.</p>
+<div class="mermaid">flowchart TD
+    subgraph sessionA["Session A (original)"]
+        A1["message 1"]
+        A2["message 2"]
+        A3["/branch"]
+        A4["message 3"]
+        A5["message 4"]
+        A6["continued normally"]
+        A1 --> A2 --> A3
+        A3 --> A4 --> A5 --> A6
+    end
+    subgraph sessionB["Session B (fork)"]
+        B1["risky experiment"]
+        B2["didn't work"]
+        B3["/quit (discard)"]
+        B1 --> B2 --> B3
+    end
+    A3 -->|fork| sessionB</div>
+<p>Use cases:
+- <strong>Try a risky refactor</strong> — branch, test the approach, discard if it fails
+- <strong>Explore alternatives</strong> — branch from the same point, try two different architectures
+- <strong>Parallel research</strong> — branch to investigate a library while main thread continues coding</p>
+<p>💡 <strong>Tip:</strong> Branches are cheap — they share no state with the parent after forking. Go wild in a branch without consequences.</p>
+<hr />
+<h2 id="86-checkpoints-rollback-time-travel-for-your-codebase">8.6 Checkpoints &amp; Rollback — Time Travel for Your Codebase</h2>
+<p>Hermes is about to modify 15 files in a complex refactor. What if something goes wrong? Checkpoints let you snapshot the filesystem and roll back if needed.</p>
+<h3 id="setup">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Enable checkpoints at invocation
+hermes --checkpoints
+
+# Or enable in config
+hermes config set checkpoints.enabled true
+hermes config set checkpoints.max_snapshots 50
+</code></pre>
+
+<h3 id="using-checkpoints">Using Checkpoints</h3>
+<pre class="highlight"><code class="language-bash"># In-session: rollback to last checkpoint
+/rollback
+
+# Rollback to specific checkpoint (N steps back)
+/rollback 3
+</code></pre>
+
+<div class="mermaid">flowchart LR
+    CP0["CP0\n(init)"] --> CP1["CP1\n(step1)"] --> CP2["CP2\n(step2)"] --> CP3["CP3\n(step3)"] --> CP4["CP4 (current)\n(step4)"]
+    CP4 -.->|"/rollback 1\nrestores to CP3"| CP3</div>
+<p>Each checkpoint captures file state at that moment. Hermes creates them automatically before each tool call that modifies files when checkpoints are enabled.</p>
+<p>⚠️ <strong>Warning:</strong> Checkpoints capture filesystem state, NOT conversation state. Rolling back restores files but keeps the conversation history. Use <code>/branch</code> if you need to fork the entire session.</p>
+<hr />
+<h2 id="87-session-snapshots-save-and-restore-full-state">8.7 Session Snapshots — Save and Restore Full State</h2>
+<p>While checkpoints protect the filesystem, snapshots protect your <strong>entire Hermes configuration and state</strong>:</p>
+<pre class="highlight"><code>/snapshot                    # Create a named snapshot
+/snapshot pre-refactor       # Named snapshot for easy reference
+/snapshot restore pre-refactor  # Restore a named snapshot
+</code></pre>
+
+<p>Snapshots capture:
+- Config.yaml state
+- Session transcript
+- Skill loading state
+- Memory state at that point</p>
+<p>Use snapshots before major changes — model switches, config experiments, or any "I might want to undo this completely" moment.</p>
+<hr />
+<h2 id="88-fast-mode-priority-processing">8.8 Fast Mode — Priority Processing</h2>
+<pre class="highlight"><code>/fast
+</code></pre>
+
+<p>Toggles fast/priority processing mode. When enabled, Hermes optimizes for speed:</p>
+<ul>
+<li>Reduced reasoning overhead</li>
+<li>Fewer intermediate explanations</li>
+<li>Streamlined tool output processing</li>
+<li>Prioritized in the processing queue</li>
+</ul>
+<p>Use it for:
+- Quick fire-and-forget questions
+- Batch operations where you just want results
+- Time-sensitive tasks</p>
+<p>Toggle off with <code>/fast</code> again when you want thorough, detailed responses back.</p>
+<hr />
+<h2 id="89-reasoning-control-dial-in-how-hard-hermes-thinks">8.9 Reasoning Control — Dial In How Hard Hermes Thinks</h2>
+<p>Different tasks need different levels of reasoning. A typo fix doesn't need extended thinking. A system architecture decision does.</p>
+<pre class="highlight"><code>/reasoning none       # No reasoning shown, fastest responses
+/reasoning minimal    # Brief reasoning, good for simple tasks
+/reasoning low        # Light reasoning for routine work
+/reasoning medium     # Default — balanced
+/reasoning high       # Extended reasoning for complex problems
+/reasoning xhigh      # Maximum reasoning for architecture decisions
+/reasoning show       # Show reasoning tokens (if model supports it)
+/reasoning hide       # Hide reasoning tokens
+</code></pre>
+
+<h3 id="reasoning-level-guide">Reasoning Level Guide</h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>When to use</th>
+<th>Token cost</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>none</code></td>
+<td>Formatting, quick lookups</td>
+<td>Lowest</td>
+<td>"What's the capital of France?"</td>
+</tr>
+<tr>
+<td><code>minimal</code></td>
+<td>Simple edits, known patterns</td>
+<td>Low</td>
+<td>"Fix the typo on line 42"</td>
+</tr>
+<tr>
+<td><code>low</code></td>
+<td>Routine coding tasks</td>
+<td>Medium</td>
+<td>"Add input validation to this form"</td>
+</tr>
+<tr>
+<td><code>medium</code></td>
+<td>Default — most tasks</td>
+<td>Medium</td>
+<td>"Implement user authentication"</td>
+</tr>
+<tr>
+<td><code>high</code></td>
+<td>Complex logic, debugging</td>
+<td>High</td>
+<td>"Debug this race condition"</td>
+</tr>
+<tr>
+<td><code>xhigh</code></td>
+<td>Architecture, multi-system design</td>
+<td>Highest</td>
+<td>"Design the event-driven pipeline"</td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> Higher reasoning = more tokens = more cost. Use <code>xhigh</code> sparingly — only for genuinely hard problems. Default <code>medium</code> handles 90% of tasks well.</p>
+<hr />
+<h2 id="810-busy-mode-what-happens-when-you-type-while-hermes-works">8.10 Busy Mode — What Happens When You Type While Hermes Works</h2>
+<p>Hermes is in the middle of a long operation. You send a message. What happens? That depends on your <strong>busy mode</strong> setting.</p>
+<pre class="highlight"><code>/busy queue       # Your message waits in line (default)
+/busy steer       # Your message gets injected mid-task
+/busy interrupt   # Your message interrupts current work
+/busy status      # Check current mode
+</code></pre>
+
+<div class="mermaid">flowchart TD
+    subgraph q["QUEUE: Safe, orderly but slowest"]
+        Q1["Work"]
+        Q2["[wait]"]
+        Q3["Your msg"]
+        Q1 --> Q2 --> Q3
+    end
+    subgraph s["STEER: Mid-flight course change"]
+        S1["Work"]
+        S2["inject"]
+        S3["cont."]
+        S1 --> S2 --> S3
+    end
+    subgraph i["INTERRUPT: Immediate context switch"]
+        I1["Work ✗ stopped"]
+        I2["New msg runs"]
+        I1 --> I2
+    end</div>
+<p><strong>Recommendation:</strong>
+- <strong><code>queue</code></strong> (default) — safest, use for most work
+- <strong><code>steer</code></strong> — when you need to course-correct without stopping
+- <strong><code>interrupt</code></strong> — emergency stop + new direction</p>
+<hr />
+<h2 id="811-background-prompts-fire-and-forget">8.11 Background Prompts — Fire and Forget</h2>
+<pre class="highlight"><code>/background Research the latest Next.js 15 features and write a summary to ~/research/nextjs15.md
+</code></pre>
+
+<p>Runs a prompt in the background inside your session. Hermes processes it independently while you continue chatting normally.</p>
+<div class="mermaid">flowchart LR
+    subgraph main["Main thread"]
+        M1["You: ..."]
+        M2["Hermes:"]
+        M3["You: ..."]
+        M4["Hermes:"]
+        M5["You: ..."]
+        M1 --> M2 --> M3 --> M4 --> M5
+    end
+    subgraph bg["Background thread"]
+        B1["Researching Next.js"]
+        B2["Reading docs..."]
+        B3["Writing summary..."]
+        B4["✅ Done → saved to\n~/research/"]
+        B1 --> B2 --> B3 --> B4
+    end</div>
+<p>Background prompts:
+- Don't block your main conversation
+- Complete even if you send new messages
+- Report back when finished (in CLI) or silently complete (in gateway)</p>
+<p>💡 <strong>Tip:</strong> Use <code>/background</code> for research tasks, file generation, or any work that takes more than a minute but doesn't need your immediate attention.</p>
+<hr />
+<h2 id="812-pipe-tricks-unix-power-meets-ai">8.12 Pipe Tricks — Unix Power Meets AI</h2>
+<p>Hermes runs in your terminal. That means it plays well with Unix pipes, redirects, and heredocs.</p>
+<h3 id="piped-input">Piped Input</h3>
+<pre class="highlight"><code class="language-bash"># Pipe a file into Hermes for analysis
+cat error.log | hermes chat -q &quot;What's causing these errors?&quot;
+
+# Pipe command output
+docker logs myapp 2&gt;&amp;1 | hermes chat -q &quot;Diagnose the crash&quot;
+
+# Pipe git diff for review
+git diff | hermes chat -q &quot;Review these changes&quot;
+</code></pre>
+
+<h3 id="heredoc-for-complex-prompts">Heredoc for Complex Prompts</h3>
+<pre class="highlight"><code class="language-bash">hermes chat -q &quot;$(cat &lt;&lt;'EOF'
+Analyze the following architecture and identify:
+1. Single points of failure
+2. Scalability bottlenecks
+3. Security concerns
+4. Cost optimization opportunities
+
+The system uses: FastAPI backend, PostgreSQL, Redis cache,
+Elasticsearch, and 3 microservices on Docker Compose.
+EOF
+)&quot;
+</code></pre>
+
+<h3 id="chaining-with-other-tools">Chaining with Other Tools</h3>
+<pre class="highlight"><code class="language-bash"># Generate code, format it, write to file
+hermes chat -q &quot;Write a Python FastAPI health check endpoint&quot; | black - | tee api/health.py
+
+# Extract todos from codebase and summarize
+grep -r &quot;TODO\|FIXME\|HACK&quot; src/ | hermes chat -q &quot;Prioritize these TODOs by urgency&quot;
+
+# Combine with jq for JSON processing
+curl -s https://api.example.com/data | hermes chat -q &quot;Extract the top 5 records by revenue and format as CSV&quot;
+</code></pre>
+
+<p>💡 <strong>Tip:</strong> The <code>-q</code> flag (query mode) is essential for pipe tricks — it runs a single query non-interactively, perfect for scripting.</p>
+<hr />
+<h2 id="813-model-mid-task-switching-change-horses-mid-race">8.13 Model Mid-Task Switching — Change Horses Mid-Race</h2>
+<p>You started a coding task with a fast, cheap model. Halfway through, you realize you need a smarter model for the complex logic. Don't restart — switch models mid-task.</p>
+<pre class="highlight"><code>/model anthropic/claude-sonnet-4    # Switch to a smarter model
+</code></pre>
+
+<p>Hermes keeps the full conversation context. The new model picks up exactly where the old one left off — same session, same history, same tool state.</p>
+<h3 id="strategic-model-switching">Strategic Model Switching</h3>
+<div class="mermaid">flowchart LR
+    subgraph phase1["Cheap model"]
+        A["deepseek/deepseek-chat\n$0.14/M tokens"]
+    end
+    subgraph phase2["Expensive model"]
+        B["anthropic/claude-sonnet-4\n$3/M tokens"]
+    end
+    subgraph phase3["Cheap model"]
+        C["deepseek/deepseek-chat\n$0.14/M tokens"]
+    end
+    A -->|"Boilerplate\nscaffolding"| B
+    B -->|"Complex logic\nimplementation"| C
+    C -->|"Write tests\nand docs"| D["Done"]</div>
+<p>💡 <strong>Tip:</strong> Use cheap models for scaffolding, formatting, and boilerplate. Switch to expensive models only for the hard parts — complex algorithms, architecture decisions, debugging. Switch back for tests and docs.</p>
+<hr />
+<h2 id="814-compression-tricks-squeeze-more-into-every-session">8.14 Compression Tricks — Squeeze More Into Every Session</h2>
+<p>Long conversations eat tokens. When you hit the context window limit, Hermes auto-compresses — but you can control it.</p>
+<h3 id="manual-compression">Manual Compression</h3>
+<pre class="highlight"><code>/compress
+</code></pre>
+
+<p>Forces an immediate compression cycle. Hermes summarizes the conversation so far and replaces the full history with a compressed version, freeing up context space for continued work.</p>
+<h3 id="compression-configuration">Compression Configuration</h3>
+<pre class="highlight"><code class="language-bash"># Tune when compression triggers (fraction of context window)
+hermes config set compression.threshold 0.50    # Default: compress at 50% full
+hermes config set compression.threshold 0.70    # Later: more context before compressing
+hermes config set compression.threshold 0.30    # Earlier: keep more room free
+
+# Set how aggressively to compress
+hermes config set compression.target_ratio 0.20  # Compress to 20% of original (default)
+hermes config set compression.target_ratio 0.40  # Less aggressive: keep 40%
+</code></pre>
+
+<div class="mermaid">flowchart TD
+    subgraph before["Before compression"]
+        Z1["0%"] --> Z2["50% — threshold\nAuto-compress triggers here"] --> Z3["100% — Hard limit (error)"]
+        Z4["Normal operation\n0% → 50%"]
+    end
+    subgraph after["After compression"]
+        A1["0% → 10%\ntarget_ratio=0.20"]
+        A2["Fresh space for\ncontinued work"]
+        A1 --> A2
+    end
+    before --> after</div>
+<h3 id="compression-best-practices">Compression Best Practices</h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>When</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manual <code>/compress</code></td>
+<td>After completing a major task phase</td>
+<td>Clears out the detailed work, keeps the conclusions</td>
+</tr>
+<tr>
+<td>Lower threshold</td>
+<td>Long automated sessions (cron)</td>
+<td><code>compression.threshold: 0.40</code></td>
+</tr>
+<tr>
+<td>Higher target ratio</td>
+<td>Tasks where detail matters</td>
+<td><code>compression.target_ratio: 0.35</code></td>
+</tr>
+<tr>
+<td>Toolset pruning</td>
+<td>Cron jobs with specific needs</td>
+<td><code>enabled_toolsets: ["terminal", "file"]</code></td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> The best compression strategy is prevention. Use <code>/goal</code> to keep Hermes focused, <code>/new</code> to start fresh between unrelated tasks, and toolset pruning on cron jobs to reduce prompt size from the start.</p>
+<hr />
+<h2 id="815-profile-based-separation-work-personal-lab">8.15 Profile-Based Separation — Work, Personal, Lab</h2>
+<p>You covered profiles in Chapter 7 for configuration isolation. Here's the <strong>power-user pattern</strong>: using profiles as completely separate workspaces.</p>
+<p><div class="mermaid">flowchart TD
+    subgraph without["WITHOUT /goal"]
+        direction TB
+        U1["You: \"Refactor the auth module\""]
+        U2["Hermes: refactors auth"]
+        U3["You: \"Also update the tests\""]
+        U4["Hermes: \"What tests?\" (lost context)"]
+        U1 --> U2 --> U3 --> U4
+    end
+    subgraph with["WITH /goal"]
+        direction TB
+        G1["You: /goal Refactor auth module to use JWT"]
+        G2["Hermes: Goal set. Working on JWT refactor..."]
+        G3["You: \"Also update the tests\""]
+        G4["Hermes: Still in JWT context, updates tests"]
+        G5["You: \"Check the middleware too\""]
+        G6["Hermes: Still in JWT context, checks MW"]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6
+    end</div>0</p>
+<h3 id="the-three-profile-setup">The Three-Profile Setup</h3>
+<pre class="highlight"><code class="language-bash"># Create work profile (clone defaults)
+hermes profile create work --clone
+hermes profile use work
+# Now configure: business model, work skills, work memory
+
+# Create personal profile
+hermes profile create personal --clone
+# Configure: cheaper model, personal skills
+
+# Create lab profile (clean slate, no memory)
+hermes profile create lab
+# Configure: local Ollama model, experimental skills
+</code></pre>
+
+<h3 id="switching-contexts">Switching Contexts</h3>
+<pre class="highlight"><code class="language-bash"># CLI: use per-invocation flag
+hermes -p work        # Work session
+hermes -p personal    # Personal session
+hermes -p lab         # Lab experiment
+
+# Gateway: each profile can run its own gateway
+# or share one with platform routing
+</code></pre>
+
+<h3 id="why-this-matters">Why This Matters</h3>
+<ol>
+<li><strong>No context pollution</strong> — work projects never leak into personal chat</li>
+<li><strong>Cost optimization</strong> — cheap model for personal, premium for work</li>
+<li><strong>Safe experimentation</strong> — lab profile with local models, no API costs</li>
+<li><strong>Memory isolation</strong> — each profile remembers only what's relevant</li>
+<li><strong>Skill separation</strong> — no need to load 50 skills when you only need 5</li>
+</ol>
+<hr />
+<h2 id="power-techniques-quick-reference">Power Techniques Quick Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Command</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Skip approvals</td>
+<td><code>/yolo</code> or <code>--yolo</code></td>
+<td>Trusted environments</td>
+</tr>
+<tr>
+<td>Standing objective</td>
+<td><code>/goal &lt;text&gt;</code></td>
+<td>Multi-step tasks</td>
+</tr>
+<tr>
+<td>Mid-task injection</td>
+<td><code>/steer &lt;text&gt;</code></td>
+<td>Course correction</td>
+</tr>
+<tr>
+<td>Stack follow-ups</td>
+<td><code>/queue &lt;text&gt;</code></td>
+<td>Sequential after-current</td>
+</tr>
+<tr>
+<td>Fork conversation</td>
+<td><code>/branch</code></td>
+<td>Risk-free exploration</td>
+</tr>
+<tr>
+<td>Time travel</td>
+<td><code>--checkpoints</code> + <code>/rollback</code></td>
+<td>Dangerous refactors</td>
+</tr>
+<tr>
+<td>Full state save</td>
+<td><code>/snapshot</code></td>
+<td>Before major changes</td>
+</tr>
+<tr>
+<td>Speed mode</td>
+<td><code>/fast</code></td>
+<td>Quick results</td>
+</tr>
+<tr>
+<td>Think harder</td>
+<td><code>/reasoning high</code></td>
+<td>Complex problems</td>
+</tr>
+<tr>
+<td>Control busy behavior</td>
+<td><code>/busy queue\|steer\|interrupt</code></td>
+<td>Long operations</td>
+</tr>
+<tr>
+<td>Fire and forget</td>
+<td><code>/background &lt;prompt&gt;</code></td>
+<td>Independent tasks</td>
+</tr>
+<tr>
+<td>Unix integration</td>
+<td><code>hermes chat -q</code> + pipes</td>
+<td>Scripting</td>
+</tr>
+<tr>
+<td>Switch models</td>
+<td><code>/model &lt;name&gt;</code></td>
+<td>Cost/performance tuning</td>
+</tr>
+<tr>
+<td>Free up context</td>
+<td><code>/compress</code></td>
+<td>Long sessions</td>
+</tr>
+<tr>
+<td>Isolate workspaces</td>
+<td><code>hermes -p &lt;profile&gt;</code></td>
+<td>Work/life separation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="three-power-user-patterns">Three Power-User Patterns</h2>
+<h3 id="pattern-1-the-safe-refactor">Pattern 1: The Safe Refactor</h3>
+<pre class="highlight"><code># Step 1: Enable safety nets
+hermes --checkpoints -p work
+
+# Step 2: Set the objective
+/goal Refactor the auth module from session-based to JWT
+
+# Step 3: Let Hermes work, steering as needed
+/steer Keep the existing API contract unchanged
+
+# Step 4: If something breaks
+/rollback 1
+
+# Step 5: If everything works
+/compress          # free up context
+/goal clear        # done
+</code></pre>
+
+<h3 id="pattern-2-the-cost-optimized-sprint">Pattern 2: The Cost-Optimized Sprint</h3>
+<pre class="highlight"><code># Start with cheap model for boilerplate
+hermes -m deepseek/deepseek-chat
+
+# Switch to premium for the hard part
+/model anthropic/claude-sonnet-4
+
+# Queue follow-up tasks
+/queue Write unit tests for the new module
+/queue Update the API documentation
+
+# Switch back to cheap for tests and docs
+/model deepseek/deepseek-chat
+</code></pre>
+
+<h3 id="pattern-3-the-research-pipeline">Pattern 3: The Research Pipeline</h3>
+<pre class="highlight"><code># Branch for exploration
+/branch
+
+# Background research task
+/background Analyze all competitors and write comparison to ~/research/competitors.md
+
+# Meanwhile, continue main work
+# ... (work on your project normally)
+
+# When background finishes, review results
+# and merge insights into main thread
+</code></pre>
+
+<hr />
+<h2 id="816-let-hermes-solve-its-own-problems">8.16 Let Hermes Solve Its Own Problems</h2>
+<p>This is the most underused power technique. When Hermes hits an error, crashes, or produces bad output — <strong>ask Hermes to fix itself.</strong></p>
+<h3 id="why-this-works">Why This Works</h3>
+<p>Hermes has access to the same tools you do. It can read logs, inspect config, search files, run commands, and read its own source code. It knows more about its own internals than you do. Use that.</p>
+<p><div class="mermaid">flowchart TD
+    subgraph without["WITHOUT /goal"]
+        direction TB
+        U1["You: \"Refactor the auth module\""]
+        U2["Hermes: refactors auth"]
+        U3["You: \"Also update the tests\""]
+        U4["Hermes: \"What tests?\" (lost context)"]
+        U1 --> U2 --> U3 --> U4
+    end
+    subgraph with["WITH /goal"]
+        direction TB
+        G1["You: /goal Refactor auth module to use JWT"]
+        G2["Hermes: Goal set. Working on JWT refactor..."]
+        G3["You: \"Also update the tests\""]
+        G4["Hermes: Still in JWT context, updates tests"]
+        G5["You: \"Check the middleware too\""]
+        G6["Hermes: Still in JWT context, checks MW"]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6
+    end</div>1</p>
+<h3 id="the-magic-phrases">The Magic Phrases</h3>
+<p>Just paste the error and say one of these:</p>
+<pre class="highlight"><code>&quot;Read the error. Diagnose it. Fix it. Verify it works.&quot;
+&quot;I'm getting this error — fix it and explain what was wrong.&quot;
+&quot;This cron job failed — read the logs, find why, patch it.&quot;
+&quot;Hermes is acting weird — run hermes doctor, find issues, fix them.&quot;
+&quot;Read the last 50 lines of gateway.log. Fix whatever's broken.&quot;
+</code></pre>
+
+<h3 id="real-example-broken-cron-job">Real Example: Broken Cron Job</h3>
+<pre class="highlight"><code>You: &quot;The morning blog cron didn't fire today. Fix it.&quot;
+
+Hermes:
+  1. Runs: hermes cron list
+  2. Finds job c6e4d1c962bd — status: error
+  3. Runs: hermes cron log c6e4d1c962bd
+  4. Reads: &quot;API error 429: rate limit exceeded&quot;
+  5. Runs: hermes config get providers.openrouter
+  6. Finds: only one API key configured
+  7. Adds credential pool fallback
+  8. Patches the cron retry settings
+  9. Runs: hermes cron test c6e4d1c962bd
+  10. Confirms: &quot;Fixed. Added second API key to pool, set retry to 
+      3 attempts with 30s delay. Test run succeeded.&quot;
+</code></pre>
+
+<p>You did nothing. Hermes diagnosed, fixed, and verified — all by itself.</p>
+<h3 id="real-example-hermes-config-drift">Real Example: Hermes Config Drift</h3>
+<pre class="highlight"><code>You: &quot;Hermes has been slow lately. Diagnose and optimize.&quot;
+
+Hermes:
+  1. Runs: hermes doctor
+  2. Checks config size, context window usage, active tools
+  3. Finds: 14 toolsets loaded (you only use 5 regularly)
+  4. Finds: compression threshold at 0.70 (too high)
+  5. Reads: config.yaml
+  6. Patches: enabled_toolsets to only needed ones
+  7. Patches: compression.threshold to 0.40
+  8. Runs: hermes status --all
+  9. Reports: &quot;Trimmed 9 unused toolsets, tightened compression. 
+      Your context window is now 60% larger per session.&quot;
+</code></pre>
+
+<h3 id="real-example-skill-gone-stale">Real Example: Skill Gone Stale</h3>
+<pre class="highlight"><code>You: &quot;The blog skill keeps failing on Tuesdays. Fix it.&quot;
+
+Hermes:
+  1. Loads skill: blog
+  2. Reads the SKILL.md and linked scripts
+  3. Runs: hermes cron log &lt;blog-job-id&gt;
+  4. Finds: &quot;Tuesday topic generation fails — API returns empty array&quot;
+  5. Reads the topic generation script
+  6. Finds: hardcoded category filter that returns 0 results on Tuesdays
+  7. Patches the script with fallback categories
+  8. Tests with a dry run
+  9. Patches the skill with a new pitfall entry
+  10. Reports: &quot;Fixed. Added fallback category list. Updated skill 
+      with pitfall documentation.&quot;
+</code></pre>
+
+<h3 id="when-self-debug-doesnt-work">When Self-Debug Doesn't Work</h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model keeps looping on the same wrong fix</td>
+<td><code>/stop</code>, then explain the error differently</td>
+</tr>
+<tr>
+<td>Hermes can't see the error (gateway-side)</td>
+<td>Check <code>gateway.log</code> manually, paste the relevant lines</td>
+</tr>
+<tr>
+<td>Config is so broken Hermes won't start</td>
+<td><code>hermes doctor --fix</code> from terminal</td>
+</tr>
+<tr>
+<td>The model itself is the problem</td>
+<td>Switch models: <code>/model openai/gpt-4o</code></td>
+</tr>
+</tbody>
+</table>
+<p>💡 <strong>Tip:</strong> After Hermes fixes its own problem, say "Save this as a skill." It'll document the diagnosis + fix so it never has to re-learn it. Each self-debug makes Hermes smarter permanently.</p>
+<hr />
+<p><strong>Progress: Chapter 8 complete.</strong> Next up: <strong>Chapter 9 — Real Business Use Cases</strong> — 10 scenarios with actual ROI numbers, showing how people make money with Hermes.</p>
+<hr />
+<p><em>Previous: <a href="ch07-advanced-config.md">Chapter 7 — Advanced Configuration</a> · Next: <a href="ch09-business-use-cases.md">Chapter 9 — Real Business Use Cases</a></em></p>
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch07-advanced-config.html" class="prev">← Ch 7: Advanced Configuration</a><a href="ch09-business-use-cases.html" class="next">Ch 9: Real Business Use Cases →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

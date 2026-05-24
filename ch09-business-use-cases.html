@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Business Use Cases — 10 Scenarios with ROI Numbers | Hermes Agent Tutorial</title>
+    <meta name="description" content="10 real business scenarios automated with Hermes Agent, complete with ROI calculations. Content marketing, code review, e-commerce, SaaS monitoring, and lead generation.">
+    <meta name="keywords" content="Hermes business use cases, AI agent ROI, automated content marketing, AI code review, SaaS monitoring agent">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch09-business-use-cases.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Real Business Use Cases — 10 Scenarios with ROI Numbers">
+    <meta property="og:description" content="10 real business scenarios automated with Hermes Agent, complete with ROI calculations. Content marketing, code review, e-commerce, SaaS monitoring, and lead generation.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch09-business-use-cases.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 9">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Real Business Use Cases — 10 Scenarios with ROI Numbers">
+    <meta name="twitter:description" content="10 real business scenarios automated with Hermes Agent, complete with ROI calculations. Content marketing, code review, e-commerce, SaaS monitoring, and lead generation.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Real Business Use Cases \u2014 10 Scenarios with ROI Numbers",
+  "description": "10 real business scenarios automated with Hermes Agent, complete with ROI calculations. Content marketing, code review, e-commerce, SaaS monitoring, and lead generation.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch09-business-use-cases.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch09-business-use-cases.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html" class="active">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 9</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-9-real-business-use-cases-10-scenarios-with-roi-numbers">Chapter 9: Real Business Use Cases — 10 Scenarios with ROI Numbers</h1>
+<blockquote>
+<p><strong>Theory is over. This chapter is about money — 10 real business scenarios where Hermes replaces expensive tools, saves hours of manual work, and generates measurable ROI. Each scenario includes architecture, setup commands, and dollar-value returns.</strong></p>
+</blockquote>
+<hr />
+<h2 id="91-content-marketing-engine-automated-blog-pipeline">9.1 Content Marketing Engine — Automated Blog Pipeline</h2>
+<p>The average business blog post costs $150-$500 when outsourced. A content schedule of 2 posts/day means $9,000-$30,000/month. Hermes can do it for the cost of API calls.</p>
+<h3 id="the-architecture">The Architecture</h3>
+<div class="mermaid">flowchart LR
+    subgraph Engine["Content Marketing Engine"]
+        subgraph Triggers["Scheduled Triggers"]
+            C1["Cron\n7am WIB"]
+            C2["Cron\n7pm WIB"]
+        end
+        subgraph Agent["Hermes Agent"]
+            S1["blog"]
+            S2["humanizer"]
+            S3["marketing-copy"]
+        end
+        C1 --> Agent
+        C2 --> Agent
+        Agent --> Blog["Blog Platform"]
+        Agent --> Social["Social cross-post"]
+    end</div>
+<h3 id="setup">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Install required skills
+hermes skills install blog
+hermes skills install humanizer
+hermes skills install marketing-copy
+
+# Create morning article job
+hermes cron create &quot;0 7 * * *&quot; \
+  --skills blog,humanizer,marketing-copy \
+  --deliver telegram \
+  --name &quot;morning-article&quot;
+
+# Create evening article job
+hermes cron create &quot;0 19 * * *&quot; \
+  --skills blog,humanizer,marketing-copy \
+  --deliver telegram \
+  --name &quot;evening-article&quot;
+</code></pre>
+
+<p>When the cron fires, Hermes:
+1. Picks a topic from your content calendar (stored in memory)
+2. Writes a full SEO-optimized article
+3. Runs it through the humanizer to strip AI patterns
+4. Publishes to your blog platform
+5. Sends you a Telegram notification with the link</p>
+<h3 id="roi-calculation">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Manual Cost</th>
+<th>Hermes Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content writer ($200/post)</td>
+<td>$12,000/mo</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Editor review ($100/post)</td>
+<td>$6,000/mo</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>SEO optimization ($50/post)</td>
+<td>$3,000/mo</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>API calls (~$0.05/article)</td>
+<td>—</td>
+<td>$3/mo</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$21,000/mo</strong></td>
+<td><strong>$3/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$21,000</strong> · Time saved: 40+ hours/month</p>
+<p>💡 <strong>Tip:</strong> Use <code>marketing-copy</code> skill to generate social media snippets from each article. One article → 5 tweets, 1 LinkedIn post, 1 email teaser — zero extra effort.</p>
+<hr />
+<h2 id="92-customer-support-automation-247-ai-agent">9.2 Customer Support Automation — 24/7 AI Agent</h2>
+<p>Your customers ask questions at 2am. Your support team sleeps. Hermes doesn't.</p>
+<h3 id="the-architecture_1">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph System["Customer Support System"]
+        Customer["Customer"] --> Channel["Telegram / WhatsApp"]
+        Channel --> Gateway["Gateway\n(24/7)"]
+        Gateway --> FAQ["FAQ Bot\n(auto)\n\nSkills:\n• custom-faq-router"]
+        Gateway --> Escalate["Complex Escalate\n\nSkills:\n• browse\n• search\n• doc"]
+        Escalate --> Human["Human Agent\n(Telegram DM)"]
+    end</div>
+<h3 id="setup_1">Setup</h3>
+<pre class="highlight"><code class="language-bash"># 1. Create a dedicated support profile
+hermes profile create support --clone
+hermes profile use support
+
+# 2. Create FAQ skill for your business
+cat &gt; ~/.hermes/skills/support/FAQ.md &lt;&lt; 'EOF'
+---
+name: support-faq
+description: &quot;Customer support FAQ router for [Your Business]&quot;
+---
+
+# Support FAQ
+
+## Routing Rules
+- Order status → Check via terminal API call
+- Pricing → Return pricing table
+- Technical issue → Escalate to human
+- Refund request → Escalate to human with context
+- General question → Answer from knowledge base
+
+## Knowledge Base
+[Paste your FAQ content here]
+EOF
+
+# 3. Set up the gateway for support
+hermes gateway setup    # configure Telegram bot for support
+
+# 4. Enable PII redaction for customer data
+hermes config set privacy.redact_pii true
+</code></pre>
+
+<h3 id="escalation-pattern">Escalation Pattern</h3>
+<p>When Hermes can't answer, it doesn't guess — it escalates:</p>
+<pre class="highlight"><code class="language-bash"># In your custom support skill, include escalation logic:
+# &quot;If confidence &lt; 70% OR topic = refund/complaint:
+#  → send_message to human agent Telegram with:
+#    - Customer message
+#    - Attempted answer
+#    - Suggested resolution&quot;
+</code></pre>
+
+<h3 id="roi-calculation_1">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Before Hermes</th>
+<th>With Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Support staff (3 shifts × $2,500/mo)</td>
+<td>$7,500/mo</td>
+<td>$2,500/mo (1 shift)</td>
+</tr>
+<tr>
+<td>Response time (avg)</td>
+<td>4 hours</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td>After-hours coverage</td>
+<td>None</td>
+<td>Full 24/7</td>
+</tr>
+<tr>
+<td>Customer satisfaction</td>
+<td>72%</td>
+<td>89%</td>
+</tr>
+<tr>
+<td><strong>Monthly savings</strong></td>
+<td>—</td>
+<td><strong>$5,000/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$5,000</strong> · Response time: -99% · CSAT: +17 points</p>
+<p>💡 <strong>Tip:</strong> Use Hermes memory to store customer interaction history. When a customer returns, Hermes recognizes them and has full context — no "can you repeat your issue?" frustration.</p>
+<hr />
+<h2 id="93-code-review-cicd-automation">9.3 Code Review &amp; CI/CD Automation</h2>
+<p>A production bug costs an average of $10,000-$50,000 in lost revenue, customer trust, and emergency fixes. Catching it in review costs $50 in developer time. Hermes automates the review.</p>
+<h3 id="the-architecture_2">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Pipeline["Automated Code Review Pipeline"]
+        Dev["Developer pushes PR"] --> GitHub["GitHub PR Event"]
+        GitHub -- "Webhook" --> Hermes["Hermes"]
+        Hermes --> Security["Security Scan\n\n• secrets\n• vulns\n• deps"]
+        Hermes --> Quality["Quality Review\n\n• style\n• logic\n• tests"]
+        Security --> Comment["PR Comment\n(inline review)"]
+        Quality --> Comment
+    end</div>
+<h3 id="setup_2">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Install review skills
+hermes skills install github-code-review
+hermes skills install requesting-code-review
+
+# Subscribe to PR webhook
+hermes webhook subscribe pr-review
+
+# The webhook handler prompt (set during creation):
+# &quot;When a PR is opened, review the code for:
+#  1. Security vulnerabilities (SQL injection, XSS, secrets)
+#  2. Logic errors and edge cases
+#  3. Missing tests
+#  4. Style violations
+#  Post inline comments on the PR via gh CLI&quot;
+</code></pre>
+
+<h3 id="the-webhook-in-action">The Webhook in Action</h3>
+<pre class="highlight"><code class="language-bash"># Hermes receives the webhook and runs:
+gh pr diff $PR_NUMBER | hermes chat -q \
+  &quot;Review this PR for security issues, logic errors, and missing tests.
+   Post inline comments for any issues found.
+   Use the github-code-review skill for formatting.&quot;
+
+# Automatic quality gate:
+# If critical issues found → comment &quot;🚫 Do not merge&quot;
+# If minor issues only    → comment &quot;⚠️ Minor issues&quot;
+# If clean                → comment &quot;✅ Approved&quot;
+</code></pre>
+
+<h3 id="roi-calculation_2">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Manual Review</th>
+<th>Hermes Review</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Review time per PR</td>
+<td>2 hours</td>
+<td>5 minutes</td>
+</tr>
+<tr>
+<td>Bugs caught in review</td>
+<td>60%</td>
+<td>85%</td>
+</tr>
+<tr>
+<td>Production incidents/quarter</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Cost per incident</td>
+<td>$15,000</td>
+<td>$15,000</td>
+</tr>
+<tr>
+<td>Developer review cost</td>
+<td>$150/PR × 40 PRs/mo</td>
+<td>API: ~$20/mo</td>
+</tr>
+<tr>
+<td><strong>Quarterly incident cost</strong></td>
+<td><strong>$60,000</strong></td>
+<td><strong>$15,000</strong></td>
+</tr>
+<tr>
+<td><strong>Monthly savings</strong></td>
+<td>—</td>
+<td><strong>$15,000/quarter = $5,000/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$6,200</strong> (review time + incident prevention) · Bug catch rate: +25%</p>
+<p>💡 <strong>Tip:</strong> Combine with Chapter 5's webhook pattern. Hermes reviews PRs automatically on every push — zero manual trigger needed.</p>
+<hr />
+<h2 id="94-e-commerce-operations">9.4 E-Commerce Operations</h2>
+<p>Missed restocks cost sales. Wrong pricing loses margin. Manual monitoring eats hours. Hermes monitors everything.</p>
+<h3 id="the-architecture_3">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Engine["E-Commerce Ops Engine"]
+        Cron1["Cron 6am"] --> Check["Check inventory levels"]
+        Check --> Low{"Low stock?"}
+        Low -->|"Yes"| Alert1["Alert + auto-reorder suggestion"]
+        Cron2["Cron hourly"] --> Check
+        Check --> OOS{"Out of stock?"}
+        OOS -->|"Yes"| Alert2["Urgent alert"]
+        Check --> Price{"Price change?"}
+        Price -->|"Yes"| Alert3["Competitor comparison alert"]
+        Cron3["Cron 9pm"] --> Report["Daily sales report → Telegram"]
+    end</div>
+<h3 id="setup_3">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Inventory monitoring script
+hermes cron create &quot;0 6 * * *&quot; \
+  --name &quot;inventory-check&quot; \
+  --skills terminal,file \
+  --deliver telegram
+
+# Prompt: &quot;Check inventory via API at my-store.com/api/stock.
+#  Alert me of any product below 10 units.
+#  Suggest reorder quantities based on 30-day sales velocity.
+#  Save report to ~/reports/inventory-$(date).md&quot;
+
+# Competitor price watch (script-only, zero tokens)
+hermes cron create &quot;every 4h&quot; \
+  --name &quot;price-watch&quot; \
+  --script ~/scripts/check-prices.sh \
+  --deliver telegram
+
+# Daily sales digest
+hermes cron create &quot;0 21 * * *&quot; \
+  --name &quot;sales-digest&quot; \
+  --skills terminal \
+  --deliver telegram
+</code></pre>
+
+<h3 id="script-only-price-watchdog-zero-token-cost">Script-Only Price Watchdog (Zero Token Cost)</h3>
+<pre class="highlight"><code class="language-bash">#!/bin/bash
+# ~/scripts/check-prices.sh — runs without LLM, costs $0
+
+COMPETITOR_URL=&quot;https://competitor.com/products&quot;
+THRESHOLD=5  # percentage difference to alert
+
+# Fetch and compare prices
+changes=$(curl -s &quot;$COMPETITOR_URL&quot; | jq -r '
+  # Extract competitor prices and compare with our data
+  # Alert if difference &gt; threshold
+')
+
+if [ -n &quot;$changes&quot; ]; then
+  echo &quot;⚠️ Price changes detected:\n$changes&quot;
+  # Non-empty stdout = delivered to Telegram
+else
+  # Empty stdout = silent (no alert)
+fi
+</code></pre>
+
+<h3 id="roi-calculation_3">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Before</th>
+<th>With Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Missed restocks/month</td>
+<td>8-12</td>
+<td>0-1</td>
+</tr>
+<tr>
+<td>Revenue lost per stockout</td>
+<td>$500</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Price monitoring time</td>
+<td>2 hrs/day</td>
+<td>0 (automated)</td>
+</tr>
+<tr>
+<td>Competitor reaction time</td>
+<td>2-3 days</td>
+<td>4 hours</td>
+</tr>
+<tr>
+<td><strong>Monthly stockout loss</strong></td>
+<td><strong>$5,000</strong></td>
+<td><strong>$250</strong></td>
+</tr>
+<tr>
+<td><strong>Monthly labor saved</strong></td>
+<td>—</td>
+<td><strong>$1,200</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$5,950</strong> · Stockout reduction: -90% · Reaction time: -95%</p>
+<p>💡 <strong>Tip:</strong> Use the <code>no_agent=True</code> script pattern for price checks — zero API token cost. Only invoke the LLM for the daily sales digest where analysis adds value.</p>
+<hr />
+<h2 id="95-research-competitive-intelligence">9.5 Research &amp; Competitive Intelligence</h2>
+<p>Your competitors publish, patent, and launch while you sleep. A daily digest of everything happening in your market — automated.</p>
+<h3 id="the-architecture_4">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Engine["Competitive Intelligence Engine"]
+        Cron1["Cron 8am"] --> Collect["Collect\n\nSources:\n• blogs\n• arxiv\n• news\n• Reddit"]
+        Cron2["Cron weekly"] --> Collect
+        Collect --> Analyze["Analyze\n\nSkills:\n• blog-watcher\n• arxiv"]
+        Analyze --> Digest["Digest → Telegram"]
+    end</div>
+<h3 id="setup_4">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Install intelligence skills
+hermes skills install blogwatcher
+hermes skills install arxiv
+
+# Daily competitive digest
+hermes cron create &quot;0 8 * * *&quot; \
+  --name &quot;competitive-digest&quot; \
+  --skills blogwatcher,arxiv,terminal \
+  --deliver telegram
+
+# Prompt: &quot;Check these competitors and topics:
+#  Competitors: [competitor1.com, competitor2.com]
+#  Topics: [our industry keywords]
+#  1. Check competitor blogs for new posts
+#  2. Search arXiv for relevant papers
+#  3. Summarize key findings in a 5-bullet digest
+#  4. Flag anything urgent with 🚨&quot;
+
+# Weekly deep-dive
+hermes cron create &quot;0 10 * * 1&quot; \
+  --name &quot;weekly-intel&quot; \
+  --skills blogwatcher,arxiv,terminal,search \
+  --deliver telegram \
+  --model anthropic/claude-sonnet-4
+
+# Use a smarter model for the weekly deep analysis
+</code></pre>
+
+<h3 id="roi-calculation_4">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Manual Research</th>
+<th>Hermes Research</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily monitoring time</td>
+<td>2 hours</td>
+<td>0 (automated)</td>
+</tr>
+<tr>
+<td>Weekly deep-dive time</td>
+<td>8 hours</td>
+<td>0 (automated)</td>
+</tr>
+<tr>
+<td>Research tools</td>
+<td>$200/mo</td>
+<td>$0 (API ~$5/mo)</td>
+</tr>
+<tr>
+<td>Competitive insights missed</td>
+<td>40%</td>
+<td>5%</td>
+</tr>
+<tr>
+<td><strong>Monthly labor saved</strong></td>
+<td>—</td>
+<td><strong>$4,000</strong></td>
+</tr>
+<tr>
+<td><strong>Earlier opportunity detection</strong></td>
+<td>—</td>
+<td><strong>Priceless</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$4,200</strong> · Coverage: 3x wider · Speed: same-day vs weekly</p>
+<p>💡 <strong>Tip:</strong> Chain the daily digest into the weekly deep-dive using <code>context_from</code>. The weekly report references all daily digests, giving you a comprehensive monthly picture without manual aggregation.</p>
+<hr />
+<h2 id="96-freelancer-agency-acceleration">9.6 Freelancer / Agency Acceleration</h2>
+<p>You're a solo freelancer with 3 active clients. Each wants daily progress. You're drowning in context-switching. Hermes becomes your agency of one.</p>
+<h3 id="the-architecture_5">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Accel["Freelancer Acceleration"]
+        subgraph Clients["Client Profiles"]
+            A["Client A\nProfile"]
+            B["Client B\nProfile"]
+            C["Client C\nProfile"]
+        end
+        Clients --> Subagents["Parallel Subagents\n(delegate_task)"]
+        subgraph Subagents
+            SA["Agent A → Build feature\n(leaf)"]
+            SB["Agent B → Write tests\n(leaf)"]
+            SC["Agent C → Deploy staging\n(leaf)"]
+        end
+        Cron["Cron 6pm"] --> Update["Daily client update → Telegram\n(auto-generated progress report)"]
+    end</div>
+<h3 id="setup_5">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Create a profile per client (isolated sessions, memory, skills)
+hermes profile create client-a --clone
+hermes profile create client-b --clone
+hermes profile create client-c --clone
+
+# Work on Client A's project
+hermes -p client-a -m anthropic/claude-sonnet-4
+
+# Inside the session, delegate parallel tasks:
+# &quot;Delegate these 3 tasks in parallel:
+#  1. Build the user dashboard component (use React + TypeScript)
+#  2. Write integration tests for the payment API
+#  3. Deploy staging environment and run smoke tests&quot;
+
+# Daily progress report (cron per client)
+hermes cron create &quot;0 18 * * *&quot; \
+  --profile client-a \
+  --name &quot;client-a-daily&quot; \
+  --deliver telegram \
+  --prompt &quot;Generate a daily progress report for Client A.
+    Summarize: commits made today, PRs opened/merged,
+    blockers, and tomorrow's plan.&quot;
+</code></pre>
+
+<h3 id="the-multi-client-sprint">The Multi-Client Sprint</h3>
+<pre class="highlight"><code class="language-bash"># Morning: kick off parallel work for all clients
+hermes -p client-a chat -q \
+  &quot;Continue the dashboard component. Focus on the data tables.&quot;
+
+hermes -p client-b chat -q \
+  &quot;Fix the checkout flow bug reported yesterday. Add regression test.&quot;
+
+hermes -p client-c chat -q \
+  &quot;Write API documentation for the new endpoints.&quot;
+</code></pre>
+
+<p>Three clients, three parallel streams, one developer.</p>
+<h3 id="roi-calculation_5">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Solo Freelancer</th>
+<th>With Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Active clients manageable</td>
+<td>2-3</td>
+<td>5-8</td>
+</tr>
+<tr>
+<td>Throughput (features/week)</td>
+<td>3-5</td>
+<td>10-15</td>
+</tr>
+<tr>
+<td>Context-switch overhead</td>
+<td>40% of day</td>
+<td>5%</td>
+</tr>
+<tr>
+<td>Daily progress reports</td>
+<td>1 hr (manual)</td>
+<td>0 (auto)</td>
+</tr>
+<tr>
+<td>Monthly revenue (3 clients × $5K)</td>
+<td>$15,000</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Monthly revenue (6 clients × $5K)</td>
+<td>—</td>
+<td>$30,000</td>
+</tr>
+<tr>
+<td><strong>Revenue increase</strong></td>
+<td>—</td>
+<td><strong>$15,000/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Revenue increase: ~$15,000/mo</strong> · Throughput: 3x · Clients manageable: 2.5x</p>
+<p>💡 <strong>Tip:</strong> Use the <code>writing-plans</code> skill to auto-generate project proposals. When a prospect emails, Hermes drafts the proposal, estimates timeline, and suggests pricing — you review and send.</p>
+<hr />
+<h2 id="97-saas-monitoring-alerting">9.7 SaaS Monitoring &amp; Alerting</h2>
+<p>Your SaaS goes down at 3am. Your customers notice at 3:05am. By morning, you've lost 200 users and a Twitter thread is trending. Hermes catches it at 3:00:30.</p>
+<h3 id="the-architecture_6">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Monitor["SaaS Monitoring System"]
+        Script1["Script\n(every 1 min)"] --> Curl["curl health endpoint"]
+        Curl --> OK{"200 OK?"}
+        OK -->|"Yes"| Silent["Silent — no output"]
+        OK -->|"500"| Alert1["Alert + auto-restart"]
+        OK -->|"Timeout"| Alert2["Urgent alert"]
+        Script2["Script\n(every 5 min)"] --> Resources["Check disk / memory / CPU"]
+        Resources --> Breach{"Threshold\nbreach?"}
+        Breach -->|"Yes"| Alert3["Alert"]
+        Cron["Cron Monday"] --> Summary["Weekly metrics summary\n(uses LLM for analysis)"]
+    end</div>
+<h3 id="setup_6">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Health check watchdog — script-only, zero token cost
+hermes cron create &quot;*/1 * * * *&quot; \
+  --name &quot;health-check&quot; \
+  --script ~/scripts/health-check.sh \
+  --no-agent \
+  --deliver telegram
+
+# Disk/memory watchdog
+hermes cron create &quot;*/5 * * * *&quot; \
+  --name &quot;resource-watch&quot; \
+  --script ~/scripts/resource-check.sh \
+  --no-agent \
+  --deliver telegram
+
+# Weekly metrics analysis (uses LLM for trend detection)
+hermes cron create &quot;0 9 * * 1&quot; \
+  --name &quot;weekly-metrics&quot; \
+  --skills terminal \
+  --deliver telegram \
+  --model deepseek/deepseek-chat
+</code></pre>
+
+<h3 id="health-check-script">Health Check Script</h3>
+<pre class="highlight"><code class="language-bash">#!/bin/bash
+# ~/scripts/health-check.sh
+
+ENDPOINT=&quot;https://myapp.com/health&quot;
+RESPONSE=$(curl -s -o /dev/null -w &quot;%{http_code}&quot; --max-time 10 &quot;$ENDPOINT&quot;)
+
+if [ &quot;$RESPONSE&quot; != &quot;200&quot; ]; then
+  echo &quot;🚨 DOWN: $ENDPOINT returned HTTP $RESPONSE&quot;
+
+  # Auto-remediation attempt
+  ssh deploy@myapp.com &quot;sudo systemctl restart myapp&quot;
+  RESTART_EXIT=$?
+
+  if [ $RESTART_EXIT -eq 0 ]; then
+    echo &quot;✅ Auto-restart succeeded. Monitoring...&quot;
+  else
+    echo &quot;❌ Auto-restart FAILED. Manual intervention required.&quot;
+  fi
+fi
+# Empty output = silent (healthy)
+</code></pre>
+
+<h3 id="roi-calculation_6">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Without Monitoring</th>
+<th>With Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean detection time</td>
+<td>4 hours</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td>Mean recovery time</td>
+<td>2 hours</td>
+<td>5 minutes (auto)</td>
+</tr>
+<tr>
+<td>Monthly downtime cost (at $500/hr)</td>
+<td>$12,000</td>
+<td>$500</td>
+</tr>
+<tr>
+<td>Monitoring SaaS (Pingdom, etc.)</td>
+<td>$150/mo</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>On-call engineer cost</td>
+<td>$3,000/mo</td>
+<td>$0</td>
+</tr>
+<tr>
+<td><strong>Monthly savings</strong></td>
+<td>—</td>
+<td><strong>$14,650/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$14,650</strong> · Detection: -99.8% · Recovery: -96%</p>
+<p>💡 <strong>Tip:</strong> Use <code>no_agent=True</code> for all watchdog scripts. They run every minute — LLM invocation would cost $50+/month. Reserve the LLM for the weekly trend analysis where it actually adds value.</p>
+<hr />
+<h2 id="98-data-analysis-reporting">9.8 Data Analysis &amp; Reporting</h2>
+<p>Your analytics dashboard shows numbers. It doesn't tell you <em>why</em> revenue dropped 12% last Tuesday. Hermes does.</p>
+<h3 id="the-architecture_7">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Engine["Data Analysis Engine"]
+        Cron1["Cron weekly"] --> Fetch["Fetch Data\n\nSources:\n• DB\n• API\n• CSV"]
+        Cron2["Cron ad-hoc"] --> Fetch
+        Fetch --> Analyze["Analyze\n\nSkills:\n• jupyter\n• terminal"]
+        Analyze --> Report["Report + Charts\n→ Telegram"]
+    end</div>
+<h3 id="setup_7">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Install Jupyter skill for live data exploration
+hermes skills install jupyter-live-kernel
+
+# Weekly analytics report
+hermes cron create &quot;0 9 * * 1&quot; \
+  --name &quot;weekly-analytics&quot; \
+  --skills jupyter-live-kernel,terminal,file \
+  --deliver telegram \
+  --prompt &quot;Generate the weekly analytics report:
+    1. Connect to PostgreSQL and pull this week's data
+    2. Compare with previous week (revenue, users, churn)
+    3. Identify top 3 changes and root causes
+    4. Generate charts and save to ~/reports/
+    5. Send summary to Telegram with key insights&quot;
+</code></pre>
+
+<h3 id="ad-hoc-analysis">Ad-Hoc Analysis</h3>
+<pre class="highlight"><code class="language-bash"># Ask questions about your data on the fly
+hermes chat -q &quot;Why did our conversion rate drop last Tuesday?
+  Pull data from the analytics DB and compare with the
+  previous 4 Tuesdays. Factor in: traffic source, device
+  type, and checkout step drop-off.&quot;
+</code></pre>
+
+<p>Hermes connects to your database, runs the queries, and returns an answer with specific numbers — not generic advice.</p>
+<h3 id="roi-calculation_7">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Data Analyst</th>
+<th>Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monthly salary</td>
+<td>$4,500/mo</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Report turnaround</td>
+<td>2 days</td>
+<td>10 minutes</td>
+</tr>
+<tr>
+<td>Ad-hoc query response</td>
+<td>4 hours</td>
+<td>2 minutes</td>
+</tr>
+<tr>
+<td>Missed insights (lack of time)</td>
+<td>60%</td>
+<td>10%</td>
+</tr>
+<tr>
+<td><strong>Monthly savings</strong></td>
+<td>—</td>
+<td><strong>$4,500</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$4,500</strong> · Report speed: -99% · Coverage: +50%</p>
+<p>💡 <strong>Tip:</strong> Use <code>execute_code</code> for data processing — it gives Hermes access to Python, pandas, and matplotlib in a single tool call. Complex analysis without Jupyter overhead.</p>
+<hr />
+<h2 id="99-email-management-triage-respond">9.9 Email Management — Triage &amp; Respond</h2>
+<p>You get 150 emails a day. 120 are noise. 25 need replies. 5 are urgent. Hermes sorts them all before you wake up.</p>
+<h3 id="the-architecture_8">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Engine["Email Triage Engine"]
+        Cron["Cron 7am"] --> Fetch["Fetch Email\n(IMAP)"]
+        Fetch --> Categorize["Categorize\n\n• urgent\n• reply\n• FYI\n• spam\n• action"]
+        Fetch --> Drafts["Draft Replies\n\nSkills:\n• himalaya\n• terminal"]
+    end</div>
+<h3 id="setup_8">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Install email skill
+hermes skills install himalaya
+
+# Morning email triage
+hermes cron create &quot;0 7 * * *&quot; \
+  --name &quot;email-triage&quot; \
+  --skills himalaya,terminal \
+  --deliver telegram \
+  --prompt &quot;Check my inbox via himalaya.
+    Categorize all unread emails:
+    🚨 URGENT (needs response today): list with sender + subject
+    📧 REPLY NEEDED (can wait): list with suggested response
+    📋 FYI (just read): count + key topics
+    🗑️ SPAM: auto-delete obvious spam
+    Send the digest to Telegram.&quot;
+
+# Afternoon follow-up
+hermes cron create &quot;0 14 * * *&quot; \
+  --name &quot;email-followup&quot; \
+  --skills himalaya,terminal \
+  --deliver telegram \
+  --prompt &quot;Check for new emails since morning triage.
+    Only alert on urgent items.&quot;
+</code></pre>
+
+<h3 id="roi-calculation_8">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Manual Email</th>
+<th>Hermes Email</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily email time</td>
+<td>2.5 hours</td>
+<td>30 minutes</td>
+</tr>
+<tr>
+<td>Urgent emails missed</td>
+<td>10%</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>Response time (avg)</td>
+<td>4 hours</td>
+<td>30 minutes</td>
+</tr>
+<tr>
+<td><strong>Daily time saved</strong></td>
+<td>—</td>
+<td><strong>2 hours</strong></td>
+</tr>
+<tr>
+<td><strong>Monthly value (at $75/hr)</strong></td>
+<td>—</td>
+<td><strong>$3,000</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Monthly savings: ~$3,000</strong> · Time saved: 2 hrs/day · Urgent miss rate: 0%</p>
+<p>💡 <strong>Tip:</strong> Configure himalaya with <code>himalaya account configure</code> to connect your email via IMAP/SMTP. Hermes reads, categorizes, and can draft replies — you just review and approve.</p>
+<hr />
+<h2 id="910-lead-generation-market-intelligence">9.10 Lead Generation &amp; Market Intelligence</h2>
+<p>Speed-to-lead is the #1 predictor of conversion. A lead responded to in 5 minutes converts 21x more than one contacted after 30 minutes. Hermes responds in 30 seconds.</p>
+<h3 id="the-architecture_9">The Architecture</h3>
+<div class="mermaid">flowchart TD
+    subgraph Engine["Lead Generation Engine"]
+        Browser["Browser Cron"] --> Scrape["Scrape Leads\n\nSkills:\n• browse\n• search"]
+        Webhook["Webhook\n(form)"] --> Scrape
+        Scrape --> Qualify["Qualify\n\n• Score\n• Enrich\n• Route"]
+        Qualify --> Respond["Auto-respond\n→ Telegram"]
+    end</div>
+<h3 id="setup_9">Setup</h3>
+<pre class="highlight"><code class="language-bash"># Daily lead scraping (e.g., job boards, directories)
+hermes cron create &quot;0 8 * * *&quot; \
+  --name &quot;lead-scrape&quot; \
+  --skills browser,search,terminal \
+  --deliver telegram \
+  --prompt &quot;Search for companies matching our ideal customer profile:
+    • Industry: [your industry]
+    • Size: 10-200 employees
+    • Location: [your region]
+    • Hiring signals: job posts for [relevant role]
+
+    For each lead found:
+    1. Company name, website, size
+    2. Key contact (LinkedIn if possible)
+    3. Pain points (inferred from hiring/posts)
+    4. Lead score (1-10)
+    5. Suggested outreach message
+
+    Save to ~/leads/$(date).csv and send top 5 to Telegram.&quot;
+
+# Instant response to inbound leads
+hermes webhook subscribe lead-form \
+  --deliver telegram \
+  --prompt &quot;A new lead submitted our contact form.
+    Qualify them based on:
+    • Company size and industry
+    • Budget indicated
+    • Timeline urgency
+    Respond via email within 5 minutes with a personalized message.
+    Alert me on Telegram with lead details and score.&quot;
+</code></pre>
+
+<h3 id="roi-calculation_9">ROI Calculation</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Manual Lead Gen</th>
+<th>Hermes Lead Gen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leads researched/day</td>
+<td>5-10</td>
+<td>50-100</td>
+</tr>
+<tr>
+<td>Response time to inbound</td>
+<td>2-4 hours</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td>Lead qualification time</td>
+<td>30 min/lead</td>
+<td>30 sec/lead</td>
+</tr>
+<tr>
+<td>Conversion rate (5min response)</td>
+<td>8%</td>
+<td>21%</td>
+</tr>
+<tr>
+<td>Monthly leads generated</td>
+<td>200</td>
+<td>2,000</td>
+</tr>
+<tr>
+<td><strong>Monthly revenue impact</strong></td>
+<td>—</td>
+<td><strong>+150% pipeline</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pipeline increase: +150%</strong> · Response time: -99.9% · Lead volume: 10x</p>
+<p>💡 <strong>Tip:</strong> Combine with the CRM integration. After qualifying, Hermes can auto-create contacts in your CRM (Airtable, Notion, or Google Sheets) with all enrichment data filled in.</p>
+<hr />
+<h2 id="master-roi-summary-all-10-scenarios">Master ROI Summary — All 10 Scenarios</h2>
+<p><div class="mermaid">flowchart TD
+    subgraph System["Customer Support System"]
+        Customer["Customer"] --> Channel["Telegram / WhatsApp"]
+        Channel --> Gateway["Gateway\n(24/7)"]
+        Gateway --> FAQ["FAQ Bot\n(auto)\n\nSkills:\n• custom-faq-router"]
+        Gateway --> Escalate["Complex Escalate\n\nSkills:\n• browse\n• search\n• doc"]
+        Escalate --> Human["Human Agent\n(Telegram DM)"]
+    end</div>0</p>
+<h3 id="hermes-cost-breakdown">Hermes Cost Breakdown</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Monthly Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM API calls (daily crons)</td>
+<td>~$15-30</td>
+</tr>
+<tr>
+<td>LLM API calls (weekly analysis)</td>
+<td>~$5-10</td>
+</tr>
+<tr>
+<td>Script-only watchdogs (no_agent)</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Hosting (runs on your machine)</td>
+<td>$0</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$20-50/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Even at the high end ($50/mo), that's replacing $79,500/mo in labor and lost revenue. The ROI isn't close — it's astronomical.</p>
+<hr />
+<h2 id="choosing-your-first-scenario">Choosing Your First Scenario</h2>
+<p>Don't try all 10 at once. Pick the one with the highest immediate impact:</p>
+<table>
+<thead>
+<tr>
+<th>Your Situation</th>
+<th>Start With</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Solo developer</td>
+<td>Code Review (9.3)</td>
+<td>Saves time immediately, zero setup</td>
+</tr>
+<tr>
+<td>Content creator</td>
+<td>Content Engine (9.1)</td>
+<td>Biggest dollar savings</td>
+</tr>
+<tr>
+<td>Agency / freelancer</td>
+<td>Agency Accel (9.6)</td>
+<td>Revenue multiplier</td>
+</tr>
+<tr>
+<td>SaaS founder</td>
+<td>Monitoring (9.7)</td>
+<td>Prevents costly downtime</td>
+</tr>
+<tr>
+<td>E-commerce owner</td>
+<td>E-Commerce Ops (9.4)</td>
+<td>Prevents lost sales</td>
+</tr>
+<tr>
+<td>Job seeker</td>
+<td>Lead Gen (9.10)</td>
+<td>Faster applications = more interviews</td>
+</tr>
+<tr>
+<td>Researcher</td>
+<td>Competitive Intel (9.5)</td>
+<td>Knowledge advantage</td>
+</tr>
+</tbody>
+</table>
+<p>Pick one. Set it up this week. Measure the results. Then add the next one.</p>
+<hr />
+<h2 id="chapter-9-key-vocabulary">Chapter 9 Key Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ROI</strong></td>
+<td>Return on Investment — the dollar value gained vs cost spent</td>
+</tr>
+<tr>
+<td><strong>no_agent</strong></td>
+<td>Script-only cron mode — runs without LLM, zero token cost</td>
+</tr>
+<tr>
+<td><strong>context_from</strong></td>
+<td>Cron job chaining — output of Job A feeds into Job B</td>
+</tr>
+<tr>
+<td><strong>Lead score</strong></td>
+<td>A 1-10 rating of how qualified a potential customer is</td>
+</tr>
+<tr>
+<td><strong>Watchdog</strong></td>
+<td>A script that monitors something and alerts on failure</td>
+</tr>
+<tr>
+<td><strong>Auto-remediation</strong></td>
+<td>Automatically fixing a problem when detected (e.g., restarting a service)</td>
+</tr>
+<tr>
+<td><strong>Triage</strong></td>
+<td>Sorting items by priority — in email, sorting by urgent/reply/FYI/spam</td>
+</tr>
+<tr>
+<td><strong>Pipeline</strong></td>
+<td>The total value of all potential deals/leads in progress</td>
+</tr>
+</tbody>
+</table>
+<h2 id="chapter-9-summary">Chapter 9 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Key Takeaway</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9.1 Content Marketing</td>
+<td>$21K/mo saved — cron + blog + humanizer skills</td>
+</tr>
+<tr>
+<td>9.2 Customer Support</td>
+<td>24/7 coverage with gateway + custom FAQ skill</td>
+</tr>
+<tr>
+<td>9.3 Code Review</td>
+<td>Webhook-triggered PR review, $6K/mo saved</td>
+</tr>
+<tr>
+<td>9.4 E-Commerce Ops</td>
+<td>Script-only price watches (free) + inventory alerts</td>
+</tr>
+<tr>
+<td>9.5 Competitive Intel</td>
+<td>Daily digests from blogs + arXiv, 3x coverage</td>
+</tr>
+<tr>
+<td>9.6 Freelancer Accel</td>
+<td>Profiles per client, parallel delegation, 3x throughput</td>
+</tr>
+<tr>
+<td>9.7 SaaS Monitoring</td>
+<td>30-second detection, auto-restart, $14K/mo saved</td>
+</tr>
+<tr>
+<td>9.8 Data Analysis</td>
+<td>Jupyter + pandas, weekly automated reports</td>
+</tr>
+<tr>
+<td>9.9 Email Management</td>
+<td>Himalaya IMAP triage, 2 hrs/day saved</td>
+</tr>
+<tr>
+<td>9.10 Lead Generation</td>
+<td>Auto-respond in 30 sec, 21x conversion boost</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Progress: Chapter 9 complete.</strong> Next up: <strong>Chapter 10 — Building a Business Around Hermes</strong> — cost analysis, pricing your services, white-labeling, and scaling.</p>
+<hr />
+<p><em>Previous: <a href="ch08-power-techniques.md">Chapter 8 — Power Techniques</a> · Next: <a href="ch10-business-around-hermes.md">Chapter 10 — Building a Business Around Hermes</a></em></p>
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch08-power-techniques.html" class="prev">← Ch 8: Power Techniques</a><a href="ch10-business-around-hermes.html" class="next">Ch 10: Building a Business Around Hermes →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

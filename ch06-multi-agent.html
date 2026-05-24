@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Orchestration — An Army of One | Hermes Agent Tutorial</title>
+    <meta name="description" content="Delegate tasks to subagents running in parallel. Kanban workflows, agent orchestration, and building multi-agent pipelines that scale your productivity.">
+    <meta name="keywords" content="Hermes multi-agent, AI delegation, subagent orchestration, Kanban workflow, parallel AI agents">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch06-multi-agent.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Multi-Agent Orchestration — An Army of One">
+    <meta property="og:description" content="Delegate tasks to subagents running in parallel. Kanban workflows, agent orchestration, and building multi-agent pipelines that scale your productivity.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch06-multi-agent.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 6">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Multi-Agent Orchestration — An Army of One">
+    <meta name="twitter:description" content="Delegate tasks to subagents running in parallel. Kanban workflows, agent orchestration, and building multi-agent pipelines that scale your productivity.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Multi-Agent Orchestration \u2014 An Army of One",
+  "description": "Delegate tasks to subagents running in parallel. Kanban workflows, agent orchestration, and building multi-agent pipelines that scale your productivity.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch06-multi-agent.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch06-multi-agent.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html" class="active">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 6</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-6-multi-agent-orchestration-an-army-of-one">Chapter 6: Multi-Agent Orchestration — An Army of One</h1>
+<blockquote>
+<p><strong>One agent is powerful. Multiple agents working together are unstoppable. Delegation, parallel execution, Kanban boards, and external coding agents turn Hermes from a solo performer into an orchestral conductor.</strong></p>
+</blockquote>
+<hr />
+<h2 id="61-why-multi-agent">6.1 Why Multi-Agent?</h2>
+<p>You've seen Hermes handle single tasks well — write code, search the web, manage files. But real work is rarely single-threaded. A typical project involves:</p>
+<ul>
+<li><strong>Research</strong> + <strong>implementation</strong> happening simultaneously</li>
+<li><strong>Frontend</strong> + <strong>backend</strong> features built in parallel</li>
+<li><strong>Writing</strong> + <strong>review</strong> as a quality gate</li>
+<li><strong>Monitoring</strong> across multiple systems at once</li>
+</ul>
+<p>One agent does these sequentially. Multiple agents do them in parallel — and parallelism is where the real throughput gains live.</p>
+<div class="mermaid">flowchart LR
+    subgraph seq ["Sequential (1 agent) — Total: ~120 min"]
+        direction TB
+        S1["Research: 20 min"] --> S2["Backend: 45 min"]
+        S2 --> S3["Frontend: 40 min"]
+        S3 --> S4["Review: 15 min"]
+    end
+
+    subgraph par ["Parallel (3 agents) — Total: ~60 min (2x faster)"]
+        direction TB
+        P1["Agent A: Research (20 min)"]
+        P2["Agent B: Backend"]
+        P3["Agent C: Frontend"]
+        P1 --> P4["Review (waits for B + C): 15 min"]
+        P2 --> P4
+        P3 --> P4
+    end</div>
+<p>Hermes gives you <strong>four mechanisms</strong> for multi-agent work, each suited to different scenarios:</p>
+<div class="mermaid">flowchart TD
+    subgraph mechanisms ["MULTI-AGENT MECHANISMS"]
+        D["1. DELEGATION (delegate_task)\nQuick synchronous subtasks inside your session\nBest for: research, code review, file analysis"]
+        S["2. SPAWNING (tmux + hermes process)\nFully independent Hermes instances\nBest for: long autonomous missions, hours/days"]
+        K["3. KANBAN BOARD (multi-agent work queue)\nDurable SQLite-backed task board with profiles\nBest for: project-scale work, specialist teams"]
+        E["4. EXTERNAL AGENTS (KiloCode, Claude Code, Codex)\nDelegate to dedicated coding CLIs\nBest for: heavy coding, PRs, refactoring"]
+    end</div>
+<hr />
+<h2 id="62-delegation-delegate_task">6.2 Delegation — <code>delegate_task</code></h2>
+<p>The fastest way to parallelize. You spawn a <strong>subagent</strong> — an isolated worker with its own conversation, terminal session, and toolset. The parent waits for the result, then continues.</p>
+<h3 id="single-task-delegation">Single Task Delegation</h3>
+<pre class="highlight"><code>You: Research the top 5 React form libraries and compare them
+
+Hermes: I'll delegate that research to a subagent.
+
+  [delegate_task(
+    goal=&quot;Research and compare top 5 React form libraries&quot;,
+    toolsets=['web'],
+    role='leaf'
+  )]
+
+  Subagent uses: web_search, web_extract
+  Subagent returns: summary of 5 libraries with pros/cons
+
+Hermes: Here's the comparison:
+  1. React Hook Form — best performance, smallest bundle
+  2. Formik — mature, large community
+  3. Zod + React — best TypeScript integration
+  ...etc
+</code></pre>
+
+<h3 id="batch-delegation-up-to-3-in-parallel">Batch Delegation — Up to 3 in Parallel</h3>
+<p>Need multiple things at once? Batch them:</p>
+<pre class="highlight"><code>You: I need three things done: check the API health, review the
+     latest PR, and find me a good icon library.
+
+Hermes: Dispatching 3 subagents in parallel...
+
+  [delegate_task(tasks=[
+    {
+      goal: &quot;Check API health endpoints and report status&quot;,
+      toolsets: ['terminal', 'web'],
+    },
+    {
+      goal: &quot;Review PR #42 for security and code quality&quot;,
+      toolsets: ['terminal', 'file'],
+    },
+    {
+      goal: &quot;Find the best React icon library for a dashboard&quot;,
+      toolsets: ['web'],
+    }
+  ])]
+
+  All 3 run simultaneously. Results arrive together.
+</code></pre>
+
+<h3 id="delegation-anatomy">Delegation Anatomy</h3>
+<div class="mermaid">flowchart TD
+    subgraph params ["DELEGATION PARAMETERS"]
+        G["goal — What the subagent should accomplish"]
+        CTX["context — Background info the subagent needs"]
+        TS["toolsets — Which tools to give it\n(default: inherits parent's tools)"]
+        R["role — 'leaf' (default) or 'orchestrator'"]
+    end
+    G --> CTX --> TS --> R
+    R -.- RTN["RETURNS: Final summary only.\nIntermediate tool output NEVER enters parent context."]
+    R -.- LIFE["LIFETIME: Bound to parent's turn.\nIf parent is interrupted → child is cancelled.\nFor durable work, use cronjob or background terminal."]</div>
+<h3 id="leaf-vs-orchestrator-roles">Leaf vs Orchestrator Roles</h3>
+<ul>
+<li><strong>Leaf</strong> (default) — focused worker. Cannot re-delegate. Best for 95% of tasks.</li>
+<li><strong>Orchestrator</strong> — can spawn its own subagents. For multi-step workflows where a subagent needs to coordinate further workers.</li>
+</ul>
+<pre class="highlight"><code class="language-yaml"># Enable deeper nesting in config.yaml
+delegation:
+  max_spawn_depth: 2        # allow orchestrator subagents
+  max_concurrent_children: 3  # max parallel children
+  max_iterations: 50         # max agent loop turns per child
+</code></pre>
+
+<h3 id="choosing-what-to-delegate">Choosing What to Delegate</h3>
+<div class="mermaid">flowchart TD
+    subgraph when ["WHEN TO DELEGATE"]
+        subgraph do ["DO delegate"]
+            D1["Research tasks (web search + synthesis)"]
+            D2["Code review (read files + assess quality)"]
+            D3["File analysis (search + summarize)"]
+            D4["Parallel independent subtasks"]
+            D5["Tasks that would flood your context with data"]
+        end
+        subgraph dont ["DON'T delegate"]
+            N1["Single tool calls (just call the tool directly)"]
+            N2["Tasks needing user interaction (subagents can't ask you)"]
+            N3["Long-running work (use cronjob or background instead)"]
+            N4["Simple questions (answer directly, no overhead)"]
+        end
+    end</div>
+<hr />
+<h2 id="63-spawning-independent-agents">6.3 Spawning Independent Agents</h2>
+<p>Delegation is bounded by the parent session. For <strong>long autonomous missions</strong> — tasks that run for hours or days — spawn a fully independent Hermes process.</p>
+<h3 id="one-shot-mode">One-Shot Mode</h3>
+<p>Fire-and-forget a single task:</p>
+<pre class="highlight"><code class="language-bash"># Foreground (waits for completion)
+hermes chat -q &quot;Refactor the auth module to use dependency injection&quot;
+
+# Background (non-blocking, from inside a session)
+terminal(command=&quot;hermes chat -q 'Set up CI/CD for ~/myapp'&quot;, timeout=300)
+</code></pre>
+
+<p>No PTY needed. The agent runs, finishes, and exits.</p>
+<h3 id="interactive-mode-via-tmux">Interactive Mode via tmux</h3>
+<p>For tasks where you want to interact with the spawned agent or monitor progress:</p>
+<pre class="highlight"><code class="language-bash"># 1. Start a new Hermes in tmux
+tmux new-session -d -s backend -x 120 -y 40 'hermes'
+
+# 2. Wait for startup, then send a task
+sleep 8 &amp;&amp; tmux send-keys -t backend 'Build REST API for user management' Enter
+
+# 3. Check progress anytime
+tmux capture-pane -t backend -p | tail -30
+
+# 4. Send follow-up instructions
+tmux send-keys -t backend 'Add rate limiting middleware' Enter
+
+# 5. Done? Kill the session
+tmux send-keys -t backend '/exit' Enter &amp;&amp; sleep 2 &amp;&amp; tmux kill-session -t backend
+</code></pre>
+
+<h3 id="multi-agent-coordination">Multi-Agent Coordination</h3>
+<p>The real power: spawn multiple agents, each on a different workstream, and relay context between them:</p>
+<div class="mermaid">flowchart TD
+    BE["BACKEND agent\n(tmux:be)"] <-->|"API schema relay"| FE["FRONTEND agent\n(tmux:fe)"]
+    BE --> YOU
+    FE --> YOU
+    YOU["YOU (Hermes main)\nMonitor both, relay info"]
+
+    BE -.- STEP["1. Spawn backend agent: Build REST API\n2. Spawn frontend agent: Build React dashboard\n3. Capture backend API schema\n4. Send schema to frontend agent\n5. Both work in parallel"]</div>
+<pre class="highlight"><code class="language-bash"># Agent A: Backend API
+tmux new-session -d -s backend -x 120 -y 40 'hermes -w'
+sleep 8 &amp;&amp; tmux send-keys -t backend 'Build REST API for user management at ~/myapp' Enter
+
+# Agent B: Frontend dashboard (simultaneously)
+tmux new-session -d -s frontend -x 120 -y 40 'hermes -w'
+sleep 8 &amp;&amp; tmux send-keys -t frontend 'Build React dashboard for user management at ~/myapp/frontend' Enter
+
+# Later: relay API schema from backend to frontend
+BACKEND_OUTPUT=$(tmux capture-pane -t backend -p | tail -50)
+tmux send-keys -t frontend &quot;Here is the API schema from the backend agent:\n$BACKEND_OUTPUT\nBuild the frontend to consume these endpoints.&quot; Enter
+</code></pre>
+
+<p><strong>The <code>-w</code> flag</strong> is crucial when spawning agents that edit code — it creates an isolated git worktree so agents don't conflict with each other's changes.</p>
+<h3 id="delegation-vs-spawning-quick-reference">Delegation vs Spawning — Quick Reference</h3>
+<div class="mermaid">flowchart TD
+    subgraph comparison ["DELEGATE_TASK vs SPAWN HERMES"]
+        subgraph dt ["delegate_task"]
+            D1["Isolation: Separate convo, shared process"]
+            D2["Duration: Minutes"]
+            D3["Tool access: Subset of parent"]
+            D4["Interactive: No"]
+            D5["Survives restart: No"]
+            D6["Overhead: Low"]
+            D7["Best for: Quick subtasks"]
+        end
+        subgraph sh ["Spawn hermes"]
+            H1["Isolation: Fully independent process"]
+            H2["Duration: Hours/days"]
+            H3["Tool access: Full access"]
+            H4["Interactive: Yes (via tmux)"]
+            H5["Survives restart: Yes (tmux)"]
+            H6["Overhead: Medium"]
+            H7["Best for: Long missions"]
+        end
+    end</div>
+<hr />
+<h2 id="64-kanban-board-multi-agent-work-queue">6.4 Kanban Board — Multi-Agent Work Queue</h2>
+<p>For <strong>project-scale work</strong> that needs coordination, persistence, and specialist roles, use the Kanban board. It's a durable SQLite-backed task board where multiple Hermes profiles collaborate.</p>
+<h3 id="what-makes-kanban-different">What Makes Kanban Different</h3>
+<p>Unlike delegation (ephemeral) or spawning (manual coordination), Kanban provides:</p>
+<ul>
+<li><strong>Persistence</strong> — tasks survive crashes, restarts, and reboots</li>
+<li><strong>Specialization</strong> — different profiles handle different task types</li>
+<li><strong>Dependency tracking</strong> — Task C waits for Task A and B to finish</li>
+<li><strong>Automatic dispatch</strong> — the dispatcher assigns and spawns workers</li>
+<li><strong>Audit trail</strong> — every action logged in the board's history</li>
+</ul>
+<div class="mermaid">stateDiagram-v2
+    [*] --> TODO
+    TODO --> READY : All parents done
+    READY --> CLAIMED : Dispatcher picks up
+    CLAIMED --> DONE : Worker finishes
+    CLAIMED --> BLOCKED : Waiting for human input
+    BLOCKED --> READY : Human provides input
+
+    NOTE_RIGHT of TODO: Parents not done → stays here
+    NOTE_RIGHT of READY: Dispatcher spawns worker
+    NOTE_RIGHT of DONE: Children auto-promoted</div>
+<h3 id="setting-up-the-board">Setting Up the Board</h3>
+<pre class="highlight"><code class="language-bash"># Initialize a Kanban board
+hermes kanban init
+
+# Create tasks with profile assignment
+hermes kanban create &quot;Build authentication service&quot; --assignee backend-dev
+hermes kanban create &quot;Design login UI&quot; --assignee frontend-dev
+hermes kanban create &quot;Write auth documentation&quot; --assignee writer
+
+# View the board
+hermes kanban list
+
+# Show task details
+hermes kanban show &lt;task_id&gt;
+
+# Link dependencies (task 3 waits for tasks 1 and 2)
+hermes kanban link &lt;task1_id&gt; &lt;task3_id&gt;
+hermes kanban link &lt;task2_id&gt; &lt;task3_id&gt;
+</code></pre>
+
+<h3 id="the-dispatcher-automatic-worker-spawning">The Dispatcher — Automatic Worker Spawning</h3>
+<p>The dispatcher runs inside the gateway and automatically:</p>
+<ol>
+<li><strong>Claims</strong> ready tasks for the assigned profile</li>
+<li><strong>Spawns</strong> a worker Hermes instance for that profile</li>
+<li><strong>Monitors</strong> the worker's progress</li>
+<li><strong>Promotes</strong> dependent tasks when parents complete</li>
+<li><strong>Reclaims</strong> stale claims if a worker crashes</li>
+</ol>
+<pre class="highlight"><code class="language-bash"># Start the dispatcher (runs in gateway by default)
+hermes kanban dispatch
+
+# Watch live progress
+hermes kanban tail
+
+# View run history
+hermes kanban runs
+</code></pre>
+
+<h3 id="profiles-as-specialists">Profiles as Specialists</h3>
+<p>Each profile is a specialist. You configure them with different models, tools, and skills:</p>
+<pre class="highlight"><code class="language-bash"># Create specialist profiles
+hermes profile create backend-dev --clone
+hermes profile create frontend-dev --clone
+hermes profile create reviewer --clone
+
+# Configure each one
+hermes -p backend-dev config set model.default deepseek/deepseek-chat
+hermes -p frontend-dev config set model.default anthropic/claude-sonnet-4
+hermes -p reviewer config set model.default anthropic/claude-sonnet-4
+
+# Assign skills per profile
+hermes -p backend-dev skills install test-driven-development
+hermes -p reviewer skills install requesting-code-review
+</code></pre>
+
+<h3 id="task-dependencies-the-real-power">Task Dependencies — The Real Power</h3>
+<p>Dependencies are what make Kanban shine for complex projects:</p>
+<div class="mermaid">flowchart TD
+    T1["T1: Design database schema\n(backend-dev)"]
+    T2["T2: Design API contract\n(backend-dev)"]
+    T3["T3: Build REST API\n(backend-dev)"]
+    T4["T4: Build React UI\n(frontend-dev)"]
+    T5["T5: Integration testing\n(reviewer)"]
+    T6["T6: Deploy\n(backend-dev)"]
+
+    T1 --> T3
+    T2 --> T3
+    T3 --> T5
+    T4 --> T5
+    T5 --> T6
+
+    T1 -.- NOTE1["T1 + T2 run in parallel (no dependencies)"]
+    T3 -.- NOTE2["T3 starts when both T1 and T2 complete"]
+    T4 -.- NOTE3["T4 runs in parallel with T3"]
+    T5 -.- NOTE4["T5 starts when both T3 and T4 complete"]
+    T6 -.- NOTE5["T6 starts when T5 completes"]</div>
+<h3 id="managing-tasks">Managing Tasks</h3>
+<pre class="highlight"><code class="language-bash"># Block a task (waiting for human input)
+hermes kanban block &lt;task_id&gt; --reason &quot;Need client approval on design&quot;
+
+# Unblock and resume
+hermes kanban unblock &lt;task_id&gt;
+
+# Add comments
+hermes kanban comment &lt;task_id&gt; &quot;Use JWT instead of session cookies&quot;
+
+# Link related tasks
+hermes kanban link &lt;parent_id&gt; &lt;child_id&gt;
+
+# Complete a task manually
+hermes kanban complete &lt;task_id&gt; --summary &quot;Auth service built with JWT&quot;
+
+# Archive completed tasks to clean the board
+hermes kanban archive &lt;task_id&gt;
+
+# View statistics
+hermes kanban stats
+</code></pre>
+
+<h3 id="when-to-use-kanban">When to Use Kanban</h3>
+<div class="mermaid">flowchart TD
+    subgraph when_kanban ["USE KANBAN WHEN..."]
+        subgraph use ["Use Kanban"]
+            K1["Multiple specialists are needed"]
+            K2["Work should survive crashes/restarts"]
+            K3["Human-in-the-loop at any step"]
+            K4["Multiple subtasks can run in parallel"]
+            K5["Review/iteration cycles are expected"]
+            K6["Audit trail matters"]
+        end
+        subgraph use_delegate ["USE delegate_task FOR..."]
+            D1["Quick one-off subtasks"]
+            D2["Simple parallel research"]
+            D3["Tasks that complete in minutes"]
+        end
+    end</div>
+<hr />
+<h2 id="65-external-coding-agents">6.5 External Coding Agents</h2>
+<p>Beyond its own subagents, Hermes can delegate to <strong>dedicated coding CLIs</strong> — specialized agents designed for heavy coding work.</p>
+<h3 id="available-external-agents">Available External Agents</h3>
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Install</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>KiloCode</strong></td>
+<td><code>npm i -g @anthropic/kilocode</code></td>
+<td>Multi-specialist coding, GitNexus integration</td>
+</tr>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td><code>npm i -g @anthropic/claude-code</code></td>
+<td>Anthropic-native coding, deep reasoning</td>
+</tr>
+<tr>
+<td><strong>OpenAI Codex</strong></td>
+<td><code>npm i -g @openai/codex</code></td>
+<td>OpenAI-native coding, sandboxed execution</td>
+</tr>
+<tr>
+<td><strong>OpenCode</strong></td>
+<td>Build from source</td>
+<td>Lightweight, extensible</td>
+</tr>
+</tbody>
+</table>
+<h3 id="delegating-to-external-agents">Delegating to External Agents</h3>
+<pre class="highlight"><code class="language-bash"># KiloCode — full feature with GitNexus context injection
+kilo run --auto --format json &quot;Implement user authentication with JWT&quot;
+
+# Claude Code — deep reasoning coding
+claude --acp --stdio &quot;Refactor the database layer to use repositories&quot;
+
+# Codex — sandboxed execution
+codex &quot;Write unit tests for the payment module&quot;
+</code></pre>
+
+<p>Hermes wraps these via the terminal tool:</p>
+<pre class="highlight"><code>You: Implement the payment service with Stripe integration
+
+Hermes: I'll delegate this to KiloCode for heavy coding.
+
+  [terminal(command=&quot;kilo run --auto --format json 'Implement payment
+   service with Stripe integration at ~/myapp/src/services/payment.ts'&quot;,
+   timeout=300)]
+
+  KiloCode completes: creates file, writes tests, commits.
+
+Hermes: ✅ Payment service implemented by KiloCode:
+  - Stripe integration with webhook handling
+  - Unit tests passing (12/12)
+  - Committed as feat: add payment service
+</code></pre>
+
+<h3 id="why-use-external-agents">Why Use External Agents?</h3>
+<ul>
+<li><strong>Specialization</strong> — they're built specifically for coding, with deep IDE integration</li>
+<li><strong>Cost efficiency</strong> — use cheaper models for bulk coding, premium models for review</li>
+<li><strong>Safety</strong> — sandboxes and approval flows prevent unauthorized changes</li>
+<li><strong>Context windows</strong> — dedicated agents can focus their entire context on the code</li>
+</ul>
+<hr />
+<h2 id="66-coordination-patterns-real-workflows">6.6 Coordination Patterns — Real Workflows</h2>
+<p>Let's see how these mechanisms combine in practice.</p>
+<h3 id="pattern-1-research-write-delegation">Pattern 1: Research + Write (Delegation)</h3>
+<pre class="highlight"><code>You: Write a blog post about Rust's ownership model
+
+Hermes:
+
+  1. [delegate_task: Research subagent]
+     goal: &quot;Research Rust ownership model — key concepts, common
+            misconceptions, real-world examples&quot;
+     toolsets: ['web']
+     → Returns: research summary with sources
+
+  2. [Hermes writes using research]
+     Uses research as context, applies blog skill,
+     produces final article
+
+  Total: ~3 minutes vs ~8 minutes sequential
+</code></pre>
+
+<h3 id="pattern-2-backend-frontend-spawning">Pattern 2: Backend + Frontend (Spawning)</h3>
+<pre class="highlight"><code>You: Build a user management feature — API and dashboard
+
+Hermes:
+
+  1. [Spawn backend agent via tmux]
+     &quot;Build REST API: /users CRUD + /auth/login + /auth/register&quot;
+
+  2. [Spawn frontend agent via tmux — simultaneously]
+     &quot;Build React dashboard: user list, create/edit forms, login page&quot;
+
+  3. [Monitor both, relay API schema when backend finishes]
+
+  4. [Review integration when both complete]
+
+  Total: ~50 minutes vs ~95 minutes sequential
+</code></pre>
+
+<h3 id="pattern-3-full-project-pipeline-kanban">Pattern 3: Full Project Pipeline (Kanban)</h3>
+<pre class="highlight"><code>You: Build an e-commerce checkout system
+
+Hermes:
+
+  T1: Design checkout database schema      [backend-dev]
+  T2: Design checkout API contract          [backend-dev]    } parallel
+  T3: Design checkout UI mockups            [frontend-dev]   }
+
+  T4: Implement checkout API                [backend-dev]    ← depends on T1, T2
+  T5: Implement checkout UI                 [frontend-dev]   ← depends on T3
+
+  T6: Integration testing                   [reviewer]       ← depends on T4, T5
+
+  T7: Security review                       [reviewer]       ← depends on T6
+
+  T8: Deploy to staging                     [backend-dev]    ← depends on T7
+
+  Dispatcher handles all spawning, monitoring, and promotion automatically.
+</code></pre>
+
+<h3 id="pattern-4-daily-operations-cron-delegation">Pattern 4: Daily Operations (Cron + Delegation)</h3>
+<div class="mermaid">flowchart TD
+    subgraph daily ["DAILY AUTOMATED PIPELINE"]
+        C1["6:00 AM — Cron: Check server health\nScript-only job, $0, alert if down"]
+        C2["9:00 AM — Cron: Daily competitive digest\nAgent job: web search + summarize\ndelegate_task for parallel research"]
+        C3["12:00 PM — Cron: Review open PRs\nAgent job: gh pr list + code review\nUses github-code-review skill"]
+        C4["6:00 PM — Cron: End-of-day report\nCollects results from all previous jobs\nUses context_from to chain outputs"]
+    end
+    C1 --> C2 --> C3 --> C4
+    C4 -.- NOTE["All automated. You review the 6 PM digest."]</div>
+<hr />
+<h2 id="67-multi-agent-best-practices">6.7 Multi-Agent Best Practices</h2>
+<h3 id="1-right-size-your-tooling">1. Right-Size Your Tooling</h3>
+<p>Don't use a Kanban board for a 10-minute task. Don't manually coordinate what the dispatcher can automate.</p>
+<pre class="highlight"><code>Quick subtask (minutes)     → delegate_task
+Parallel research (minutes) → delegate_task (batch)
+Long coding (hours)         → spawn hermes (tmux)
+Project with specialists    → Kanban board
+</code></pre>
+
+<h3 id="2-isolate-file-edits">2. Isolate File Edits</h3>
+<p>When multiple agents touch the same codebase, use <strong>git worktrees</strong> (<code>-w</code> flag):</p>
+<pre class="highlight"><code class="language-bash">hermes -w    # creates an isolated worktree for this agent
+</code></pre>
+
+<p>Without worktrees, two agents editing the same files will create merge conflicts.</p>
+<h3 id="3-keep-subagent-context-focused">3. Keep Subagent Context Focused</h3>
+<p>Subagents get a <strong>fresh conversation</strong> — no memory of your session. Provide everything they need in the <code>context</code> parameter:</p>
+<pre class="highlight"><code>❌ &quot;Fix the bug we discussed earlier&quot;
+✅ &quot;Fix the TypeError in src/api/auth.py line 42 — the login
+    function expects a dict but receives a string. The function
+    signature is def login(credentials: dict).&quot;
+</code></pre>
+
+<h3 id="4-verify-external-results">4. Verify External Results</h3>
+<p>Subagents are <strong>self-reporting</strong>. They might claim "uploaded successfully" when they didn't. For operations with side effects:</p>
+<pre class="highlight"><code class="language-bash"># After a subagent claims it created a file:
+read_file(&quot;path/to/file&quot;)  # verify it exists and has content
+
+# After a subagent claims it deployed:
+terminal(command=&quot;curl -s https://myapp.com/health&quot;)  # verify it's live
+</code></pre>
+
+<h3 id="5-dont-delegate-trivial-work">5. Don't Delegate Trivial Work</h3>
+<pre class="highlight"><code>❌ delegate_task(goal=&quot;Read package.json&quot;)
+   → Just use read_file(&quot;package.json&quot;) directly
+
+✅ delegate_task(goal=&quot;Analyze all dependencies in package.json,
+    check for security vulnerabilities, find outdated packages,
+    and suggest updates&quot;)
+   → Complex analysis worth the overhead
+</code></pre>
+
+<h3 id="6-handle-stuck-kanban-workers">6. Handle Stuck Kanban Workers</h3>
+<p>When a worker crashes or hallucinates:</p>
+<pre class="highlight"><code class="language-bash"># Reclaim — abort and reset to ready
+hermes kanban reclaim &lt;task_id&gt;
+
+# Reassign — switch to a different profile
+hermes kanban reassign &lt;task_id&gt; backend-dev --reclaim
+
+# View the audit trail
+hermes kanban log &lt;task_id&gt;
+</code></pre>
+
+<hr />
+<h2 id="68-key-vocabulary">6.8 Key Vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Delegation</strong></td>
+<td>Spawning a synchronous subagent via <code>delegate_task</code></td>
+</tr>
+<tr>
+<td><strong>Subagent</strong></td>
+<td>An isolated worker with its own conversation and tools</td>
+</tr>
+<tr>
+<td><strong>Leaf</strong></td>
+<td>A subagent that cannot re-delegate (default role)</td>
+</tr>
+<tr>
+<td><strong>Orchestrator</strong></td>
+<td>A subagent that can spawn its own subagents</td>
+</tr>
+<tr>
+<td><strong>Batch delegation</strong></td>
+<td>Running up to 3 subagent tasks in parallel</td>
+</tr>
+<tr>
+<td><strong>Spawning</strong></td>
+<td>Launching a fully independent Hermes process via tmux</td>
+</tr>
+<tr>
+<td><strong>Worktree</strong></td>
+<td>Isolated git working directory (<code>-w</code> flag) for parallel agents</td>
+</tr>
+<tr>
+<td><strong>Kanban board</strong></td>
+<td>Durable SQLite-backed task queue for multi-profile coordination</td>
+</tr>
+<tr>
+<td><strong>Dispatcher</strong></td>
+<td>Background service that auto-claims and spawns workers for ready tasks</td>
+</tr>
+<tr>
+<td><strong>Profile</strong></td>
+<td>An isolated Hermes configuration used as a specialist role</td>
+</tr>
+<tr>
+<td><strong>Dependency</strong></td>
+<td>Parent-child link — child waits for parent(s) to complete</td>
+</tr>
+<tr>
+<td><strong>External agent</strong></td>
+<td>Third-party coding CLI (KiloCode, Claude Code, Codex)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chapter-6-summary">Chapter 6 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>What You Learned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Why multi-agent</td>
+<td>Parallelism = 2-5x throughput for multi-workstream tasks</td>
+</tr>
+<tr>
+<td>Delegation</td>
+<td>Quick synchronous subagents, batch up to 3 in parallel, leaf vs orchestrator</td>
+</tr>
+<tr>
+<td>Spawning</td>
+<td>Independent Hermes processes via tmux for long autonomous missions</td>
+</tr>
+<tr>
+<td>Kanban board</td>
+<td>Durable task queue with dependencies, specialist profiles, auto-dispatch</td>
+</tr>
+<tr>
+<td>External agents</td>
+<td>KiloCode, Claude Code, Codex for heavy coding with specialized CLIs</td>
+</tr>
+<tr>
+<td>Coordination patterns</td>
+<td>Research+write, backend+frontend, project pipeline, daily operations</td>
+</tr>
+<tr>
+<td>Best practices</td>
+<td>Right-size tooling, isolate edits, focused context, verify results</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next:</strong> <a href="ch07-advanced-config.md">Chapter 7: Advanced Configuration &amp; Power User Tips →</a></p>
+<hr />
+<!-- SCREENSHOT: delegate_task parallel execution output -->
+<!-- SCREENSHOT: tmux multi-agent session layout -->
+<!-- SCREENSHOT: hermes kanban list showing task board -->
+<!-- SCREENSHOT: Kanban dependency graph visualization -->
+<!-- SCREENSHOT: External agent delegation output -->
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch05-automation-scheduling.html" class="prev">← Ch 5: Automation</a><a href="ch07-advanced-config.html" class="next">Ch 7: Advanced Configuration →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

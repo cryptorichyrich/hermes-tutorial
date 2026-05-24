@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Concepts — Agent Loop, Models, and Tools | Hermes Agent Tutorial</title>
+    <meta name="description" content="Understand how Hermes Agent works internally. The Agent Loop, model selection (GPT-4, Claude, Gemini, DeepSeek, local LLMs), 40+ built-in tools, and execution pipeline explained.">
+    <meta name="keywords" content="Hermes Agent loop, LLM model selection, AI agent tools, agent execution pipeline, OpenRouter, Hermes architecture">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch02-core-concepts.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Core Concepts — Agent Loop, Models, and Tools">
+    <meta property="og:description" content="Understand how Hermes Agent works internally. The Agent Loop, model selection (GPT-4, Claude, Gemini, DeepSeek, local LLMs), 40+ built-in tools, and execution pipeline explained.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch02-core-concepts.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 2">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Core Concepts — Agent Loop, Models, and Tools">
+    <meta name="twitter:description" content="Understand how Hermes Agent works internally. The Agent Loop, model selection (GPT-4, Claude, Gemini, DeepSeek, local LLMs), 40+ built-in tools, and execution pipeline explained.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Core Concepts \u2014 Agent Loop, Models, and Tools",
+  "description": "Understand how Hermes Agent works internally. The Agent Loop, model selection (GPT-4, Claude, Gemini, DeepSeek, local LLMs), 40+ built-in tools, and execution pipeline explained.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch02-core-concepts.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch02-core-concepts.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html">Ch 1</a><a href="ch02-core-concepts.html" class="active">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 2</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-2-core-concepts">Chapter 2: Core Concepts</h1>
+<blockquote>
+<p><strong>Understand the engine before you drive the car. This chapter demystifies how Hermes thinks, acts, and remembers.</strong></p>
+</blockquote>
+<hr />
+<h2 id="21-the-agent-loop-how-hermes-thinks">2.1 The Agent Loop — How Hermes Thinks</h2>
+<p>Everything Hermes does follows one repeating pattern — the <strong>agent loop</strong>:</p>
+<div class="mermaid">flowchart TD
+    A["<b>1. BUILD PROMPT</b><br/>Assemble system prompt + context<br/><i>memory, skills, tools, history</i>"]
+    B["<b>2. CALL LLM</b><br/>Send everything to the LLM<br/><i>Claude, GPT-4, Gemini, etc.</i>"]
+    C{"<b>3. PARSE RESPONSE</b><br/>Tool call?"}
+    D["YES: Run the tool"]
+    E["DONE: Reply to user"]
+    F["Append tool result"]
+
+    A --> B --> C
+    C -->|Tool call| D --> F --> A
+    C -->|Text response| E</div>
+<p>Here's what that looks like in practice:</p>
+<pre class="highlight"><code>You: Set up a Python project with pytest
+
+Turn 1:
+  LLM → &quot;I'll create the project structure.&quot;
+       Tool call: terminal(&quot;mkdir -p myproject/tests&quot;)
+       Tool call: write_file(&quot;myproject/tests/__init__.py&quot;, &quot;&quot;)
+
+Turn 2:
+  LLM → &quot;Now I'll add the test configuration.&quot;
+       Tool call: write_file(&quot;myproject/pyproject.toml&quot;, &quot;[tool.pytest]...&quot;)
+
+Turn 3:
+  LLM → &quot;Project created! Here's the structure:
+       myproject/
+       ├── src/
+       ├── tests/
+       │   └── __init__.py
+       └── pyproject.toml
+
+       Run tests with: pytest&quot;
+</code></pre>
+
+<p><strong>Three things to notice:</strong></p>
+<ol>
+<li><strong>Multiple turns</strong> — Hermes doesn't do everything in one shot. Each LLM call is a "turn," and complex tasks take multiple turns</li>
+<li><strong>Tool results feed back</strong> — the output of one tool call becomes context for the next</li>
+<li><strong>It stops when done</strong> — the LLM decides when to respond with text instead of more tool calls</li>
+</ol>
+<h3 id="turn-limits">Turn Limits</h3>
+<p>Hermes doesn't loop forever. The default is <strong>90 turns per conversation turn</strong> (configurable):</p>
+<pre class="highlight"><code class="language-yaml"># ~/.hermes/config.yaml
+agent:
+  max_turns: 90
+</code></pre>
+
+<p>Most tasks complete in 2-15 turns. If Hermes hits the limit, it summarizes what it accomplished and what's left.</p>
+<h3 id="context-compression">Context Compression</h3>
+<p>When the conversation gets long (near the model's token limit), Hermes automatically <strong>compresses context</strong> — summarizing older messages while keeping recent ones intact:</p>
+<pre class="highlight"><code class="language-yaml">compression:
+  enabled: true
+  threshold: 0.50    # Compress when 50% of context window used
+  target_ratio: 0.20  # Compress down to 20% of original
+</code></pre>
+
+<p>You can also trigger it manually:</p>
+<pre class="highlight"><code>/compress
+</code></pre>
+
+<hr />
+<h2 id="22-models-providers-the-brains">2.2 Models &amp; Providers — The Brains</h2>
+<p>Hermes is <strong>provider-agnostic</strong> — it doesn't care which LLM powers it. You choose.</p>
+<h3 id="provider-overview">Provider Overview</h3>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Auth Method</th>
+<th>Key Env Var</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OpenRouter</strong></td>
+<td>API key</td>
+<td><code>OPENROUTER_API_KEY</code></td>
+<td>Access to 200+ models, one key</td>
+</tr>
+<tr>
+<td><strong>Anthropic</strong></td>
+<td>API key</td>
+<td><code>ANTHROPIC_API_KEY</code></td>
+<td>Claude models — best for coding</td>
+</tr>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>API key</td>
+<td><code>OPENAI_API_KEY</code></td>
+<td>GPT-4o, o3</td>
+</tr>
+<tr>
+<td><strong>Google Gemini</strong></td>
+<td>API key</td>
+<td><code>GOOGLE_API_KEY</code></td>
+<td>Large context windows</td>
+</tr>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>API key</td>
+<td><code>DEEPSEEK_API_KEY</code></td>
+<td>Budget-friendly coding</td>
+</tr>
+<tr>
+<td><strong>xAI / Grok</strong></td>
+<td>API key</td>
+<td><code>XAI_API_KEY</code></td>
+<td>Grok models</td>
+</tr>
+<tr>
+<td><strong>Z.AI / GLM</strong></td>
+<td>API key</td>
+<td><code>GLM_API_KEY</code></td>
+<td>GLM models</td>
+</tr>
+<tr>
+<td><strong>GitHub Copilot</strong></td>
+<td>OAuth</td>
+<td><code>hermes login</code></td>
+<td>Free with Copilot subscription</td>
+</tr>
+<tr>
+<td><strong>Custom endpoint</strong></td>
+<td>Config</td>
+<td><code>model.base_url</code> + <code>model.api_key</code></td>
+<td>Self-hosted, local models</td>
+</tr>
+</tbody>
+</table>
+<h3 id="choosing-your-model">Choosing Your Model</h3>
+<pre class="highlight"><code class="language-bash"># Interactive model picker
+hermes model
+
+# Set directly
+hermes config set model.default anthropic/claude-sonnet-4
+hermes config set model.provider openrouter
+</code></pre>
+
+<p><strong>Model tiers for different tasks:</strong></p>
+<div class="mermaid">flowchart LR
+    subgraph Complex["🧠 Complex Reasoning"]
+        CR1["Claude Sonnet 4"]
+        CR2["GPT-4o"]
+        CRD["<i>Architecture, debugging, multi-step planning</i>"]
+    end
+    subgraph Fast["⚡ Fast & Cheap"]
+        FC1["Claude Haiku"]
+        FC2["Gemini Flash"]
+        FCD["<i>Simple tasks, quick questions, bulk operations</i>"]
+    end
+    subgraph Coding["💻 Deep Coding"]
+        DC1["Claude Sonnet 4"]
+        DC2["DeepSeek V3"]
+        DCD["<i>Code generation, refactoring, PR reviews</i>"]
+    end
+    subgraph LongContext["📚 Long Context"]
+        LC1["Gemini 2.5 Pro (1M tokens)"]
+        LCD["<i>Large codebases, document analysis</i>"]
+    end
+    subgraph Budget["💰 Budget"]
+        BU1["DeepSeek V3"]
+        BU2["Gemini Flash"]
+        BUD["<i>When cost matters more than peak quality</i>"]
+    end</div>
+<h3 id="switching-models-mid-conversation">Switching Models Mid-Conversation</h3>
+<p>You don't need to restart to change models:</p>
+<pre class="highlight"><code>/model anthropic/claude-sonnet-4    # Switch for this session
+/model deepseek/deepseek-chat       # Switch to budget model
+</code></pre>
+
+<h3 id="credential-pools">Credential Pools</h3>
+<p>Running multiple API keys for the same provider? Hermes rotates them automatically:</p>
+<pre class="highlight"><code class="language-bash"># Add additional keys
+hermes auth add
+
+# View all keys
+hermes auth list openrouter
+</code></pre>
+
+<p>When one key hits a rate limit, Hermes silently rotates to the next. No interruption.</p>
+<hr />
+<h2 id="23-toolsets-the-hands">2.3 Toolsets — The Hands</h2>
+<p>Models think. <strong>Toolsets act.</strong> Each toolset is a bundle of related capabilities:</p>
+<div class="mermaid">flowchart LR
+    subgraph Toolsets["HERMES TOOLSETS"]
+        direction TB
+        T1["🌐 web — Search engines + content extraction"]
+        T2["🔍 search — Web search only"]
+        T3["🖥️ terminal — Shell commands + process management"]
+        T4["📁 file — Read, write, search, patch files"]
+        T5["🌍 browser — Browser automation (Chromium)"]
+        T6["🐍 code_exec — Sandboxed Python execution"]
+        T7["👁️ vision — Image analysis"]
+        T8["🎨 image_gen — AI image generation"]
+        T9["🎬 video — Video analysis & generation"]
+        T10["🔊 tts — Text-to-speech"]
+        T11["🧠 memory — Persistent cross-session memory"]
+        T12["🔎 session_search — Search past conversations"]
+        T13["👥 delegation — Subagent task delegation"]
+        T14["⏰ cronjob — Scheduled task management"]
+        T15["❓ clarify — Ask user clarifying questions"]
+        T16["📨 messaging — Cross-platform message sending"]
+        T17["✅ todo — In-session task planning"]
+        T18["📋 kanban — Multi-agent work queues"]
+        T19["🎵 spotify — Spotify playback control"]
+        T20["🏠 homeassistant — Smart home control"]
+        T21["🔒 safe — Minimal toolset for locked sessions"]
+    end</div>
+<h3 id="managing-toolsets">Managing Toolsets</h3>
+<pre class="highlight"><code class="language-bash"># Interactive curses UI — toggle toolsets on/off
+hermes tools
+
+# Command line
+hermes tools enable browser
+hermes tools disable spotify
+
+# List all
+hermes tools list
+</code></pre>
+
+<p><strong>Important:</strong> Tool changes take effect on the <strong>next session</strong> (<code>/reset</code> or new <code>hermes</code> invocation), not mid-conversation. This preserves prompt caching.</p>
+<h3 id="the-tools-in-action">The Tools in Action</h3>
+<p>Here's what a typical tool-enabled workflow looks like:</p>
+<pre class="highlight"><code>You: Find the latest version of React and update my project
+
+Hermes uses: web (search for latest React version)
+Hermes uses: file (read package.json)
+Hermes uses: file (patch package.json with new version)
+Hermes uses: terminal (npm install)
+
+✓ React updated from 19.0.0 to 19.1.0 in ~/my-project/
+</code></pre>
+
+<p>Each tool call is a separate turn in the agent loop. Hermes decides which tools to use, in what order, based on your request.</p>
+<hr />
+<h2 id="24-sessions-the-conversations">2.4 Sessions — The Conversations</h2>
+<p>Every chat you have with Hermes is a <strong>session</strong> — a self-contained conversation with its own history, context, and state.</p>
+<h3 id="session-lifecycle">Session Lifecycle</h3>
+<div class="mermaid">flowchart LR
+    NEW["🆕 NEW SESSION<br/><i>Fresh context · Full tools · No memory</i>"]
+    ACTIVE["✅ ACTIVE SESSION<br/><i>Growing context · Full tools · Can save memory</i>"]
+    COMPRESSED["📦 COMPRESSED SESSION<br/><i>Summarized context · Full tools · Memory preserved</i>"]
+    CLOSED["🗄️ CLOSED (archived)"]
+
+    NEW -->|Start| ACTIVE -->|Compress| COMPRESSED -->|End| CLOSED</div>
+<h3 id="session-commands">Session Commands</h3>
+<pre class="highlight"><code class="language-bash"># CLI — start a new session
+hermes
+
+# Resume most recent session
+hermes --continue
+
+# Resume a specific session by ID
+hermes --resume 20260101_143052_abc123
+
+# Resume by name
+hermes --continue my-project
+</code></pre>
+
+<p>Inside a session:</p>
+<pre class="highlight"><code>/new              # Start fresh (same process, clean context)
+/title auth-work  # Name this session for easy resume later
+/undo             # Remove last exchange (oops, wrong prompt)
+/history          # See conversation history (CLI)
+</code></pre>
+
+<h3 id="session-storage">Session Storage</h3>
+<p>Sessions are stored in a local SQLite database:</p>
+<pre class="highlight"><code class="language-bash"># Browse sessions interactively
+hermes sessions browse
+
+# List recent sessions
+hermes sessions list
+
+# Export a session
+hermes sessions export session_2026.jsonl
+
+# Clean up old sessions
+hermes sessions prune --older-than 30
+</code></pre>
+
+<p><strong>Key insight:</strong> Sessions are local and private. Your conversation history never leaves your machine (unless you explicitly export or share it).</p>
+<hr />
+<h2 id="25-configuration-the-control-panel">2.5 Configuration — The Control Panel</h2>
+<p>Hermes is configured through one YAML file and one <code>.env</code> file:</p>
+<pre class="highlight"><code>~/.hermes/
+├── config.yaml     ← All settings (model, tools, agent behavior)
+├── .env            ← API keys and secrets (never committed to git)
+├── skills/         ← Installed skills
+├── sessions/       ← Session transcripts
+├── state.db        ← Session store (SQLite)
+└── logs/           ← Gateway and error logs
+</code></pre>
+
+<h3 id="configyaml-the-main-config">config.yaml — The Main Config</h3>
+<pre class="highlight"><code class="language-yaml"># ~/.hermes/config.yaml
+
+# Model configuration
+model:
+  default: anthropic/claude-sonnet-4
+  provider: openrouter
+  context_length: 200000
+
+# Agent behavior
+agent:
+  max_turns: 90
+  tool_use_enforcement: true
+
+# Terminal settings
+terminal:
+  backend: local       # local, docker, ssh
+  timeout: 180         # seconds
+
+# Context compression
+compression:
+  enabled: true
+  threshold: 0.50
+  target_ratio: 0.20
+
+# Memory
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  provider: builtin    # builtin, honcho, mem0
+
+# Security
+security:
+  tirith_enabled: false
+  redact_secrets: false
+
+# Delegation (subagents)
+delegation:
+  max_iterations: 50
+  max_spawn_depth: 1
+  max_concurrent_children: 3
+</code></pre>
+
+<h3 id="env-secrets">.env — Secrets</h3>
+<pre class="highlight"><code class="language-bash"># ~/.hermes/.env
+OPENROUTER_API_KEY=sk-or-v1-xxxxx
+ANTHROPIC_API_KEY=sk-ant-xxxxx
+GOOGLE_API_KEY=AIzaxxxxx
+</code></pre>
+
+<h3 id="quick-config-commands">Quick Config Commands</h3>
+<pre class="highlight"><code class="language-bash"># View current config
+hermes config
+
+# Edit config in your editor
+hermes config edit
+
+# Set individual values
+hermes config set model.default deepseek/deepseek-chat
+hermes config set agent.max_turns 120
+hermes config set terminal.timeout 300
+
+# Check for issues
+hermes doctor
+</code></pre>
+
+<h3 id="profiles-multiple-configurations">Profiles — Multiple Configurations</h3>
+<p>If you need different setups for different projects:</p>
+<pre class="highlight"><code class="language-bash"># Create a profile (clones current config)
+hermes profile create work --clone
+
+# Switch to it
+hermes profile use work
+
+# Use a profile for one command
+hermes -p work chat -q &quot;Check production logs&quot;
+</code></pre>
+
+<p>Each profile gets its own:
+- Config and .env
+- Sessions and memory
+- Skills and history</p>
+<pre class="highlight"><code>~/.hermes/
+├── config.yaml              ← Default profile
+├── .env
+├── profiles/
+│   ├── work/
+│   │   ├── config.yaml      ← Work profile
+│   │   └── .env
+│   └── personal/
+│       ├── config.yaml      ← Personal profile
+│       └── .env
+</code></pre>
+
+<hr />
+<h2 id="26-how-it-all-fits-together">2.6 How It All Fits Together</h2>
+<p>Let's zoom out and see the complete picture:</p>
+<div class="mermaid">flowchart TD
+    subgraph Platforms["📱 Messaging Platforms"]
+        TG["Telegram"]
+        DC["Discord"]
+        CLI["CLI"]
+        MORE["..."]
+    end
+
+    Platforms --> GW
+
+    subgraph Core["🔧 Core"]
+        GW["🔀 GATEWAY<br/><i>Routes messages · Manages connections</i>"]
+        AL["🔁 AGENT LOOP<br/><i>Builds prompt · Calls LLM · Dispatches tools · Manages context</i>"]
+
+        subgraph Internal["Internal State"]
+            MEM["🧠 Memory"]
+            SKL["📋 Skills"]
+            SES["💬 Sessions"]
+        end
+    end
+
+    GW --> AL
+
+    subgraph Tools["🛠️ Toolsets"]
+        T1["Terminal"]
+        T2["Files"]
+        T3["Web"]
+        T4["Browser"]
+        T5["Cron"]
+        T6["Delegation"]
+    end
+
+    AL --> Tools
+
+    subgraph Providers["☁️ Providers — 20+ LLM APIs"]
+        P1["OpenRouter"]
+        P2["Anthropic"]
+        P3["OpenAI"]
+        P4["Google"]
+        PM["..."]
+    end
+
+    AL --> Providers</div>
+<p><strong>The flow:</strong>
+1. You send a message (Telegram, Discord, CLI, etc.)
+2. Gateway receives it and routes to a session
+3. Agent loop builds a prompt with your message + memory + skills + tool schemas
+4. LLM processes the prompt and decides: respond with text, or call a tool
+5. If tool call → execute it → feed result back → repeat
+6. If text response → deliver back through the same platform</p>
+<p><strong>All platforms share the same session, memory, and tools.</strong> Start a conversation on Telegram, continue it on CLI — seamless.</p>
+<hr />
+<h2 id="27-key-vocabulary">2.7 Key Vocabulary</h2>
+<p>Before we move on, let's lock in the terminology:</p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Agent loop</strong></td>
+<td>The think → act → observe cycle Hermes repeats until done</td>
+</tr>
+<tr>
+<td><strong>Turn</strong></td>
+<td>One cycle of the agent loop (one LLM call)</td>
+</tr>
+<tr>
+<td><strong>Session</strong></td>
+<td>A complete conversation with its own history and context</td>
+</tr>
+<tr>
+<td><strong>Provider</strong></td>
+<td>The LLM API service (OpenRouter, Anthropic, etc.)</td>
+</tr>
+<tr>
+<td><strong>Model</strong></td>
+<td>The specific LLM (Claude Sonnet 4, GPT-4o, etc.)</td>
+</tr>
+<tr>
+<td><strong>Toolset</strong></td>
+<td>A bundle of related tools (web, terminal, file, etc.)</td>
+</tr>
+<tr>
+<td><strong>Tool</strong></td>
+<td>A single capability (web_search, terminal, read_file, etc.)</td>
+</tr>
+<tr>
+<td><strong>Skill</strong></td>
+<td>A reusable procedure Hermes learns and reloads</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>Persistent facts that survive across sessions</td>
+</tr>
+<tr>
+<td><strong>Profile</strong></td>
+<td>An isolated Hermes configuration (config + .env + sessions)</td>
+</tr>
+<tr>
+<td><strong>Gateway</strong></td>
+<td>The service connecting Hermes to messaging platforms</td>
+</tr>
+<tr>
+<td><strong>Context</strong></td>
+<td>Everything the LLM sees: system prompt + history + tool output</td>
+</tr>
+<tr>
+<td><strong>Compression</strong></td>
+<td>Summarizing old context to stay within token limits</td>
+</tr>
+<tr>
+<td><strong>Delegation</strong></td>
+<td>Spawning a subagent to handle a subtask in isolation</td>
+</tr>
+<tr>
+<td><strong>Cron</strong></td>
+<td>A scheduled task that runs automatically at set times</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chapter-2-summary">Chapter 2 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>What You Learned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent loop</td>
+<td>Think → Act → Observe cycle, max 90 turns, auto-compression</td>
+</tr>
+<tr>
+<td>Models &amp; providers</td>
+<td>20+ providers, switch freely, credential rotation</td>
+</tr>
+<tr>
+<td>Toolsets</td>
+<td>20+ tool bundles, enable/disable per platform</td>
+</tr>
+<tr>
+<td>Sessions</td>
+<td>Self-contained conversations, resumable, stored locally</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td>config.yaml + .env, quick commands, profiles for isolation</td>
+</tr>
+<tr>
+<td>Architecture</td>
+<td>Platform → Gateway → Agent Loop → Tools → Provider</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next:</strong> <a href="ch03-messaging-gateway.md">Chapter 3: Messaging Gateway →</a></p>
+<hr />
+<!-- SCREENSHOT: Agent loop terminal output showing multiple tool calls -->
+<!-- SCREENSHOT: hermes model interactive picker -->
+<!-- SCREENSHOT: hermes tools curses UI -->
+<!-- SCREENSHOT: hermes sessions browse list -->
+<!-- SCREENSHOT: config.yaml in editor -->
+            <nav class="chapter-nav" aria-label="Chapter navigation"><a href="ch01-hello-hermes.html" class="prev">← Ch 1: Hello Hermes</a><a href="ch03-messaging-gateway.html" class="next">Ch 3: Messaging Gateway →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>

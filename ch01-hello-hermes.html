@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Hermes — Install, First Run, and Your 5-Minute Win | Hermes Agent Tutorial</title>
+    <meta name="description" content="Get started with Hermes Agent in 5 minutes. Install, configure, and run your first AI agent task. Covers the Harness Framework, Three Tools Three Jobs, and system requirements.">
+    <meta name="keywords" content="Hermes Agent install, AI agent setup, Harness Engineering, Hermes vs Claude Code, Hermes vs OpenClaw, AI agent tutorial">
+    <meta name="author" content="Bio">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cryptorichyrich.github.io/hermes-tutorial/ch01-hello-hermes.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Hello Hermes — Install, First Run, and Your 5-Minute Win">
+    <meta property="og:description" content="Get started with Hermes Agent in 5 minutes. Install, configure, and run your first AI agent task. Covers the Harness Framework, Three Tools Three Jobs, and system requirements.">
+    <meta property="og:url" content="https://cryptorichyrich.github.io/hermes-tutorial/ch01-hello-hermes.html">
+    <meta property="og:site_name" content="Hermes Agent Tutorial">
+    <meta property="article:author" content="https://biotama.cv">
+    <meta property="article:section" content="Chapter 1">
+    <meta property="article:tag" content="Hermes Agent">
+    <meta property="article:tag" content="AI Agent">
+    <meta property="article:tag" content="Nous Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Hello Hermes — Install, First Run, and Your 5-Minute Win">
+    <meta name="twitter:description" content="Get started with Hermes Agent in 5 minutes. Install, configure, and run your first AI agent task. Covers the Harness Framework, Three Tools Three Jobs, and system requirements.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Hello Hermes \u2014 Install, First Run, and Your 5-Minute Win",
+  "description": "Get started with Hermes Agent in 5 minutes. Install, configure, and run your first AI agent task. Covers the Harness Framework, Three Tools Three Jobs, and system requirements.",
+  "author": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv",
+    "jobTitle": "System Architect \u00b7 Fintech Engineer"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Bio",
+    "url": "https://biotama.cv"
+  },
+  "url": "https://cryptorichyrich.github.io/hermes-tutorial/ch01-hello-hermes.html",
+  "mainEntityOfPage": "https://cryptorichyrich.github.io/hermes-tutorial/ch01-hello-hermes.html",
+  "isPartOf": {
+    "@type": "TechArticle",
+    "name": "Hermes Agent \u2014 The Complete Tutorial",
+    "url": "https://cryptorichyrich.github.io/hermes-tutorial"
+  },
+  "programmingLanguage": "Python",
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "Hermes Agent",
+    "url": "https://github.com/nousresearch/hermes-agent",
+    "applicationCategory": "DeveloperApplication"
+  }
+}</script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Top bar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 56px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; z-index: 100;
+        }
+        .nav-brand {
+            font-weight: 700; font-size: 1rem; color: var(--primary);
+            text-decoration: none; display: flex; align-items: center; gap: 6px;
+        }
+        .nav-brand span { font-size: 1.2rem; }
+        .nav-links {
+            display: flex; gap: 2px; margin-left: 24px; overflow-x: auto;
+        }
+        .nav-links a {
+            padding: 4px 12px; border-radius: 6px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.8rem; font-weight: 500;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary); color: white;
+        }
+
+        .container {
+            max-width: 860px; margin: 72px auto 60px; padding: 0 20px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .breadcrumbs a { color: var(--primary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs .sep { margin: 0 8px; }
+
+        /* Content */
+        .markdown-body {
+            background: var(--surface); border-radius: 16px; padding: 44px 52px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.04);
+        }
+
+        .markdown-body h1 {
+            font-size: 2rem; font-weight: 800; margin-bottom: 8px;
+            padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+        }
+        .markdown-body h2 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 44px; margin-bottom: 14px;
+            padding-left: 14px; border-left: 4px solid var(--primary);
+        }
+        .markdown-body h3 {
+            font-size: 1.2rem; font-weight: 600; margin-top: 28px; margin-bottom: 10px;
+        }
+        .markdown-body p { margin-bottom: 14px; }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent); background: #fffbeb;
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0;
+        }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        .markdown-body code {
+            background: #f1f5f9; padding: 2px 7px; border-radius: 5px;
+            font-size: 0.88em; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        .markdown-body pre {
+            background: #1e1e2e; border-radius: 12px; padding: 18px 22px;
+            overflow-x: auto; margin: 18px 0;
+        }
+        .markdown-body pre code {
+            background: none; padding: 0; color: #cdd6f4;
+            font-size: 0.82rem; line-height: 1.6;
+        }
+
+        .markdown-body table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            margin: 18px 0; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border);
+        }
+        .markdown-body th {
+            background: var(--primary); color: white; font-weight: 600;
+            text-align: left; padding: 10px 14px;
+        }
+        .markdown-body td { padding: 8px 14px; border-top: 1px solid var(--border); }
+        .markdown-body tr:nth-child(even) td { background: #f8fafc; }
+
+        .markdown-body ul, .markdown-body ol { padding-left: 22px; margin-bottom: 14px; }
+        .markdown-body li { margin-bottom: 5px; }
+
+        .markdown-body hr {
+            border: none; height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), transparent);
+            margin: 36px 0;
+        }
+
+        .markdown-body img {
+            max-width: 100%; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .markdown-body a {
+            color: var(--primary); text-decoration: none; font-weight: 500;
+            border-bottom: 1px solid var(--primary-light); transition: all 0.2s;
+        }
+        .markdown-body a:hover { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+
+        /* Mermaid */
+        .mermaid { margin: 20px auto; text-align: center; }
+
+        /* Chapter nav */
+        .chapter-nav {
+            display: flex; justify-content: space-between; margin-top: 40px;
+            padding-top: 20px; border-top: 2px solid var(--border);
+        }
+        .chapter-nav a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px; background: var(--bg);
+            color: var(--primary); font-weight: 600; border: 1px solid var(--border);
+            transition: all 0.2s; text-decoration: none; font-size: 0.9rem;
+        }
+        .chapter-nav a:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        /* Author bio — subtle */
+        .author-bio {
+            display: flex; align-items: center; gap: 14px; margin-top: 32px;
+            padding: 16px 20px; background: #f8fafc; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .author-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .author-info { font-size: 0.88rem; line-height: 1.5; }
+        .author-info strong { color: var(--text); }
+        .author-info a {
+            color: var(--primary); text-decoration: none;
+            border-bottom: 1px solid var(--primary-light);
+        }
+        .author-info a:hover { text-decoration: underline; }
+        .author-info p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Footer */
+        footer {
+            text-align: center; padding: 24px 20px; color: var(--text-muted);
+            font-size: 0.82rem; margin-top: 20px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .markdown-body { padding: 24px 18px; }
+            .markdown-body h1 { font-size: 1.5rem; }
+            .markdown-body h2 { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .container { padding: 0 12px; }
+            .chapter-nav { flex-direction: column; gap: 10px; }
+            .chapter-nav a { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="nav-brand"><span>📘</span> Hermes Tutorial</a>
+        <div class="nav-links"><a href="ch01-hello-hermes.html" class="active">Ch 1</a><a href="ch02-core-concepts.html">Ch 2</a><a href="ch03-messaging-gateway.html">Ch 3</a><a href="ch04-skills-memory.html">Ch 4</a><a href="ch05-automation-scheduling.html">Ch 5</a><a href="ch06-multi-agent.html">Ch 6</a><a href="ch07-advanced-config.html">Ch 7</a><a href="ch08-power-techniques.html">Ch 8</a><a href="ch09-business-use-cases.html">Ch 9</a><a href="ch10-business-around-hermes.html">Ch 10</a></div>
+    </nav>
+
+    <div class="container">
+        
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">📘 Home</a>
+        <span class="sep">›</span>
+        <span>Chapter 1</span>
+    </nav>
+    
+        <article class="markdown-body">
+            <h1 id="chapter-1-hello-hermes">Chapter 1: Hello Hermes</h1>
+<blockquote>
+<p><strong>The AI agent that works while you sleep, chats where you chat, and gets smarter every time you use it.</strong></p>
+</blockquote>
+<hr />
+<h2 id="11-the-problem-hermes-solves">1.1 The Problem Hermes Solves</h2>
+<p>You've used ChatGPT. You've used Claude. Maybe Copilot, maybe Gemini. They're great at answering questions — but every time you open a new chat, you start from zero. No memory. No tools. No access to your files, your terminal, your workflow.</p>
+<p><strong>Hermes Agent is different.</strong></p>
+<p>Hermes is an <strong>autonomous AI agent</strong> that:</p>
+<ul>
+<li><strong>Remembers</strong> — your preferences, your projects, your past conversations, across sessions</li>
+<li><strong>Acts</strong> — reads files, writes code, runs terminal commands, searches the web, manages your schedule</li>
+<li><strong>Lives everywhere</strong> — Telegram, Discord, Slack, WhatsApp, your terminal, your IDE</li>
+<li><strong>Improves</strong> — learns from experience by saving reusable skills</li>
+<li><strong>Scales</strong> — spawns parallel agents, schedules cron jobs, orchestrates multi-agent workflows</li>
+</ul>
+<p>It's not a chatbot. It's an <strong>AI employee</strong> that works 24/7 across all your platforms with full system access.</p>
+<hr />
+<h2 id="12-what-makes-hermes-different">1.2 What Makes Hermes Different</h2>
+<p>The AI agent space is crowded. Here's where Hermes sits:</p>
+<div class="mermaid">flowchart LR
+    subgraph Chatbots["💬 Chatbots"]
+        direction TB
+        C1["ChatGPT"]
+        C2["Claude.ai"]
+        C3["Gemini"]
+        CT["❌ Q&A only · No tools · No memory"]
+    end
+    subgraph CodingAgents["💻 Coding Agents"]
+        direction TB
+        D1["Claude Code"]
+        D2["GitHub Copilot"]
+        D3["Cursor"]
+        D4["Codex CLI"]
+        DT["⚠️ Code only · IDE-bound · No scheduling"]
+    end
+    subgraph FullAgents["🚀 Full Agent Platforms"]
+        direction TB
+        F1["Hermes Agent"]
+        F2["OpenHands"]
+        F3["MetaGPT"]
+        FT["✅ Everything + Memory · Multi-platform · Persistent context"]
+    end</div>
+<p><strong>Key differentiators:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>ChatGPT</th>
+<th>Claude Code</th>
+<th>Hermes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Persistent memory</td>
+<td>❌</td>
+<td>Partial</td>
+<td>✅ Cross-session</td>
+</tr>
+<tr>
+<td>Messaging platforms</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅ 10+ platforms</td>
+</tr>
+<tr>
+<td>Skill system</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅ Learns &amp; improves</td>
+</tr>
+<tr>
+<td>Cron scheduling</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅ Built-in</td>
+</tr>
+<tr>
+<td>Multi-agent orchestration</td>
+<td>❌</td>
+<td>Partial</td>
+<td>✅ Delegation + Kanban</td>
+</tr>
+<tr>
+<td>Provider-agnostic</td>
+<td>❌</td>
+<td>❌ Anthropic only</td>
+<td>✅ 20+ providers</td>
+</tr>
+<tr>
+<td>Self-improvement</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅ Curator system</td>
+</tr>
+</tbody>
+</table>
+<h3 id="three-tools-three-jobs">Three Tools, Three Jobs</h3>
+<p>Hermes isn't here to replace your existing tools. It's the next step in the progression:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Job</th>
+<th>Analogy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td>Interactive pair programming</td>
+<td>Sitting with a senior dev at the terminal</td>
+</tr>
+<tr>
+<td><strong>OpenClaw</strong></td>
+<td>Configuration-as-behavior</td>
+<td>Raising a pet — you shape it with SOUL.md</td>
+</tr>
+<tr>
+<td><strong>Hermes Agent</strong></td>
+<td>Autonomous self-improvement</td>
+<td>An employee who learns on the job, works while you sleep</td>
+</tr>
+</tbody>
+</table>
+<p>Each tool excels at its job. You don't choose one — you use all three for different needs. And here's the best part: all three use the <strong>agentskills.io standard</strong>, meaning Skills are portable. A Skill written for Claude Code works in Hermes, and vice versa.</p>
+<blockquote>
+<p><strong>💡 When to reach for Hermes:</strong> If you want an AI that runs background tasks, schedules itself, remembers everything across sessions, and gets better without you feeding it — that's Hermes. If you need real-time pair coding, that's Claude Code.</p>
+</blockquote>
+<h3 id="the-harness-framework">The Harness Framework</h3>
+<p>In early 2026, a consensus emerged in the AI world: <strong>the bottleneck isn't the model — it's the environment around it.</strong> Mitchell Hashimoto (creator of Terraform) named this <strong>Harness Engineering</strong> — the practice of wrapping AI in rules, memory, and tools so it performs reliably.</p>
+<p>Hermes is the first agent that <strong>ships with the harness built in</strong>. Every component maps to a proven principle:</p>
+<div class="mermaid">flowchart LR
+    subgraph Harness["THE HARNESS BUILT INTO HERMES"]
+        direction TB
+        IL["📖 Instruction Layer<br/><i>Teach the AI</i>"] --> HS["⚙️ Skill System<br/><i>Auto-created + self-improving SKILL.md files</i>"]
+        CL["🔒 Constraint Layer<br/><i>Keep it safe</i>"] --> TP["🛡️ Tool Permissions<br/><i>Sandbox + toolset enable/disable on demand</i>"]
+        FL["🔁 Feedback Layer<br/><i>Learn from mistakes</i>"] --> LL["📊 Learning Loop<br/><i>Auto-retrospective after each task, skill patching</i>"]
+        ML["💾 Memory Layer<br/><i>Don't forget</i>"] --> TM["🗂️ Three-layer Memory<br/><i>Session + persistent + skill + FTS5 recall</i>"]
+        OL["🎼 Orchestration Layer<br/><i>Coordinate work</i>"] --> SA["🤖 Sub-Agent Delegation<br/><i>Cron scheduling + multi-platform gateway</i>"]
+    end</div>
+<p>Other tools require you to build this harness manually — writing config files, setting up hooks, managing memory by hand. Hermes does all five automatically, from your very first conversation.</p>
+<hr />
+<h2 id="13-system-requirements">1.3 System Requirements</h2>
+<p>Before we install, make sure you have:</p>
+<p><strong>Required:</strong>
+- <strong>Python 3.10+</strong> — Hermes is a Python application
+- <strong>Git</strong> — for installation and project management
+- <strong>4GB RAM minimum</strong> — 8GB recommended for multi-agent workflows
+- <strong>Internet connection</strong> — API calls to LLM providers</p>
+<p><strong>Supported Operating Systems:</strong>
+- ✅ Linux (Ubuntu 20.04+, Fedora, Arch)
+- ✅ macOS (Intel + Apple Silicon)
+- ✅ Windows 10/11 (native, WSL2, or git-bash)
+- ✅ Docker (any OS)</p>
+<p><strong>One LLM provider API key</strong> — pick one to start:
+- OpenRouter (recommended — access to 200+ models)
+- Anthropic (Claude models)
+- OpenAI (GPT-4, GPT-4o)
+- Google (Gemini)
+- DeepSeek
+- Or any of 15+ others</p>
+<blockquote>
+<p><strong>💡 Recommendation:</strong> Start with OpenRouter. One API key gives you access to every major model, and you can switch between them freely. We'll cover provider setup in Section 1.5.</p>
+</blockquote>
+<hr />
+<h2 id="14-installation">1.4 Installation</h2>
+<h3 id="linux-macos">Linux &amp; macOS</h3>
+<pre class="highlight"><code class="language-bash"># One-line install
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+</code></pre>
+
+<p>This script will:
+1. Clone the Hermes Agent repository
+2. Create a Python virtual environment
+3. Install all dependencies
+4. Add <code>hermes</code> to your PATH</p>
+<h3 id="windows">Windows</h3>
+<pre class="highlight"><code class="language-bash"># Using git-bash (recommended)
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+</code></pre>
+
+<blockquote>
+<p><strong>Windows users:</strong> Hermes runs natively on Windows. Use git-bash, PowerShell, or Windows Terminal — all work. See [Appendix A: Windows Quirks] for platform-specific notes.</p>
+</blockquote>
+<h3 id="docker">Docker</h3>
+<pre class="highlight"><code class="language-bash">docker pull ghcr.io/nousresearch/hermes-agent:latest
+docker run -it --rm \
+  -v ~/.hermes:/root/.hermes \
+  -v ~/projects:/root/projects \
+  ghcr.io/nousresearch/hermes-agent:latest
+</code></pre>
+
+<h3 id="verify-installation">Verify Installation</h3>
+<pre class="highlight"><code class="language-bash">hermes --version
+# Output: hermes x.x.x
+</code></pre>
+
+<p>If you see a version number, you're golden.</p>
+<hr />
+<h2 id="15-your-first-run-the-setup-wizard">1.5 Your First Run — The Setup Wizard</h2>
+<pre class="highlight"><code class="language-bash">hermes setup
+</code></pre>
+
+<p>Hermes launches an interactive wizard that walks you through:</p>
+<p><strong>Step 1: Model Selection</strong></p>
+<pre class="highlight"><code>? Choose your default model:
+  ❯ Anthropic Claude Sonnet 4 (recommended)
+    OpenAI GPT-4o
+    Google Gemini 2.5 Pro
+    DeepSeek V3
+    [100+ more via OpenRouter]
+</code></pre>
+
+<p><strong>Step 2: API Key</strong></p>
+<pre class="highlight"><code>? Enter your API key: sk-or-v1-xxxxx...
+✓ Key validated. Provider: OpenRouter
+</code></pre>
+
+<p><strong>Step 3: Tool Configuration</strong></p>
+<pre class="highlight"><code>? Which toolsets would you like to enable?
+  ❯ ◉ web (search + content extraction)
+    ◉ terminal (shell commands)
+    ◉ file (read/write/search)
+    ◉ browser (web automation)
+    ◯ image_gen (AI image generation)
+    ◉ memory (persistent memory)
+    ◉ delegation (subagent tasks)
+    ◉ cronjob (scheduled tasks)
+</code></pre>
+
+<blockquote>
+<p><strong>💡 Tip:</strong> Enable <code>web</code>, <code>terminal</code>, <code>file</code>, <code>memory</code>, <code>delegation</code>, and <code>cronjob</code> at minimum. You can add more later with <code>hermes tools</code>.</p>
+</blockquote>
+<p><strong>Step 4: Confirm</strong></p>
+<pre class="highlight"><code>✓ Setup complete!
+  Model: openrouter/anthropic/claude-sonnet-4
+  Provider: openrouter
+  Tools: 6 toolsets enabled
+  Config: ~/.hermes/config.yaml
+
+Run 'hermes' to start chatting.
+</code></pre>
+
+<hr />
+<h2 id="16-your-5-minute-win">1.6 Your 5-Minute Win</h2>
+<p>Let's get you actual value right now. Start Hermes:</p>
+<pre class="highlight"><code class="language-bash">hermes
+</code></pre>
+
+<p>You'll see the welcome banner and a prompt:</p>
+<pre class="highlight"><code>╭──────────────────────────────────────────╮
+│  Hermes Agent v2.x                       │
+│  Model: claude-sonnet-4 (OpenRouter)     │
+│  Tools: 42 loaded                        │
+╰──────────────────────────────────────────╯
+
+You: 
+</code></pre>
+
+<h3 id="task-1-ask-it-anything">Task 1: Ask It Anything</h3>
+<pre class="highlight"><code>You: What are the top 5 most starred GitHub repos this week?
+</code></pre>
+
+<p>Hermes uses its web search tools, fetches live data, and gives you an answer with sources. Not cached — <strong>live</strong>.</p>
+<h3 id="task-2-have-it-do-real-work">Task 2: Have It Do Real Work</h3>
+<pre class="highlight"><code>You: Create a Python FastAPI project called &quot;my-api&quot; in ~/projects/ 
+    with a health check endpoint, Dockerfile, and README
+</code></pre>
+
+<p>Watch what happens:</p>
+<pre class="highlight"><code>Hermes: I'll set up a FastAPI project with the requested structure.
+
+  [terminal] mkdir -p ~/projects/my-api/app
+  [write]   ~/projects/my-api/app/main.py (created)
+  [write]   ~/projects/my-api/Dockerfile (created)
+  [write]   ~/projects/my-api/README.md (created)
+  [write]   ~/projects/my-api/requirements.txt (created)
+
+  Done! Project created at ~/projects/my-api/
+
+  Structure:
+  my-api/
+  ├── app/
+  │   └── main.py          ← FastAPI app with GET /health
+  ├── Dockerfile            ← Multi-stage Python 3.12 build
+  ├── requirements.txt      ← fastapi, uvicorn
+  └── README.md             ← Setup &amp; run instructions
+
+  Run it: cd ~/projects/my-api &amp;&amp; python -m uvicorn app.main:app --reload
+</code></pre>
+
+<p><strong>That just happened.</strong> Hermes created real files on your real filesystem, with working code, in seconds.</p>
+<h3 id="task-3-make-it-remember">Task 3: Make It Remember</h3>
+<pre class="highlight"><code>You: Remember that my preferred Python framework is FastAPI and I use 
+    4-space indentation.
+
+Hermes: ✓ Saved to memory:
+  - Preferred Python framework: FastAPI
+  - Code style: 4-space indentation
+</code></pre>
+
+<p>Next session, next week, next month — Hermes will <strong>still remember this</strong>. No re-explaining.</p>
+<hr />
+<h2 id="17-the-big-picture-what-you-just-unlocked">1.7 The Big Picture — What You Just Unlocked</h2>
+<p>In 5 minutes, you've experienced three core capabilities:</p>
+<div class="mermaid">flowchart TD
+    MEM["🧠 MEMORY<br/><i>Learns & persists across sessions</i>"]
+    TOOL["🔧 TOOLS<br/><i>Terminal, files, web, browser, code, cron</i>"]
+    PLAT["💬 PLATFORMS<br/><i>Telegram, Discord, Slack, WhatsApp, CLI</i>"]
+
+    MEM --- TOOL
+    TOOL --- PLAT
+    PLAT --- MEM
+
+    DESC["<b>Together =</b> An AI that knows you, acts for you,<br/>and meets you where you already work."]
+    MEM --> DESC</div>
+<p><strong>What's next:</strong> In Chapter 2, we'll dive into <em>how</em> Hermes works — the agent loop, model selection, toolsets, and configuration. You'll understand what's happening under the hood so you can bend Hermes to your will.</p>
+<p>But first — if you want Hermes on your phone right now...</p>
+<h3 id="bonus-connect-to-telegram-2-minutes">Bonus: Connect to Telegram (2 minutes)</h3>
+<pre class="highlight"><code class="language-bash">hermes gateway setup
+</code></pre>
+
+<p>Select Telegram, enter your bot token (from <a href="https://t.me/BotFather">@BotFather</a>), and:</p>
+<pre class="highlight"><code>✓ Gateway running
+✓ Telegram connected: @YourHermesBot
+
+Message your bot on Telegram to start chatting.
+Same agent, same memory, same tools — now in your pocket.
+</code></pre>
+
+<p>Now you have Hermes on your phone. <strong>Every feature from the CLI is available through Telegram.</strong> Send voice messages, images, files — Hermes handles them all.</p>
+<hr />
+<h2 id="chapter-1-summary">Chapter 1 Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>What You Learned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What Hermes is</td>
+<td>Autonomous AI agent with memory, tools, and multi-platform presence</td>
+</tr>
+<tr>
+<td>Installation</td>
+<td>One command: <code>curl ... \| bash</code> then <code>hermes setup</code></td>
+</tr>
+<tr>
+<td>First interaction</td>
+<td><code>hermes</code> → chat, create projects, save memories</td>
+</tr>
+<tr>
+<td>Quick win</td>
+<td>Created a real FastAPI project in seconds</td>
+</tr>
+<tr>
+<td>Telegram gateway</td>
+<td><code>hermes gateway setup</code> → AI in your pocket</td>
+</tr>
+<tr>
+<td>Key insight</td>
+<td>Hermes remembers, acts, and lives where you work</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next:</strong> <a href="ch02-core-concepts.md">Chapter 2: Core Concepts →</a></p>
+<hr />
+<!-- SCREENSHOT: Hermes welcome banner in terminal -->
+<!-- SCREENSHOT: Setup wizard model selection -->
+<!-- SCREENSHOT: FastAPI project creation output -->
+<!-- SCREENSHOT: Telegram bot first message -->
+            <nav class="chapter-nav" aria-label="Chapter navigation"><span></span><a href="ch02-core-concepts.html" class="next">Ch 2: Core Concepts →</a></nav>
+            
+    <aside class="author-bio">
+        <div class="author-avatar">B</div>
+        <div class="author-info">
+            <strong>Bio</strong> · <a href="https://biotama.cv" target="_blank" rel="noopener">System Architect · Fintech Engineer</a>
+            <p>Building AI-powered systems in production. More at <a href="https://biotama.cv" target="_blank" rel="noopener">biotama.cv</a></p>
+        </div>
+    </aside>
+    
+        </article>
+        <footer>
+            <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
+            <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#eef2ff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6366f1',
+                secondaryColor: '#f0fdf4',
+                tertiaryColor: '#fffbeb',
+                fontSize: '14px'
+            },
+            flowchart: { curve: 'basis', padding: 16 }
+        });
+    </script>
+</body>
+</html>
