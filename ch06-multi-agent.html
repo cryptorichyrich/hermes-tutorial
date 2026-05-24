@@ -310,6 +310,26 @@
         }
         .mermaid-zoom-overlay svg {
             min-width: 1200px; max-width: none; height: auto;
+            transform-origin: top left; transition: transform 0.2s ease;
+        }
+        .mermaid-zoom-controls {
+            position: sticky; top: 0; left: 0; z-index: 10;
+            display: flex; gap: 4px; padding-bottom: 12px;
+        }
+        .mermaid-zoom-controls button {
+            width: 36px; height: 36px; border-radius: 10px;
+            border: 1px solid var(--hairline); background: var(--surface-card);
+            color: var(--ink); font-size: 20px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; line-height: 1; font-family: inherit;
+        }
+        .mermaid-zoom-controls button:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+        .mermaid-zoom-controls .zoom-level {
+            display: flex; align-items: center; padding: 0 10px;
+            font-size: 13px; color: var(--muted); font-weight: 500;
+            letter-spacing: 0.3px; min-width: 48px; justify-content: center;
         }
 
         /* Chapter nav */
@@ -1082,20 +1102,74 @@ hermes kanban log &lt;task_id&gt;
                 wrap.appendChild(t);
             }
         });
-        // Mermaid zoom with pan/drag
+        // Mermaid zoom with pan/drag + zoom buttons
         document.querySelectorAll('.mermaid').forEach(function(m) {
             m.addEventListener('click', function() {
+                var scale = 1, minScale = 0.5, maxScale = 4;
                 var overlay = document.createElement('div');
                 overlay.className = 'mermaid-zoom-overlay active';
+
                 var content = document.createElement('div');
                 content.className = 'mermaid-zoom-content';
-                content.innerHTML = m.innerHTML;
+
+                // Zoom controls toolbar
+                var controls = document.createElement('div');
+                controls.className = 'mermaid-zoom-controls';
+                var btnOut = document.createElement('button');
+                btnOut.innerHTML = '&#8722;'; btnOut.title = 'Zoom out';
+                var btnIn = document.createElement('button');
+                btnIn.innerHTML = '&#43;'; btnIn.title = 'Zoom in';
+                var btnReset = document.createElement('button');
+                btnReset.innerHTML = '&#8634;'; btnReset.title = 'Reset';
+                var level = document.createElement('span');
+                level.className = 'zoom-level'; level.textContent = '100%';
+                controls.appendChild(btnOut);
+                controls.appendChild(level);
+                controls.appendChild(btnIn);
+                controls.appendChild(btnReset);
+                content.appendChild(controls);
+
+                // Diagram container
+                var diagramWrap = document.createElement('div');
+                diagramWrap.innerHTML = m.innerHTML;
+                content.appendChild(diagramWrap);
                 overlay.appendChild(content);
                 document.body.appendChild(overlay);
+
+                function applyScale() {
+                    var svg = diagramWrap.querySelector('svg');
+                    if (svg) svg.style.transform = 'scale(' + scale + ')';
+                    level.textContent = Math.round(scale * 100) + '%';
+                }
+
+                btnIn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    scale = Math.min(scale + 0.25, maxScale);
+                    applyScale();
+                });
+                btnOut.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    scale = Math.max(scale - 0.25, minScale);
+                    applyScale();
+                });
+                btnReset.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    scale = 1; applyScale();
+                    content.scrollLeft = 0; content.scrollTop = 0;
+                });
+
+                // Mouse wheel zoom
+                content.addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    var delta = e.deltaY > 0 ? -0.15 : 0.15;
+                    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
+                    applyScale();
+                }, { passive: false });
 
                 // Pan state
                 var isPanning = false, startX = 0, startY = 0, scrollL = 0, scrollT = 0;
                 content.addEventListener('mousedown', function(e) {
+                    if (e.target.tagName === 'BUTTON') return;
                     isPanning = true;
                     startX = e.pageX - content.offsetLeft;
                     startY = e.pageY - content.offsetTop;
@@ -1106,17 +1180,15 @@ hermes kanban log &lt;task_id&gt;
                 });
                 overlay.addEventListener('mousemove', function(e) {
                     if (!isPanning) return;
-                    var x = e.pageX - content.offsetLeft;
-                    var y = e.pageY - content.offsetTop;
-                    content.scrollLeft = scrollL - (x - startX);
-                    content.scrollTop = scrollT - (y - startY);
+                    content.scrollLeft = scrollL - (e.pageX - content.offsetLeft - startX);
+                    content.scrollTop = scrollT - (e.pageY - content.offsetTop - startY);
                 });
                 overlay.addEventListener('mouseup', function() {
                     isPanning = false;
                     content.style.cursor = 'grab';
                 });
 
-                // Close on click outside content or Escape
+                // Close
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) overlay.remove();
                 });
