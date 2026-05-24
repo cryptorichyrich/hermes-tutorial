@@ -48,17 +48,15 @@ cd hermes-tutorial
 - **AI enthusiasts** exploring autonomous agents beyond chat-based tools
 - **Teams** looking to automate workflows with self-improving AI
 - **Entrepreneurs** building services around AI Agent technology
-- **Anyone** who read the Orange Book (花叔's guide) and wants the English equivalent — deeper, longer, and more hands-on
+- **Learners** who prefer a hands-on, code-heavy approach with production-tested examples
 
 ## What makes this different?
 
-| | This Tutorial | Orange Book |
-|---|---|---|
-| Language | English | Chinese |
-| Depth | Code-heavy, production-tested | Concept-heavy, overview-oriented |
-| Code examples | 100+ runnable snippets | High-level overviews |
-| Business use cases | 10 scenarios with dollar ROI | Cost overview only |
-| Harness Framework | Full chapter with mapping table | Originated the concept |
+- **Code-first** — 100+ runnable snippets you can paste and execute immediately
+- **Production-tested** — Every recommendation comes from running Hermes in real projects
+- **10 business use cases** with actual dollar ROI calculations
+- **Full Harness Framework coverage** with detailed mapping to Hermes components
+- **Mermaid diagrams** — 82 professionally rendered architecture and flow diagrams
 
 ## Key Topics Covered
 
@@ -90,7 +88,6 @@ This tutorial is released under the [MIT License](LICENSE). Share it, adapt it, 
 ## Acknowledgments
 
 - [Nous Research](https://github.com/nousresearch) — for building Hermes Agent and open-sourcing it
-- HuaShu (花叔) — whose Orange Book introduced the Harness Engineering framework that inspired Chapter 1's conceptual structure
 - The Hermes Agent community on [Discord](https://discord.gg/nousresearch) and [Telegram](https://t.me/nousresearch)
 
 ---
