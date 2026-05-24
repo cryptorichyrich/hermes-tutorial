@@ -151,6 +151,9 @@ def render_markdown(md_text: str) -> str:
         html = html.replace(f"<p>{key}</p>", f'<div class="mermaid">{code}</div>')
         html = html.replace(key, f'<div class="mermaid">{code}</div>')
 
+    # Fix internal links: .md → .html
+    html = re.sub(r'href="((?:ch\d|appendix)[^"]*)\.md"', r'href="\1.html"', html)
+
     return html
 
 
@@ -232,6 +235,10 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
     for c in CHAPTERS:
         active = ' class="active"' if c["num"] == ch else ""
         nav_links += f'<a href="{c["slug"]}.html"{active}>Ch {c["num"]}</a>'
+
+    # Markdown source for copy button (HTML-escaped)
+    import html as html_mod
+    md_source = html_mod.escape(md_text)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -555,6 +562,27 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
         .chapter-nav .prev, .chapter-nav .next {{ border: 1px solid var(--hairline); background: var(--surface-card); color: var(--ink); }}
         .chapter-nav .prev:hover, .chapter-nav .next:hover {{ background: var(--primary); color: white; border-color: var(--primary); }}
 
+        /* Copy as Markdown button */
+        .copy-md-btn {{
+            position: fixed; bottom: 24px; right: 24px; z-index: 900;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 9999px;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            color: var(--ink); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; letter-spacing: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }}
+        .copy-md-btn:hover {{
+            background: var(--primary); color: white; border-color: var(--primary);
+        }}
+        .copy-md-btn svg {{
+            width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;
+        }}
+        .copy-md-btn.copied {{
+            background: #16a34a; color: white; border-color: #16a34a;
+        }}
+
         /* Author bio — subtle */
         .author-bio {{
             display: flex; align-items: center; gap: 16px; margin-top: 48px;
@@ -615,6 +643,11 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
             {nav_html}
             {author_bio}
         </article>
+        <button class="copy-md-btn" id="copyMdBtn" aria-label="Copy as Markdown">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyMdLabel">Copy Markdown</span>
+        </button>
+        <script type="text/markdown" id="mdSource">{md_source}</script>
         <footer>
             <p>Hermes Agent Tutorial by <a href="{AUTHOR_URL}" target="_blank" rel="noopener">{AUTHOR_NAME}</a> ·
             <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
@@ -743,6 +776,24 @@ def build_page(chapter: dict, prev_ch: dict | None, next_ch: dict | None) -> str
                 }});
             }});
         }});
+        // Copy as Markdown
+        (function() {{
+            var btn = document.getElementById('copyMdBtn');
+            var label = document.getElementById('copyMdLabel');
+            var src = document.getElementById('mdSource');
+            if (!btn || !src) return;
+            btn.addEventListener('click', function() {{
+                var md = src.textContent;
+                navigator.clipboard.writeText(md).then(function() {{
+                    label.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(function() {{
+                        label.textContent = 'Copy Markdown';
+                        btn.classList.remove('copied');
+                    }}, 2000);
+                }});
+            }});
+        }})();
     </script>
 </body>
 </html>"""

@@ -350,6 +350,27 @@
         .chapter-nav .prev, .chapter-nav .next { border: 1px solid var(--hairline); background: var(--surface-card); color: var(--ink); }
         .chapter-nav .prev:hover, .chapter-nav .next:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* Copy as Markdown button */
+        .copy-md-btn {
+            position: fixed; bottom: 24px; right: 24px; z-index: 900;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 9999px;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            color: var(--ink); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; letter-spacing: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .copy-md-btn:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+        .copy-md-btn svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;
+        }
+        .copy-md-btn.copied {
+            background: #16a34a; color: white; border-color: #16a34a;
+        }
+
         /* Author bio — subtle */
         .author-bio {
             display: flex; align-items: center; gap: 16px; margin-top: 48px;
@@ -976,7 +997,7 @@ process(action=&quot;close&quot;, session_id=&quot;...&quot;)
 </tr>
 </tbody>
 </table>
-<p><strong>Next:</strong> <a href="ch06-multi-agent.md">Chapter 6: Multi-Agent Orchestration →</a></p>
+<p><strong>Next:</strong> <a href="ch06-multi-agent.html">Chapter 6: Multi-Agent Orchestration →</a></p>
 <hr />
 <!-- SCREENSHOT: hermes cron list showing active jobs -->
 <!-- SCREENSHOT: Cron job creation interactive flow -->
@@ -994,6 +1015,548 @@ process(action=&quot;close&quot;, session_id=&quot;...&quot;)
     </aside>
     
         </article>
+        <button class="copy-md-btn" id="copyMdBtn" aria-label="Copy as Markdown">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyMdLabel">Copy Markdown</span>
+        </button>
+        <script type="text/markdown" id="mdSource"># Chapter 5: Automation &amp; Scheduling — Hermes Never Sleeps
+
+&gt; **The real power of an AI agent isn&#x27;t in answering questions — it&#x27;s in running tasks on autopilot. Cron jobs, webhooks, background processes, and job chaining turn Hermes from a chat partner into a 24/7 operations engine.**
+
+---
+
+## 5.1 Why Automation Matters
+
+You&#x27;ve set up Hermes, connected it to Telegram, built up skills and memory. But you&#x27;re still *driving* every interaction manually. Automation changes the game:
+
+- **Consistency** — tasks run at the same time, every time, without you remembering
+- **Speed** — Hermes reacts to events the moment they happen
+- **Scale** — one Hermes can monitor 10 systems, write 2 blog posts a day, and review every PR
+- **Freedom** — you sleep, Hermes works. You code, Hermes handles ops.
+
+```mermaid
+flowchart LR
+    subgraph spectrum [&quot;THE AUTOMATION SPECTRUM — LOW AUTONOMY → HIGH AUTONOMY&quot;]
+        M[&quot;MANUAL\n(you type)\nYou → Hermes\n\&quot;Write this\&quot;&quot;]
+        S[&quot;SCHEDULED\n(cron jobs)\nScheduler → Hermes\n\&quot;Every day at 9am\&quot;&quot;]
+        E[&quot;EVENT-DRIVEN\n(webhooks)\nHook → Hermes\n\&quot;When PR is opened\&quot;&quot;]
+    end
+    M --&gt; S --&gt; E
+```
+
+Hermes gives you four automation mechanisms, each with a different trigger:
+
+| Mechanism | Trigger | Duration | Best For |
+|-----------|---------|----------|----------|
+| **Cron jobs** | Time-based schedule | Minutes to hours | Daily digests, periodic checks, content pipeline |
+| **Script-only jobs** | Time-based schedule | Seconds | Watchdogs, health checks, threshold alerts |
+| **Webhooks** | External HTTP event | Minutes | CI/CD, GitHub events, payment notifications |
+| **Background tasks** | Manual kick-off | Minutes to hours | Long builds, test suites, data processing |
+
+---
+
+## 5.2 Cron Jobs — Scheduled Intelligence
+
+Cron jobs are the backbone of Hermes automation. They run a full agent loop on a schedule — the same Hermes brain, same tools, same memory, just autonomous.
+
+### Creating a Cron Job
+
+```bash
+# Interactive creation (recommended)
+hermes cron create &quot;0 9 * * *&quot;
+
+# Or use natural language
+hermes cron create &quot;every day at 9am&quot;
+hermes cron create &quot;every 2 hours&quot;
+hermes cron create &quot;30m&quot;
+```
+
+During creation, Hermes walks you through the key settings:
+
+```mermaid
+flowchart TD
+    subgraph anatomy [&quot;CRON JOB ANATOMY&quot;]
+        direction TB
+        S[&quot;Schedule: \&quot;0 9 * * *\&quot; — When it runs&quot;]
+        N[&quot;Name: \&quot;morning-digest\&quot; — Human label&quot;]
+        P[&quot;Prompt: \&quot;Check emails...\&quot; — What Hermes does&quot;]
+        SK[&quot;Skills: [email, summary] — Preloaded knowledge&quot;]
+        MO[&quot;Model: claude-sonnet-4 — Optional override&quot;]
+        D[&quot;Deliver: telegram — Where output goes&quot;]
+        W[&quot;Workdir: ~/projects/app — Project context&quot;]
+        E[&quot;Enabled: [x] — Active or paused&quot;]
+    end
+    S --&gt; N --&gt; P --&gt; SK --&gt; MO --&gt; D --&gt; W --&gt; E
+    E -.-&gt;|&quot;Result: Hermes wakes up at 9am,\nloads skills, checks inbox,\nwrites digest, delivers to Telegram&quot;| R((📰 Digest))
+```
+
+### Schedule Formats
+
+Hermes supports four schedule formats:
+
+```bash
+# 1. Duration — runs every N minutes/hours
+&quot;30m&quot;           # Every 30 minutes
+&quot;2h&quot;            # Every 2 hours
+
+# 2. &quot;Every&quot; phrase — natural language
+&quot;every monday 9am&quot;
+&quot;every weekday at 8:30&quot;
+&quot;every 6 hours&quot;
+
+# 3. Standard cron — 5-field expression
+&quot;0 9 * * *&quot;     # Every day at 9:00
+&quot;*/15 * * * *&quot;  # Every 15 minutes
+&quot;0 9 * * 1-5&quot;   # Weekdays at 9:00
+
+# 4. One-shot — ISO timestamp
+&quot;2026-06-01T09:00:00&quot;   # Once, at a specific time
+```
+
+### Managing Cron Jobs
+
+```bash
+# List all jobs
+hermes cron list
+
+# List including disabled/paused jobs
+hermes cron list --all
+
+# Pause a job (stop it from running)
+hermes cron pause &lt;job_id&gt;
+
+# Resume a paused job
+hermes cron resume &lt;job_id&gt;
+
+# Trigger a job manually (run on next tick)
+hermes cron run &lt;job_id&gt;
+
+# Edit a job&#x27;s schedule, prompt, or delivery
+hermes cron edit &lt;job_id&gt;
+
+# Delete a job
+hermes cron remove &lt;job_id&gt;
+
+# Check scheduler status
+hermes cron status
+```
+
+Inside a session, use `/cron` to manage jobs from chat.
+
+### Delivery Targets
+
+Cron job output needs to go somewhere. Hermes supports multiple delivery targets:
+
+```bash
+# Default: deliver back to the current chat
+deliver: &quot;origin&quot;
+
+# Deliver to all connected channels
+deliver: &quot;all&quot;
+
+# Deliver to a specific platform chat
+deliver: &quot;telegram&quot;
+deliver: &quot;discord:#engineering&quot;
+deliver: &quot;telegram:-1001234567890:17585&quot;
+
+# Combine targets
+deliver: &quot;origin,all&quot;
+```
+
+### Model Overrides
+
+Different jobs may need different models. Override per-job without changing your default:
+
+```yaml
+model:
+  model: &quot;anthropic/claude-sonnet-4&quot;
+  provider: &quot;anthropic&quot;
+```
+
+A daily digest might use a fast/cheap model, while a code review job needs the best reasoning. You control this per-job.
+
+---
+
+## 5.3 Script-Only Jobs — Lightweight Watchdogs
+
+Not every scheduled task needs an LLM. **Script-only jobs** run a script and deliver its output verbatim — no agent loop, no tokens, no model call:
+
+```mermaid
+flowchart TD
+    subgraph agent [&quot;AGENT JOB (default)&quot;]
+        A1[&quot;Schedule tick&quot;] --&gt; A2[&quot;Load agent&quot;]
+        A2 --&gt; A3[&quot;Load skills&quot;]
+        A3 --&gt; A4[&quot;Run LLM prompt&quot;]
+        A4 --&gt; A5[&quot;Deliver response&quot;]
+    end
+
+    subgraph script [&quot;SCRIPT-ONLY JOB (no_agent: true)&quot;]
+        B1[&quot;Schedule tick&quot;] --&gt; B2[&quot;Run script&quot;]
+        B2 --&gt; B3[&quot;Capture stdout&quot;]
+        B3 --&gt; B4{&quot;stdout?&quot;}
+        B4 --&gt;|&quot;empty&quot;| B5[&quot;SILENT — nothing sent&quot;]
+        B4 --&gt;|&quot;has text&quot;| B6[&quot;SEND — deliver verbatim&quot;]
+        B4 --&gt;|&quot;exit non-zero&quot;| B7[&quot;ERROR — alert sent&quot;]
+    end
+
+    A5 -.- NOTE1[&quot;~5-50K tokens/job\nMinutes per run&quot;]
+    B5 -.- NOTE2[&quot;~0 tokens/job\nSeconds per run&quot;]
+```
+
+**When to use script-only:**
+- Server uptime checks (`curl -sf https://api.example.com/health`)
+- Disk/memory/GPU threshold alerts
+- Git repo status checks
+- Any fixed-output health check where the script IS the message
+
+```bash
+# Example: a GPU memory watchdog
+hermes cron create &quot;5m&quot; \
+  --script scripts/gpu_watchdog.py \
+  --no-agent \
+  --deliver telegram
+```
+
+The script at `~/.hermes/scripts/gpu_watchdog.py` might look like:
+
+```python
+#!/usr/bin/env python3
+import subprocess, sys
+result = subprocess.run([&quot;nvidia-smi&quot;, &quot;--query-gpu=memory.used&quot;, &quot;--format=csv,noheader,nounits&quot;],
+                       capture_output=True, text=True)
+used = int(result.stdout.strip().split(&quot;\n&quot;)[0])
+if used &gt; 90:
+    print(f&quot;⚠️ GPU memory at {used}% — over 90% threshold!&quot;)
+# No output = silent (nothing sent)
+```
+
+**Key behavior:**
+- Empty stdout → nothing sent (you won&#x27;t even know it ran)
+- Non-empty stdout → delivered verbatim as the message
+- Non-zero exit → error alert sent
+- Maximum efficiency — zero tokens, zero model cost
+
+### Real-World Example: Gateway Heartbeat
+
+The most important script-only job is one that keeps Hermes itself alive. System failures happen — Windows sleep/hibernate kills processes, OOM killers strike on Linux, unexpected crashes occur at 3 AM. Without a heartbeat, your gateway silently dies and you lose hours of coverage.
+
+Hermes ships with a built-in heartbeat script at `~/.hermes/scripts/heartbeat.py`:
+
+```bash
+# Set up the gateway heartbeat — runs every 10 minutes, zero tokens
+hermes cron create &quot;every 10m&quot; \
+  --script scripts/heartbeat.py \
+  --no-agent \
+  --deliver origin
+```
+
+**How it works:**
+
+```mermaid
+flowchart TD
+    A[&quot;GATEWAY HEARTBEAT\nevery 10 min&quot;] --&gt; B{&quot;ALIVE?&quot;}
+    B --&gt;|&quot;YES&quot;| C[&quot;Silent exit\n(nothing sent)&quot;]
+    B --&gt;|&quot;NO&quot;| D[&quot;Kill zombie PIDs&quot;]
+    D --&gt; E[&quot;Restart gateway&quot;]
+    E --&gt; F[&quot;Notify you via Telegram&quot;]
+
+    style A fill:#e3f2fd
+    style C fill:#e8f5e9
+    style F fill:#fff3e0
+```
+
+**Key details:**
+- **Zero tokens.** The heartbeat is a pure Python script (`no_agent: true`). It checks processes and log files locally — no API calls, no model involved. Your LLM bill is unaffected.
+- **Silent when healthy.** If the gateway is running fine, the script prints nothing and exits with code 0. You never see a message. Only problems get reported.
+- **Auto-restart.** When the gateway is down, the script kills any zombie processes and starts a fresh instance.
+- **Survives sleep/hibernate.** On Windows, pair this with a Scheduled Task (every 10 min + at logon, with `StartWhenAvailable`). On Linux, use systemd timers. The watchdog catches up after wake.
+
+**On Windows — add a Scheduled Task for extra reliability:**
+
+```powershell
+# Run as admin in PowerShell
+$action = New-ScheduledTaskAction -Execute &quot;python&quot; `
+  -Argument &quot;$env:LOCALAPPDATA\hermes\scripts\heartbeat.py --restart&quot;
+$trigger1 = New-ScheduledTaskTrigger -Once -At (Get-Date) `
+  -RepetitionInterval (New-Timespan -Minutes 10) `
+  -RepetitionDuration (New-Timespan -Days 365)
+$trigger2 = New-ScheduledTaskTrigger -AtLogOn
+$settings = New-ScheduledTaskSettingsSet `
+  -StartWhenAvailable -DontStopOnIdleEnd `
+  -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+Register-ScheduledTask -TaskName &quot;HermesHeartbeat&quot; `
+  -Action $action -Trigger $trigger1,$trigger2 `
+  -Settings $settings -Description &quot;Restarts Hermes gateway if down&quot;
+```
+
+This gives you **two safety nets** — the internal cron heartbeat (runs while the gateway is alive) and the OS-level Scheduled Task (runs even when the gateway is dead). Maximum downtime after any failure: ~15 minutes.
+
+&gt; **💡 Cost clarification:** The heartbeat costs **nothing** in LLM tokens. It&#x27;s a `no_agent: true` cron job running a local Python script. No model is invoked. The only cost is ~2 seconds of CPU every 10 minutes — negligible on any machine.
+
+---
+
+## 5.4 Job Chaining — Output Pipelines
+
+Jobs can chain together — the output of Job A feeds as context into Job B:
+
+```mermaid
+flowchart LR
+    subgraph chain [&quot;JOB CHAINING WITH context_from&quot;]
+        A[&quot;JOB A\nCollect data\n(script)&quot;]
+        B[&quot;JOB B\nSummarize\n(LLM agent)&quot;]
+        C[&quot;JOB C\nDeliver\n(telegram)&quot;]
+    end
+    A --&gt;|&quot;stdout&quot;| B
+    B --&gt;|&quot;analysis&quot;| C
+
+    B -.- NOTE_B[&quot;context_from: [\&quot;job-a-id\&quot;]&quot;]
+    C -.- NOTE_C[&quot;context_from: [\&quot;job-b-id\&quot;]&quot;]
+```
+
+**Practical example — daily competitive intelligence:**
+
+```bash
+# Job 1: Collect competitor updates (script-only, zero tokens)
+hermes cron create &quot;0 8 * * *&quot; \
+  --name &quot;competitor-collect&quot; \
+  --script scripts/competitor_check.py \
+  --no-agent
+
+# Job 2: Analyze and summarize (agent, uses Job 1 output)
+hermes cron create &quot;0 8 * * *&quot; \
+  --name &quot;competitor-analysis&quot; \
+  --prompt &quot;Analyze the competitor updates below. Flag any threats or opportunities. Be concise.&quot; \
+  --context-from &quot;competitor-collect&quot; \
+  --skills &quot;research,marketing-copy&quot; \
+  --deliver &quot;telegram&quot;
+```
+
+Job 1 runs at 8am, collects raw data. Job 2 runs at 8am on the same tick, but uses Job 1&#x27;s *most recent completed output* as injected context. The result: a smart analysis delivered to your Telegram, powered by free data collection + paid LLM reasoning only where it adds value.
+
+---
+
+## 5.5 Webhooks — Event-Driven Automation
+
+Webhooks flip the model: instead of Hermes checking on a schedule, external systems *push* events to Hermes:
+
+```bash
+# Subscribe to a webhook route
+hermes webhook subscribe deploy-hook
+
+# List active webhooks
+hermes webhook list
+
+# Test a webhook
+hermes webhook test deploy-hook
+
+# Remove a webhook
+hermes webhook remove deploy-hook
+```
+
+This creates an HTTP endpoint at `/webhooks/deploy-hook`. When an external service (GitHub, Stripe, your CI) sends a POST to that endpoint, Hermes processes it.
+
+```mermaid
+flowchart TD
+    GH[&quot;GitHub PR opened&quot;] --&gt; POST1[&quot;POST /webhooks/pr-hook&quot;]
+    SP[&quot;Stripe payment&quot;] --&gt; POST2[&quot;POST /webhooks/payment&quot;]
+    POST1 --&gt; GW
+    POST2 --&gt; GW
+
+    subgraph gateway [&quot;GATEWAY&quot;]
+        GW[&quot;Receives HTTP POST\nParses payload\nTriggers agent&quot;]
+    end
+
+    GW --&gt; AL
+
+    subgraph agentloop [&quot;AGENT LOOP&quot;]
+        AL[&quot;Processes event\nRuns tools\nDelivers response&quot;]
+    end
+```
+
+**Common webhook patterns:**
+- **CI/CD** — auto-review code when a PR opens
+- **Payments** — log transactions, send confirmations
+- **Monitoring** — PagerDuty alert → Hermes investigates
+- **Forms** — new submission → CRM update + notification
+
+---
+
+## 5.6 Background Tasks — Long-Running Work
+
+For tasks too long for a single turn but not recurring enough for cron, use **background terminal processes**:
+
+```bash
+# Start a long-running build
+terminal(command=&quot;npm run build&quot;, background=True, notify_on_complete=True)
+
+# The process runs in the background
+# Hermes is free to work on other things
+# You get notified when it finishes
+```
+
+```mermaid
+flowchart TD
+    START[&quot;START\nterminal(bg=true)&quot;] --&gt; RUNNING[&quot;RUNNING\nprocess(poll)&quot;]
+    RUNNING --&gt; DONE[&quot;DONE\nAuto-notify&quot;]
+    RUNNING --&gt; CHECK[&quot;CHECK PROGRESS\npoll → see progress\nlog → full output\nwait → block until done&quot;]
+
+    DONE -.- NOTE1[&quot;notify_on_complete=True →\none notification at end&quot;]
+    CHECK -.- NOTE2[&quot;watch_patterns=[\&quot;Build OK\&quot;] →\nnotify on rare mid-run text\n(rate limit: 1 per 15 sec)&quot;]
+```
+
+**Process management commands:**
+
+```bash
+# List all background processes
+process(action=&quot;list&quot;)
+
+# Check status + new output
+process(action=&quot;poll&quot;, session_id=&quot;...&quot;)
+
+# Full output with pagination
+process(action=&quot;log&quot;, session_id=&quot;...&quot;, offset=0, limit=200)
+
+# Block until done (with timeout)
+process(action=&quot;wait&quot;, session_id=&quot;...&quot;, timeout=300)
+
+# Send input to a running process
+process(action=&quot;submit&quot;, session_id=&quot;...&quot;, data=&quot;y&quot;)
+
+# Kill a running process
+process(action=&quot;kill&quot;, session_id=&quot;...&quot;)
+
+# Send raw stdin without newline
+process(action=&quot;write&quot;, session_id=&quot;...&quot;, data=&quot;partial input&quot;)
+
+# Close stdin / send EOF
+process(action=&quot;close&quot;, session_id=&quot;...&quot;)
+```
+
+---
+
+## 5.7 Cron Safety &amp; Best Practices
+
+Running autonomous agents on a schedule comes with responsibility. Here&#x27;s how to keep things safe:
+
+```mermaid
+flowchart TD
+    subgraph safety [&quot;CRON SAFETY CHECKLIST&quot;]
+        P[&quot;PROMPT: Self-contained — no chat context available\nCron jobs run in fresh sessions.\nInclude everything the agent needs to know.&quot;]
+        SK[&quot;SKILLS: Attach the right skills\nA cron job has no conversation history.\nSkills inject the knowledge it needs.&quot;]
+        NR[&quot;NO RECURSIVE CRON: Cron jobs must NOT\ncreate more cron jobs. Prevents runaway scheduling.&quot;]
+        TO[&quot;TIMEOUT: 3-minute hard limit per run\nHermes enforces this — no infinite loops.&quot;]
+        DD[&quot;DEDUP: .tick.lock prevents duplicate ticks\nTwo gateway processes won&#x27;t run the same job twice.&quot;]
+        MEM[&quot;MEMORY: Cron sessions skip memory by default\nThey don&#x27;t pollute your memory with scheduled output.&quot;]
+        SC[&quot;SCRIPT JOBS: Design for silence\nEmpty stdout = nothing sent.\nOnly output alerts, not noise.&quot;]
+    end
+    P --&gt; SK --&gt; NR --&gt; TO --&gt; DD --&gt; MEM --&gt; SC
+```
+
+### Cost Awareness
+
+Cron jobs consume tokens. Here&#x27;s a rough guide:
+
+| Job Type | Tokens/Run | Runs/Day | Est. Daily Cost |
+|----------|-----------|----------|-----------------|
+| Script-only (no_agent) | 0 | 288 (every 5min) | $0.00 |
+| Simple digest (short prompt) | ~2-5K | 1 | ~$0.01-0.05 |
+| Research + summary | ~10-30K | 2 | ~$0.10-0.30 |
+| Code review (full PR) | ~20-50K | 5 | ~$0.50-2.50 |
+| Blog article generation | ~30-80K | 2 | ~$0.60-3.20 |
+
+**Tip:** Use script-only jobs for data collection (free), reserve LLM agent jobs for tasks that actually need reasoning.
+
+---
+
+## 5.8 Automation in Practice — Three Real Workflows
+
+### Workflow 1: Content Marketing Engine
+
+```mermaid
+flowchart TD
+    subgraph pipeline [&quot;DAILY BLOG PIPELINE (2 articles/day)&quot;]
+        M[&quot;8:00 AM — Job: morning-article\nSkills: [blog, marketing-copy, humanizer]\nPrompt: Write today&#x27;s morning article...\nDeliver: telegram&quot;]
+        M --&gt; MH[&quot;Hermes researches topics,\nwrites, edits, and publishes.\nYou get a notification.&quot;]
+        E[&quot;6:00 PM — Job: evening-article\nSame pipeline, different time slot.&quot;]
+        W[&quot;Weekly — Job: content-digest\ncontext_from: [morning, evening]\nSummarizes the week&#x27;s content performance.&quot;]
+    end
+    M --&gt; MH --&gt; E --&gt; W
+    W -.- COST[&quot;Cost: ~$1.50-3.00/day\nValue: Replaces $2,000-5,000/mo content writer&quot;]
+```
+
+### Workflow 2: Server Watchdog
+
+```mermaid
+flowchart TD
+    subgraph infra [&quot;INFRASTRUCTURE MONITORING&quot;]
+        H[&quot;Every 5 min — Script-only: health_check.py\nChecks: API uptime, DB connections,\ndisk space, memory usage\nOutput: silent unless something&#x27;s wrong\nCost: $0.00 (no LLM)&quot;]
+        G[&quot;Every 15 min — Script-only: gpu_monitor.py\nChecks: GPU temp, memory, utilization\nOutput: alert only if &gt;90%\nCost: $0.00&quot;]
+        A[&quot;On alert — Webhook: auto-remediation\nHermes receives the alert, investigates,\nattempts fix, notifies if manual action needed\nCost: ~$0.05-0.10 per incident&quot;]
+    end
+    H --&gt;|&quot;alert&quot;| A
+    G --&gt;|&quot;alert&quot;| A
+```
+
+### Workflow 3: GitHub PR Auto-Review
+
+```mermaid
+flowchart TD
+    subgraph review [&quot;CODE REVIEW AUTOMATION&quot;]
+        WH[&quot;Webhook: /webhooks/pr-review\nTrigger: GitHub PR opened or updated&quot;]
+        S1[&quot;1. GitHub sends PR event to webhook&quot;]
+        S2[&quot;2. Hermes loads github-code-review skill&quot;]
+        S3[&quot;3. Agent reads the diff, runs analysis&quot;]
+        S4[&quot;4. Posts inline review comments on the PR&quot;]
+        S5[&quot;5. Sends summary to Discord #engineering channel&quot;]
+    end
+    WH --&gt; S1 --&gt; S2 --&gt; S3 --&gt; S4 --&gt; S5
+    S5 -.- CFG[&quot;Skills: [github-code-review, requesting-code-review]\nWorkdir: ~/projects/myapp\nDeliver: discord:#engineering\nCost: ~$0.10-0.50 per review\nValue: Catches bugs before production&quot;]
+```
+
+---
+
+## Chapter 5 Key Vocabulary
+
+| Term | Definition |
+|------|-----------|
+| **Cron job** | A scheduled task that runs a full agent loop on a time-based schedule |
+| **Schedule** | When a cron job runs — supports duration, natural language, cron expression, or ISO timestamp |
+| **Script-only job** | A cron job with `no_agent=True` — runs a script, no LLM, zero token cost |
+| **Job chaining** | Connecting jobs via `context_from` so Job B receives Job A&#x27;s output as context |
+| **Webhook** | An HTTP endpoint that triggers Hermes when an external event occurs |
+| **Delivery target** | Where cron job output is sent — Telegram, Discord, Slack, or any connected platform |
+| **Background task** | A terminal process started with `background=True` that runs while you continue working |
+| **Model override** | Per-job model/provider setting independent of your default configuration |
+| **Workdir** | The working directory for a cron job — loads project context files (AGENTS.md, etc.) |
+| **.tick.lock** | Lock file preventing duplicate cron ticks across multiple processes |
+
+---
+
+## Chapter 5 Summary
+
+| Topic | What You Learned |
+|-------|-----------------|
+| Why automation | From manual to autonomous — consistency, speed, scale, freedom |
+| Cron jobs | Full agent loop on schedule, multiple schedule formats, delivery targets |
+| Script-only jobs | Zero-token watchdogs — script output delivered verbatim, silent when empty |
+| Gateway heartbeat | Built-in heartbeat.py keeps gateway alive after crashes, sleep, hibernation — zero cost |
+| Job chaining | `context_from` pipeline — data collection → analysis → delivery |
+| Webhooks | Event-driven triggers — external systems push events to Hermes |
+| Background tasks | Long-running processes with `notify_on_complete` for non-blocking work |
+| Safety | Self-contained prompts, no recursive cron, 3-min timeout, dedup locks |
+| Cost awareness | Script-only = free, simple = pennies, complex = dollars — design accordingly |
+| Real workflows | Content engine, server watchdog, PR auto-review — end-to-end examples |
+
+**Next:** [Chapter 6: Multi-Agent Orchestration →](ch06-multi-agent.md)
+
+---
+
+&lt;!-- SCREENSHOT: hermes cron list showing active jobs --&gt;
+&lt;!-- SCREENSHOT: Cron job creation interactive flow --&gt;
+&lt;!-- SCREENSHOT: Webhook POST in browser devtools --&gt;
+&lt;!-- SCREENSHOT: Background task notification in Telegram --&gt;
+&lt;!-- SCREENSHOT: process(action=&quot;log&quot;) output showing build progress --&gt;
+</script>
         <footer>
             <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
             <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
@@ -1122,6 +1685,24 @@ process(action=&quot;close&quot;, session_id=&quot;...&quot;)
                 });
             });
         });
+        // Copy as Markdown
+        (function() {
+            var btn = document.getElementById('copyMdBtn');
+            var label = document.getElementById('copyMdLabel');
+            var src = document.getElementById('mdSource');
+            if (!btn || !src) return;
+            btn.addEventListener('click', function() {
+                var md = src.textContent;
+                navigator.clipboard.writeText(md).then(function() {
+                    label.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(function() {
+                        label.textContent = 'Copy Markdown';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        })();
     </script>
 </body>
 </html>

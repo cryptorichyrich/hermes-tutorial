@@ -350,6 +350,27 @@
         .chapter-nav .prev, .chapter-nav .next { border: 1px solid var(--hairline); background: var(--surface-card); color: var(--ink); }
         .chapter-nav .prev:hover, .chapter-nav .next:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* Copy as Markdown button */
+        .copy-md-btn {
+            position: fixed; bottom: 24px; right: 24px; z-index: 900;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 9999px;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            color: var(--ink); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; letter-spacing: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .copy-md-btn:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+        .copy-md-btn svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;
+        }
+        .copy-md-btn.copied {
+            background: #16a34a; color: white; border-color: #16a34a;
+        }
+
         /* Author bio — subtle */
         .author-bio {
             display: flex; align-items: center; gap: 16px; margin-top: 48px;
@@ -1460,7 +1481,7 @@ hermes gateway run
 </tr>
 </tbody>
 </table>
-<p><strong>Next:</strong> <a href="ch08-power-techniques.md">Chapter 8: Power Techniques — Goal, Checkpoints, Steer, Compression →</a></p>
+<p><strong>Next:</strong> <a href="ch08-power-techniques.html">Chapter 8: Power Techniques — Goal, Checkpoints, Steer, Compression →</a></p>
 <hr />
 <!-- SCREENSHOT: hermes doctor output showing all checks passed -->
 <!-- SCREENSHOT: hermes mcp list showing connected servers -->
@@ -1478,6 +1499,1052 @@ hermes gateway run
     </aside>
     
         </article>
+        <button class="copy-md-btn" id="copyMdBtn" aria-label="Copy as Markdown">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyMdLabel">Copy Markdown</span>
+        </button>
+        <script type="text/markdown" id="mdSource"># Chapter 7: Advanced Configuration — Taming the Machine
+
+&gt; **Default Hermes works out of the box. Advanced Hermes runs securely across clients, extends with external tools, isolates environments, and never hits a rate limit. This chapter turns you from a user into an operator.**
+
+---
+
+## 7.1 Security &amp; Privacy
+
+Hermes has access to your terminal, your files, your API keys, and your messaging platforms. That power demands guardrails. Let&#x27;s walk through every security control — and when to use each.
+
+### Secret Redaction
+
+By default, Hermes passes tool output through unmodified — terminal stdout, file contents, web responses, everything reaches the conversation verbatim. If you want Hermes to auto-mask strings that look like API keys, tokens, and secrets before they enter the context window and logs:
+
+```bash
+hermes config set security.redact_secrets true
+```
+
+After enabling, strings matching patterns like `sk-...`, `ghp_...`, `xoxb-...`, and generic `API_KEY=`, `password=`, `secret=` values get replaced with `[REDACTED]` in tool output.
+
+**Important:** This takes effect on the next session start — not mid-conversation. That&#x27;s deliberate. It prevents the LLM from flipping its own security toggle during a task.
+
+```bash
+# Verify it&#x27;s on
+hermes config get security.redact_secrets
+
+# Turn it off
+hermes config set security.redact_secrets false
+```
+
+### PII Redaction in Gateway Messages
+
+Separate from secret redaction. When enabled, the gateway hashes user IDs and strips phone numbers from session context before it reaches the model:
+
+```bash
+hermes config set privacy.redact_pii true    # enable
+hermes config set privacy.redact_pii false   # disable (default)
+```
+
+💡 **Tip:** If you run Hermes on a shared Telegram group or Discord server, enable PII redaction. For personal DMs, it&#x27;s usually unnecessary.
+
+### Command Approval Modes
+
+Hermes asks for permission before running destructive shell commands (`rm -rf`, `git reset --hard`, etc.) by default. Three modes:
+
+| Mode | Behavior | Best for |
+|------|----------|----------|
+| `manual` | Always prompt on flagged commands (default) | Most users — safe default |
+| `smart` | Auxiliary LLM auto-approves low-risk, prompts on high-risk | Power users who want speed without full YOLO |
+| `off` | Skip all approval prompts | Trusted environments, automated workflows |
+
+```bash
+# Recommended for power users
+hermes config set approvals.mode smart
+
+# Full bypass (not recommended for production)
+hermes config set approvals.mode off
+```
+
+Per-session override without changing config:
+
+```bash
+# One-shot YOLO
+hermes --yolo chat -q &quot;Clean up temp files&quot;
+
+# Or in session
+/yolo
+```
+
+**Key insight:** YOLO mode (`off`) and secret redaction are independent. Turning off approvals does NOT disable secret redaction. You can be fast AND secure.
+
+### Security Quick Reference
+
+```mermaid
+flowchart TD
+    subgraph security[&quot;🔒 SECURITY LAYERS&quot;]
+        direction TB
+        subgraph L1[&quot;Layer 1: Secret Redaction&quot;]
+            L1A[&quot;Masks API keys, tokens in tool output&quot;]
+            L1B[&quot;Config: security.redact_secrets&quot;]
+            L1C[&quot;Restart required&quot;]
+        end
+        subgraph L2[&quot;Layer 2: PII Redaction&quot;]
+            L2A[&quot;Hashes user IDs, strips phone numbers&quot;]
+            L2B[&quot;Config: privacy.redact_pii&quot;]
+            L2C[&quot;Gateway-only (messaging platforms)&quot;]
+        end
+        subgraph L3[&quot;Layer 3: Command Approval&quot;]
+            L3A[&quot;Prompts before destructive commands&quot;]
+            L3B[&quot;Config: approvals.mode (manual/smart/off)&quot;]
+            L3C[&quot;Per-session: /yolo or --yolo flag&quot;]
+        end
+        subgraph L4[&quot;Layer 4: Environment Filtering&quot;]
+            L4A[&quot;MCP subprocesses get only safe env vars&quot;]
+            L4B[&quot;API keys only passed when explicitly configured&quot;]
+        end
+        L1 --&gt; L2 --&gt; L3 --&gt; L4
+    end
+```
+
+---
+
+## 7.2 MCP Servers — Extending Hermes with External Tools
+
+Hermes has 20+ built-in toolsets. But what if you need something it doesn&#x27;t have — a database query tool, a custom API integration, or a specialized analysis engine?
+
+**MCP (Model Context Protocol)** is the answer. MCP servers expose external tools that Hermes discovers automatically and uses like native ones.
+
+### How It Works
+
+```mermaid
+flowchart LR
+    subgraph hermes[&quot;HERMES AGENT&quot;]
+        H[&quot;Hermes Agent&quot;]
+    end
+    H -- &quot;stdio&quot; --&gt; A[&quot;MCP Server A\n(GitHub)&quot;]
+    H -- &quot;HTTP&quot; --&gt; B[&quot;MCP Server B\n(Company API)&quot;]
+    H -- &quot;stdio&quot; --&gt; C[&quot;MCP Server C\n(GitNexus)&quot;]
+    
+    subgraph note[&quot;Tool Naming&quot;]
+        N[&quot;Tools appear as:\nmcp_github_*, mcp_company_*, etc.\nAuto-injected into all platform toolsets&quot;]
+    end
+```
+
+1. You declare MCP servers in `config.yaml`
+2. On startup, Hermes connects to each server and discovers its tools
+3. Tools appear with `mcp_{server}_{tool}` naming — available everywhere
+4. Connections persist for the agent&#x27;s lifetime with auto-reconnection
+
+### Adding an MCP Server
+
+**Prerequisite:** Install the MCP Python package:
+
+```bash
+pip install mcp
+```
+
+#### Stdio Transport (Local Subprocess)
+
+Most common pattern — Hermes launches the server as a subprocess:
+
+```yaml
+# In ~/.hermes/config.yaml
+mcp_servers:
+  filesystem:
+    command: &quot;npx&quot;
+    args: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/home/user/projects&quot;]
+    timeout: 30
+
+  gitnexus:
+    command: &quot;uvx&quot;
+    args: [&quot;gitnexus-mcp&quot;]
+    timeout: 120
+```
+
+#### HTTP Transport (Remote Server)
+
+For shared or remote MCP servers:
+
+```yaml
+mcp_servers:
+  company_api:
+    url: &quot;https://mcp.mycompany.com/v1/mcp&quot;
+    headers:
+      Authorization: &quot;Bearer sk-your-token-here&quot;
+    timeout: 180
+    connect_timeout: 30
+```
+
+#### CLI Commands
+
+```bash
+# Add interactively
+hermes mcp add gitnexus --url http://localhost:3000
+
+# List configured servers
+hermes mcp list
+
+# Test a connection
+hermes mcp test gitnexus
+
+# Remove a server
+hermes mcp remove gitnexus
+
+# Toggle specific tools from a server
+hermes mcp configure gitnexus
+```
+
+### Security: Environment Filtering
+
+MCP subprocesses do NOT get your full shell environment. Only safe baseline variables (`PATH`, `HOME`, `USER`, `LANG`, etc.) are inherited. API keys and secrets are excluded unless you explicitly pass them:
+
+```yaml
+mcp_servers:
+  github:
+    command: &quot;npx&quot;
+    args: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;]
+    env:
+      # Only this token reaches the subprocess
+      GITHUB_PERSONAL_ACCESS_TOKEN: &quot;ghp_xxxx&quot;
+```
+
+💡 **Tip:** If an MCP tool fails with a credential error, check that you&#x27;ve passed the required env vars in the server config — they won&#x27;t come from your shell automatically.
+
+### Multiple Servers
+
+Stack them in config — all tools from all servers are available simultaneously:
+
+```yaml
+mcp_servers:
+  time:
+    command: &quot;uvx&quot;
+    args: [&quot;mcp-server-time&quot;]
+
+  filesystem:
+    command: &quot;npx&quot;
+    args: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/tmp&quot;]
+
+  github:
+    command: &quot;npx&quot;
+    args: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-github&quot;]
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: &quot;ghp_xxxx&quot;
+
+  company_api:
+    url: &quot;https://mcp.internal.company.com/mcp&quot;
+    headers:
+      Authorization: &quot;Bearer sk-xxxx&quot;
+```
+
+**Restart required** after adding or removing servers — no hot-reload yet. In gateway: `/restart`. In CLI: exit and relaunch.
+
+---
+
+## 7.3 Custom Providers &amp; Base URLs
+
+Hermes ships with 20+ built-in providers. But sometimes you need:
+
+- A **self-hosted model** (vLLM, Ollama, LocalAI)
+- A **corporate proxy** that speaks OpenAI-compatible API
+- A **custom endpoint** with different auth
+
+### Setting a Custom Base URL
+
+```bash
+# Point to a self-hosted endpoint
+hermes config set model.base_url &quot;http://localhost:11434/v1&quot;
+
+# Use with any model name
+hermes config set model.default &quot;local/llama3&quot;
+
+# Set the API key (if your endpoint requires one)
+hermes config set model.api_key &quot;your-key-here&quot;
+```
+
+### Common Self-Hosted Setups
+
+| Server | Base URL | Notes |
+|--------|----------|-------|
+| Ollama | `http://localhost:11434/v1` | Free, runs locally, no API key needed |
+| vLLM | `http://localhost:8000/v1` | Production-grade, OpenAI-compatible |
+| LocalAI | `http://localhost:8080/v1` | Drop-in OpenAI replacement |
+| LM Studio | `http://localhost:1234/v1` | GUI app, OpenAI-compatible |
+| Corporate proxy | `https://api.company.com/v1` | May require API key or Bearer token |
+
+**Example: Ollama setup**
+
+```bash
+# Install and run Ollama (separate step)
+ollama serve
+ollama pull llama3
+
+# Point Hermes to it
+hermes config set model.base_url &quot;http://localhost:11434/v1&quot;
+hermes config set model.default &quot;local/llama3&quot;
+
+# Verify
+hermes chat -q &quot;Hello, are you running locally?&quot;
+```
+
+**Example: Corporate proxy with API key**
+
+```bash
+hermes config set model.base_url &quot;https://ai-proxy.company.com/v1&quot;
+hermes config set model.api_key &quot;corp-key-xxxxx&quot;
+hermes config set model.default &quot;gpt-4o&quot;
+```
+
+### Switching Back
+
+```bash
+# Remove custom URL to use provider defaults
+hermes config set model.base_url &quot;&quot;
+
+# Or switch to a built-in provider
+hermes model    # Interactive picker
+```
+
+💡 **Tip:** Custom base URLs apply globally. If you need different models for different tasks, use **profiles** (Section 7.4) or per-job model overrides in cron tasks.
+
+---
+
+## 7.4 Profiles — Isolated Hermes Instances
+
+Profiles give you completely separate Hermes environments — each with its own config, sessions, skills, memory, and API keys. Think of them as separate users on the same machine.
+
+### Why Profiles?
+
+```mermaid
+flowchart LR
+    subgraph without[&quot;WITHOUT PROFILES&quot;]
+        direction TB
+        W1[&quot;~/.hermes/&quot;]
+        W2[&quot;config.yaml ← One config for everything&quot;]
+        W3[&quot;.env ← All keys mixed together&quot;]
+        W4[&quot;sessions/ ← Work + personal sessions merged&quot;]
+        W5[&quot;skills/ ← All skills in one pool&quot;]
+        W6[&quot;state.db ← One session database&quot;]
+        W1 --&gt; W2 &amp; W3 &amp; W4 &amp; W5 &amp; W6
+    end
+
+    subgraph with[&quot;WITH PROFILES&quot;]
+        direction TB
+        P1[&quot;~/.hermes/&quot;]
+        P2[&quot;config.yaml ← Default profile&quot;]
+        P3[&quot;profiles/&quot;]
+        P1 --&gt; P2 &amp; P3
+        subgraph work[&quot;work/&quot;]
+            W7[&quot;config.yaml ← Work config, models, keys&quot;]
+            W8[&quot;.env&quot;]
+            W9[&quot;sessions/ ← Work sessions only&quot;]
+            W10[&quot;skills/ ← Work-specific skills&quot;]
+            W11[&quot;state.db ← Work session database&quot;]
+        end
+        subgraph acme[&quot;client-acme/&quot;]
+            A1[&quot;config.yaml ← Client-specific config&quot;]
+            A2[&quot;.env&quot;]
+            A3[&quot;...&quot;]
+        end
+        P3 --&gt; work &amp; acme
+    end
+```
+
+**Use cases:**
+
+- **Work / personal separation** — different models, different API keys, different skills
+- **Client isolation** — each client gets their own profile, sessions never leak
+- **Experimentation** — a &quot;lab&quot; profile for testing new models without risking your main setup
+- **Kanban workers** — specialist profiles for different task types (Chapter 6)
+
+### Creating &amp; Managing Profiles
+
+```bash
+# List existing profiles
+hermes profile list
+
+# Create a new profile (starts blank)
+hermes profile create work
+
+# Clone your current config into the new profile
+hermes profile create work --clone
+
+# Clone everything (config + sessions + skills + memory)
+hermes profile create work --clone-all
+
+# Set a sticky default
+hermes profile use work
+
+# Launch with a specific profile (overrides default)
+hermes -p work chat -q &quot;Check staging server logs&quot;
+
+# Show profile details
+hermes profile show work
+
+# Rename a profile
+hermes profile rename work company
+
+# Export/import (for backup or migration)
+hermes profile export work    # Creates work.tar.gz
+hermes profile import work.tar.gz
+
+# Delete a profile
+hermes profile delete old-client
+```
+
+### Per-Invocation Profile
+
+You don&#x27;t need to change your default. Use `-p` for one-off switches:
+
+```bash
+# Quick personal task from work machine
+hermes -p personal chat -q &quot;What&#x27;s on my shopping list?&quot;
+
+# Run a cron job under a specific profile
+# (via cronjob tool&#x27;s profile parameter)
+```
+
+### Profile-Aware Paths
+
+Inside a profile, all the standard paths resolve correctly:
+
+| What | Default Profile | Named Profile |
+|------|----------------|---------------|
+| Config | `~/.hermes/config.yaml` | `~/.hermes/profiles/work/config.yaml` |
+| Sessions | `~/.hermes/sessions/` | `~/.hermes/profiles/work/sessions/` |
+| Skills | `~/.hermes/skills/` | `~/.hermes/profiles/work/skills/` |
+| State DB | `~/.hermes/state.db` | `~/.hermes/profiles/work/state.db` |
+| Env | `~/.hermes/.env` | `~/.hermes/profiles/work/.env` |
+| Auth | `~/.hermes/auth.json` | `~/.hermes/profiles/work/auth.json` |
+
+Hermes handles this automatically — you never need to construct these paths manually.
+
+---
+
+## 7.5 Credential Pools — Rate Limit Busting
+
+API providers enforce rate limits per key. When you&#x27;re running multiple agents, cron jobs, and background tasks simultaneously, a single key can throttle fast.
+
+**Credential pools** solve this. Register multiple API keys for the same provider, and Hermes rotates across them automatically.
+
+### Setting Up Credential Pools
+
+```bash
+# Interactive wizard — add a new credential
+hermes auth add
+
+# List all credentials for a provider
+hermes auth list openrouter
+
+# Remove a specific credential by index
+hermes auth remove openrouter 2
+
+# Reset exhaustion status (if keys got flagged)
+hermes auth reset openrouter
+```
+
+### How Rotation Works
+
+```mermaid
+flowchart TD
+    A[&quot;Request arrives for OpenRouter&quot;] --&gt; B{&quot;Key pool lookup&quot;}
+    
+    B --&gt; K1[&quot;Key 1\nLast used: 2 min ago\n✅ USE THIS&quot;]
+    B --&gt; K2[&quot;Key 2\nLast used: 30s ago\n⏳ Backoff&quot;]
+    B --&gt; K3[&quot;Key 3\nLast used: 5 min ago\n✅ Available&quot;]
+    
+    K1 --&gt; C[&quot;Pick least-recently-used non-exhausted key&quot;]
+    K3 --&gt; C
+    C --&gt; D[&quot;Mark used, attach to request&quot;]
+    
+    D --&gt; E{&quot;Response?&quot;}
+    E -- &quot;200 OK&quot; --&gt; F[&quot;Request succeeds&quot;]
+    E -- &quot;429 Rate Limited&quot; --&gt; G[&quot;Mark key as exhausted\n(cooldown period)&quot;]
+    G --&gt; H{&quot;Retry with next available key&quot;}
+    H -- &quot;Keys available&quot; --&gt; C
+    H -- &quot;All keys exhausted&quot; --&gt; I[&quot;Wait for shortest cooldown\nthen retry&quot;]
+    I --&gt; C
+```
+
+**Key insight:** You don&#x27;t need to manage rotation manually. Just register multiple keys and Hermes handles the rest — picking the least-recently-used key, respecting cooldowns, and spreading load evenly.
+
+### When to Use Credential Pools
+
+| Scenario | Single Key | Credential Pool |
+|----------|-----------|-----------------|
+| Personal use, light automation | ✅ | — |
+| Multiple cron jobs running concurrently | — | ✅ |
+| Kanban workers (3+ parallel agents) | — | ✅ |
+| Heavy delegation (batch `delegate_task`) | — | ✅ |
+| Production gateway with daily users | — | ✅ |
+
+💡 **Tip:** Even 2-3 keys per provider dramatically reduces throttling. Many providers offer free tiers — stack them for burst capacity without cost.
+
+---
+
+## 7.6 Context Window Optimization
+
+LLMs have finite context windows. Hermes has several mechanisms to stay within limits while keeping the most relevant information available.
+
+### Automatic Compression
+
+When the conversation approaches the token limit, Hermes automatically compresses older messages into a compact summary:
+
+```yaml
+# config.yaml — compression settings
+compression:
+  enabled: true            # default: true
+  threshold: 0.50          # trigger when 50% of context is used
+  target_ratio: 0.20       # compress down to 20% of context
+```
+
+```bash
+# Adjust thresholds
+hermes config set compression.threshold 0.40   # compress sooner
+hermes config set compression.target_ratio 0.15 # compress smaller
+
+# Manual compression mid-session
+/compress
+```
+
+### Toolset Pruning
+
+Every enabled toolset adds schema definitions to the system prompt. If you&#x27;re only using 3 tools but have 20 toolsets enabled, you&#x27;re wasting tokens on unused schemas.
+
+```bash
+# Interactive tool manager
+hermes tools
+
+# Enable only what you need
+hermes tools enable terminal
+hermes tools enable file
+hermes tools enable web
+
+# Disable everything else
+hermes tools disable browser
+hermes tools disable spotify
+# ...
+```
+
+💡 **Tip:** A minimal toolset (`terminal` + `file` + `web`) uses ~40% fewer tokens in the system prompt than the full bundle. For long sessions or complex tasks, this matters.
+
+### Cron Jobs: Enabled Toolsets
+
+Cron jobs can restrict which toolsets the agent has access to — reducing both token overhead and attack surface:
+
+```yaml
+# In the cronjob tool:
+enabled_toolsets: [&quot;web&quot;, &quot;terminal&quot;, &quot;file&quot;]
+```
+
+This is especially valuable for scheduled tasks that only need a few capabilities.
+
+---
+
+## 7.7 Debugging Hermes
+
+When something goes wrong, Hermes has built-in diagnostic tools.
+
+### `hermes doctor` — Health Check
+
+```bash
+# Full system check
+hermes doctor
+
+# Auto-fix common issues
+hermes doctor --fix
+```
+
+Checks:
+- Python version and dependencies
+- Config file validity
+- API key presence
+- Gateway service status
+- MCP server connectivity
+- Session store integrity
+
+### `/debug` — Upload Debug Report
+
+In any session:
+
+```
+/debug
+```
+
+Uploads a debug report (system info + recent logs) and returns a shareable link. Useful for getting help from the community or filing bug reports.
+
+### Log Inspection
+
+```bash
+# Gateway logs
+cat ~/.hermes/logs/gateway.log
+
+# Recent errors
+grep -i &quot;error\|failed\|traceback&quot; ~/.hermes/logs/gateway.log | tail -30
+
+# Follow logs in real-time
+tail -f ~/.hermes/logs/gateway.log
+```
+
+### `hermes status` — Component Status
+
+```bash
+# Quick status
+hermes status
+
+# Detailed status (all components)
+hermes status --all
+```
+
+Shows gateway state, cron scheduler, MCP connections, memory provider, and active sessions.
+
+### Common Issues Quick-Fix
+
+| Symptom | Fix |
+|---------|-----|
+| &quot;No models provided&quot; (HTTP 400) | Config has UTF-8 BOM — re-save without BOM (`hermes config edit`) |
+| Tool not available | `hermes tools list` → check enablement → `/reset` |
+| Changes not taking effect | Restart session: `/reset` (CLI) or `/restart` (gateway) |
+| Model/provider errors | `hermes doctor` → check API key → `hermes model` to reconfigure |
+| Voice not working | Check `stt.enabled: true` + provider setup → `/restart` |
+| MCP server won&#x27;t connect | `hermes mcp test &lt;name&gt;` → check `command` is on PATH → check YAML indent |
+| Copilot 403 | `gh auth` tokens don&#x27;t work for Copilot API — use `hermes model` → GitHub Copilot OAuth |
+
+---
+
+## 7.8 Windows-Specific Tips
+
+Hermes runs natively on Windows — PowerShell, cmd, Windows Terminal, git-bash mintty, VS Code terminal all work. But Windows has quirks.
+
+### Input: Ctrl+Enter for Newlines
+
+**Alt+Enter doesn&#x27;t insert a newline on Windows.** Windows Terminal intercepts it for fullscreen toggle. Use **Ctrl+Enter** instead.
+
+```bash
+# Diagnostic: see exactly how your terminal sends keystrokes
+python scripts/keystroke_diagnostic.py
+```
+
+### Config: UTF-8 BOM
+
+If `config.yaml` was saved by Notepad or another Windows editor with a UTF-8 BOM, you&#x27;ll get &quot;No models provided&quot; errors on first run. Fix:
+
+```bash
+# Re-save without BOM
+hermes config edit
+```
+
+### Paths: Forward Slashes
+
+```bash
+# ✅ Works everywhere
+C:/Users/you/project
+~/project
+
+# ❌ Avoid in bash (escape hell)
+C:\\Users\\you\\project
+```
+
+Forward slashes work in every Hermes tool and most Windows APIs. Prefer them.
+
+### `execute_code` Sandbox: WinError 10106
+
+If you see &quot;The requested service provider could not be loaded&quot; from the sandbox — it&#x27;s usually the env scrubber dropping `SYSTEMROOT` from the child process. Fixed in current versions. If it recurs, check inside `execute_code`:
+
+```python
+import os
+print(os.environ.get(&quot;SYSTEMROOT&quot;))  # Should be C:\Windows
+```
+
+### Shell: Hermes Uses Bash on Windows
+
+The `terminal` tool runs commands through bash (git-bash / MSYS), not PowerShell. Use POSIX syntax:
+
+```bash
+# ✅ Correct
+ls $HOME &amp;&amp; echo &quot;done&quot;
+grep &quot;pattern&quot; file.txt
+
+# ❌ Won&#x27;t work
+Get-ChildItem
+Select-String &quot;pattern&quot; file.txt
+$env:FOO
+```
+
+---
+
+## Practical Patterns
+
+### Pattern 1: Secure Production Setup
+
+Setting up Hermes for a production gateway with multiple users:
+
+```bash
+# 1. Enable security features
+hermes config set security.redact_secrets true
+hermes config set privacy.redact_pii true
+hermes config set approvals.mode smart
+
+# 2. Add credential pool for rate limit handling
+hermes auth add   # Add OpenRouter key 1
+hermes auth add   # Add OpenRouter key 2
+
+# 3. Create a production profile
+hermes profile create prod --clone
+hermes profile use prod
+
+# 4. Tighten compression for long sessions
+hermes config set compression.threshold 0.40
+
+# 5. Verify everything
+hermes doctor --fix
+hermes status --all
+```
+
+### Pattern 2: Local-Model Lab Profile
+
+Experimenting with local models without touching your main setup:
+
+```bash
+# Create isolated lab profile
+hermes profile create lab
+
+# Point to local Ollama
+hermes config set model.base_url &quot;http://localhost:11434/v1&quot;
+hermes config set model.default &quot;local/llama3&quot;
+
+# Run a quick test
+hermes -p lab chat -q &quot;Explain transformer attention in one paragraph&quot;
+```
+
+### Pattern 3: Multi-Client Agency Setup
+
+Running Hermes for multiple clients with full isolation:
+
+```bash
+# Create per-client profiles
+hermes profile create client-acme --clone
+hermes profile create client-globex --clone
+hermes profile create client-stark --clone
+
+# Each gets their own:
+# - config.yaml (different models, base URLs)
+# - .env (different API keys)
+# - sessions/ (isolated conversation history)
+# - skills/ (client-specific workflows)
+
+# Run a task for a specific client
+hermes -p client-acme chat -q &quot;Generate monthly report&quot;
+
+# Use Kanban with specialist profiles (Chapter 6)
+```
+
+### Pattern 4: MCP-Powered Development Environment
+
+Extending Hermes with project-specific tools:
+
+```yaml
+# config.yaml
+mcp_servers:
+  gitnexus:
+    command: &quot;uvx&quot;
+    args: [&quot;gitnexus-mcp&quot;]
+    timeout: 120
+
+  filesystem:
+    command: &quot;npx&quot;
+    args: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-filesystem&quot;, &quot;/home/user/projects&quot;]
+    timeout: 30
+
+  database:
+    command: &quot;npx&quot;
+    args: [&quot;-y&quot;, &quot;@modelcontextprotocol/server-postgres&quot;, &quot;postgresql://localhost/mydb&quot;]
+    timeout: 60
+```
+
+```bash
+# After adding servers
+hermes mcp list       # Verify all connected
+hermes mcp test gitnexus  # Test specific server
+/reload-mcp           # Reload in session (gateway)
+```
+
+---
+
+## 7.9 Local Models — Running Hermes Completely Offline
+
+Cloud APIs are great until they&#x27;re not. Rate limits, outages, pricing changes, data privacy concerns — local models eliminate all of them. Zero cost per token. Zero data leaving your machine. Zero dependency on anyone else&#x27;s server.
+
+### The Hardware Reality
+
+```mermaid
+flowchart LR
+    subgraph hw[&quot;LOCAL LLM HARDWARE GUIDE&quot;]
+        direction TB
+        S4[&quot;4 GB RAM\n1-3B params (Q4)\nbasic chat, formatting\n15-30 tok/s&quot;]
+        S8[&quot;8 GB RAM\n7-8B params (Q4_K_M)\nsolid daily assistant\n8-20 tok/s&quot;]
+        S16[&quot;16 GB RAM\n8-14B params (Q4_K_M)\nquality code, analysis\n5-15 tok/s&quot;]
+        S32[&quot;32 GB RAM\n14-32B params (Q4_K_M)\nnear-cloud quality\n3-8 tok/s&quot;]
+        GPU[&quot;GPU (8GB VRAM)\n7-8B params (Q8)\n50-100 tok/s (fast!)&quot;]
+        NOTE[&quot;No GPU? No problem.\nCPU inference works.\nSlower, but perfectly usable for batch tasks.&quot;]
+        S4 --&gt; S8 --&gt; S16 --&gt; S32
+    end
+```
+
+### Setup: llama.cpp (Recommended)
+
+```bash
+# 1. Install llama.cpp
+git clone https://github.com/ggerganov/llama.cpp ~/llama.cpp
+cd ~/llama.cpp &amp;&amp; make -j$(nproc)
+
+# 2. Download a model (pick one based on your RAM)
+# Option A: 8B params, 4.9GB — best for 16GB RAM
+# Search huggingface.co for &quot;llama 3.1 8b instruct gguf q4_k_m&quot;
+
+# Option B: 3B params, 2GB — best for 8GB RAM  
+# Search for &quot;phi-3 mini gguf q4_k_m&quot;
+
+# Option C: 1.5B params, 1.1GB — runs on anything
+# Search for &quot;qwen 2.5 1.5b gguf q4&quot;
+
+# 3. Save to ~/models/
+mkdir -p ~/models
+# Place your .gguf file there
+
+# 4. Test it works
+cd ~/llama.cpp
+./llama-cli -m ~/models/llama-3.1-8b-instruct-q4_k_m.gguf \
+  -p &quot;Hello, explain quantum computing in one sentence.&quot; \
+  -n 100 -c 2048
+```
+
+### Connecting Hermes to Your Local Model
+
+```bash
+# Start the local model server
+./llama-server -m ~/models/llama-3.1-8b-instruct-q4_k_m.gguf \
+  --host 127.0.0.1 --port 8080 \
+  -c 4096 -ngl 0    # -ngl 0 = CPU only; set to 99 for GPU
+
+# In another terminal, configure Hermes
+hermes config set providers.local.type openai-compatible
+hermes config set providers.local.base_url http://127.0.0.1:8080/v1
+hermes config set providers.local.model &quot;local-model&quot;
+
+# Use it
+hermes -m local &quot;Summarize this document for me&quot;
+```
+
+### Setup: Ollama (Easiest)
+
+```bash
+# 1. Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# 2. Pull a model
+ollama pull llama3.1:8b       # 4.9GB, best all-rounder
+ollama pull phi3:mini          # 2.2GB, great for low-RAM
+ollama pull deepseek-coder-v2  # For code tasks
+
+# 3. It auto-starts on port 11434
+# Configure Hermes
+hermes config set providers.ollama.type ollama
+hermes config set providers.ollama.base_url http://127.0.0.1:11434
+
+# Use it
+hermes -m ollama/llama3.1:8b &quot;Write a Python script to parse CSV files&quot;
+```
+
+### Hybrid Strategy — Best of Both Worlds
+
+```mermaid
+flowchart LR
+    subgraph local[&quot;LOCAL (free, private)&quot;]
+        L1[&quot;✓ Email triage / categorization&quot;]
+        L2[&quot;✓ Document summarization&quot;]
+        L3[&quot;✓ Data extraction &amp; formatting&quot;]
+        L4[&quot;✓ PII-sensitive tasks&quot;]
+        L5[&quot;✓ Bulk batch processing&quot;]
+        L6[&quot;✓ Late-night crons (when speed doesn&#x27;t matter)&quot;]
+    end
+    subgraph cloud[&quot;CLOUD (paid, smarter)&quot;]
+        C1[&quot;✓ Client-facing content&quot;]
+        C2[&quot;✓ Architecture &amp; design decisions&quot;]
+        C3[&quot;✓ Code review (needs deep reasoning)&quot;]
+        C4[&quot;✓ Complex debugging&quot;]
+        C5[&quot;✓ Real-time interactive chat&quot;]
+    end
+    RULE[&quot;Rule of thumb:\nIf nobody sees the output → local\nIf a human reads the output → cloud&quot;]
+```
+
+### The Cost Difference
+
+| Task | Cloud (Sonnet) | Local (llama.cpp) |
+|------|---------------|-------------------|
+| 100 email triages/day | ~$0.50/day = $15/mo | $0 forever |
+| Daily 2000-word blog | ~$0.10/article | $0 forever |
+| Weekly data report | ~$0.50/report | $0 forever |
+| 24/7 monitoring analysis | ~$30/mo | $0 forever |
+| **Total for 1 year** | **~$540** | **$0** |
+
+Local models pay for themselves in electricity (negligible) after the first month.
+
+💡 **Tip:** Create a `local` profile that defaults to your local model. Use it for batch crons and PII-heavy tasks. Switch to your cloud profile for interactive work.
+
+---
+
+## 7.10 Running Hermes on Android
+
+Your phone is always with you. Your laptop isn&#x27;t. Running a local LLM on Android means Hermes works anywhere — on the train, at a café, even without internet.
+
+### Hardware Requirements
+
+```mermaid
+flowchart LR
+    subgraph android[&quot;ANDROID LLM — WHAT YOUR PHONE CAN RUN&quot;]
+        direction TB
+        P4[&quot;4 GB RAM\n1-1.5B (Q4)\n10-20 tok/s&quot;]
+        P6[&quot;6 GB RAM\n1.5-3B (Q4)\n8-18 tok/s&quot;]
+        P8[&quot;8 GB RAM\n3B (Q4_K_M)\n10-20 tok/s&quot;]
+        P12[&quot;12 GB RAM\n3-7B (Q4_K_M)\n5-15 tok/s&quot;]
+        P16[&quot;16 GB RAM\n7-8B (Q4_K_M)\n3-10 tok/s&quot;]
+        P4 --&gt; P6 --&gt; P8 --&gt; P12 --&gt; P16
+    end
+    subgraph chips[&quot;Chipset matters too&quot;]
+        CS1[&quot;Snapdragon 8 Gen 2/3 — fastest&quot;]
+        CS2[&quot;Exynos 1580+ — good&quot;]
+        CS3[&quot;Older chips — subtract 30-50% speed&quot;]
+    end
+    subgraph example[&quot;Example: Samsung A56 (12GB, Exynos 1580)&quot;]
+        E1[&quot;Gemma 2 2B at Q4: ~18-25 tok/s&quot;]
+        E2[&quot;Llama 3.1 8B at Q4: ~3-6 tok/s&quot;]
+        E3[&quot;Qwen 2.5 3B at Q4: ~12-18 tok/s&quot;]
+    end
+```
+
+### Setup: Termux + llama.cpp
+
+```bash
+# 1. Install Termux from F-Droid (NOT Play Store — outdated)
+#    https://f-droid.org/packages/com.termux/
+
+# 2. Inside Termux, install dependencies
+pkg update &amp;&amp; pkg upgrade
+pkg install git cmake wget
+
+# 3. Build llama.cpp for ARM
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+mkdir build &amp;&amp; cd build
+cmake .. -DGGML_OPENMP=ON
+cmake --build . --config Release -j$(nproc)
+
+# 4. Download a phone-friendly model
+# Best pick: Qwen 2.5 3B Instruct (Q4_K_M, ~1.9GB)
+# Or: Gemma 2 2B (Q4_K_M, ~1.4GB) — faster
+mkdir -p ~/models
+cd ~/models
+wget &quot;https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf&quot;
+
+# 5. Test it
+cd ~/llama.cpp/build/bin
+./llama-cli \
+  -m ~/models/qwen2.5-3b-instruct-q4_k_m.gguf \
+  -p &quot;Explain Docker in 3 sentences&quot; \
+  -n 150 -c 2048
+```
+
+### Connecting Phone Hermes to Telegram
+
+```bash
+# Start the model server in Termux
+./llama-server \
+  -m ~/models/qwen2.5-3b-instruct-q4_k_m.gguf \
+  --host 127.0.0.1 --port 8080 \
+  -c 2048 -t 4    # -t 4 = 4 threads (adjust for your CPU)
+
+# In another Termux session:
+# Install Hermes (if not already)
+pip install hermes-agent
+
+# Configure to use local model
+hermes config set providers.local.type openai-compatible
+hermes config set providers.local.base_url http://127.0.0.1:8080/v1
+hermes config set providers.local.model &quot;local&quot;
+
+# Connect to your existing Telegram bot
+hermes gateway run
+
+# Now your phone IS your AI assistant.
+# Fully offline. Fully private. Zero API cost.
+```
+
+### The Mobile Workflow
+
+```mermaid
+flowchart TD
+    subgraph morning[&quot;🌅 Morning (offline, on train)&quot;]
+        M1[&quot;→ Summarize my unread emails&quot;]
+        M2[&quot;→ Draft replies to the 3 urgent ones&quot;]
+        M3[&quot;→ Local model handles it, no internet needed&quot;]
+        M1 --&gt; M2 --&gt; M3
+    end
+    subgraph work[&quot;🏢 At work (WiFi)&quot;]
+        W1[&quot;→ Switch to cloud model for quality work&quot;]
+        W2[&quot;→ /model anthropic/claude-sonnet-4&quot;]
+        W1 --&gt; W2
+    end
+    subgraph evening[&quot;🌙 Evening (offline, at home)&quot;]
+        E1[&quot;→ Write tomorrow&#x27;s blog draft&quot;]
+        E2[&quot;→ Local model drafts it, you refine later&quot;]
+        E1 --&gt; E2
+    end
+    subgraph travel[&quot;✈️ Travel (no WiFi at all)&quot;]
+        T1[&quot;→ Full Hermes works on phone data&quot;]
+        T2[&quot;→ Local model = zero data usage&quot;]
+        T3[&quot;→ Only Telegram API uses data (minimal)&quot;]
+        T1 --&gt; T2 --&gt; T3
+    end
+    morning --&gt; work --&gt; evening --&gt; travel
+```
+
+### Tips for Mobile Performance
+
+- **Use Q4_K_M quantization** — best speed/quality tradeoff
+- **Limit context to 2048 tokens** (`-c 2048`) — saves RAM
+- **Use 4 threads** (`-t 4`) — optimal for phone CPUs
+- **Close other apps** — LLM needs all available RAM
+- **Keep phone plugged in** — inference drains battery fast
+- **Use a cooling pad** for extended sessions — phones throttle when hot
+
+💡 **Tip:** If you have a phone + laptop on the same WiFi, run the model on your phone (it&#x27;s always on) and connect your laptop&#x27;s Hermes to it. Phone becomes a dedicated AI server.
+
+---
+
+## Summary
+
+| Topic | Key takeaway |
+|-------|-------------|
+| Secret redaction | Masks API keys in tool output — `security.redact_secrets true` |
+| PII redaction | Hashes user IDs in gateway messages — `privacy.redact_pii true` |
+| Command approval | `manual` / `smart` / `off` — `approvals.mode smart` recommended |
+| MCP servers | Extend Hermes with external tools via stdio or HTTP transport |
+| Custom providers | Point to self-hosted models via `model.base_url` |
+| Profiles | Isolated Hermes instances — separate config, sessions, skills, memory |
+| Credential pools | Multiple API keys per provider, automatic rotation |
+| Context optimization | Compression + toolset pruning = more room for real work |
+| Local models | llama.cpp or Ollama — free, private, offline AI |
+| Android setup | Termux + llama.cpp — AI assistant in your pocket |
+| Debugging | `hermes doctor`, `/debug`, log inspection, `hermes status` |
+| Windows tips | Ctrl+Enter, UTF-8 BOM, forward slashes, bash not PowerShell |
+
+**Next:** [Chapter 8: Power Techniques — Goal, Checkpoints, Steer, Compression →](ch08-power-techniques.md)
+
+---
+
+&lt;!-- SCREENSHOT: hermes doctor output showing all checks passed --&gt;
+&lt;!-- SCREENSHOT: hermes mcp list showing connected servers --&gt;
+&lt;!-- SCREENSHOT: hermes profile list showing multiple profiles --&gt;
+&lt;!-- SCREENSHOT: hermes auth list showing credential pool --&gt;
+&lt;!-- SCREENSHOT: Windows Terminal Ctrl+Enter newline --&gt;
+</script>
         <footer>
             <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
             <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
@@ -1606,6 +2673,24 @@ hermes gateway run
                 });
             });
         });
+        // Copy as Markdown
+        (function() {
+            var btn = document.getElementById('copyMdBtn');
+            var label = document.getElementById('copyMdLabel');
+            var src = document.getElementById('mdSource');
+            if (!btn || !src) return;
+            btn.addEventListener('click', function() {
+                var md = src.textContent;
+                navigator.clipboard.writeText(md).then(function() {
+                    label.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(function() {
+                        label.textContent = 'Copy Markdown';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        })();
     </script>
 </body>
 </html>

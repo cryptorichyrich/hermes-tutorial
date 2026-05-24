@@ -350,6 +350,27 @@
         .chapter-nav .prev, .chapter-nav .next { border: 1px solid var(--hairline); background: var(--surface-card); color: var(--ink); }
         .chapter-nav .prev:hover, .chapter-nav .next:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* Copy as Markdown button */
+        .copy-md-btn {
+            position: fixed; bottom: 24px; right: 24px; z-index: 900;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 9999px;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            color: var(--ink); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; letter-spacing: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .copy-md-btn:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+        .copy-md-btn svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;
+        }
+        .copy-md-btn.copied {
+            background: #16a34a; color: white; border-color: #16a34a;
+        }
+
         /* Author bio — subtle */
         .author-bio {
             display: flex; align-items: center; gap: 16px; margin-top: 48px;
@@ -1051,7 +1072,7 @@ hermes kanban log &lt;task_id&gt;
 </tr>
 </tbody>
 </table>
-<p><strong>Next:</strong> <a href="ch07-advanced-config.md">Chapter 7: Advanced Configuration &amp; Power User Tips →</a></p>
+<p><strong>Next:</strong> <a href="ch07-advanced-config.html">Chapter 7: Advanced Configuration &amp; Power User Tips →</a></p>
 <hr />
 <!-- SCREENSHOT: delegate_task parallel execution output -->
 <!-- SCREENSHOT: tmux multi-agent session layout -->
@@ -1069,6 +1090,682 @@ hermes kanban log &lt;task_id&gt;
     </aside>
     
         </article>
+        <button class="copy-md-btn" id="copyMdBtn" aria-label="Copy as Markdown">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyMdLabel">Copy Markdown</span>
+        </button>
+        <script type="text/markdown" id="mdSource"># Chapter 6: Multi-Agent Orchestration — An Army of One
+
+&gt; **One agent is powerful. Multiple agents working together are unstoppable. Delegation, parallel execution, Kanban boards, and external coding agents turn Hermes from a solo performer into an orchestral conductor.**
+
+---
+
+## 6.1 Why Multi-Agent?
+
+You&#x27;ve seen Hermes handle single tasks well — write code, search the web, manage files. But real work is rarely single-threaded. A typical project involves:
+
+- **Research** + **implementation** happening simultaneously
+- **Frontend** + **backend** features built in parallel
+- **Writing** + **review** as a quality gate
+- **Monitoring** across multiple systems at once
+
+One agent does these sequentially. Multiple agents do them in parallel — and parallelism is where the real throughput gains live.
+
+```mermaid
+flowchart LR
+    subgraph seq [&quot;Sequential (1 agent) — Total: ~120 min&quot;]
+        direction TB
+        S1[&quot;Research: 20 min&quot;] --&gt; S2[&quot;Backend: 45 min&quot;]
+        S2 --&gt; S3[&quot;Frontend: 40 min&quot;]
+        S3 --&gt; S4[&quot;Review: 15 min&quot;]
+    end
+
+    subgraph par [&quot;Parallel (3 agents) — Total: ~60 min (2x faster)&quot;]
+        direction TB
+        P1[&quot;Agent A: Research (20 min)&quot;]
+        P2[&quot;Agent B: Backend&quot;]
+        P3[&quot;Agent C: Frontend&quot;]
+        P1 --&gt; P4[&quot;Review (waits for B + C): 15 min&quot;]
+        P2 --&gt; P4
+        P3 --&gt; P4
+    end
+```
+
+Hermes gives you **four mechanisms** for multi-agent work, each suited to different scenarios:
+
+```mermaid
+flowchart TD
+    subgraph mechanisms [&quot;MULTI-AGENT MECHANISMS&quot;]
+        D[&quot;1. DELEGATION (delegate_task)\nQuick synchronous subtasks inside your session\nBest for: research, code review, file analysis&quot;]
+        S[&quot;2. SPAWNING (tmux + hermes process)\nFully independent Hermes instances\nBest for: long autonomous missions, hours/days&quot;]
+        K[&quot;3. KANBAN BOARD (multi-agent work queue)\nDurable SQLite-backed task board with profiles\nBest for: project-scale work, specialist teams&quot;]
+        E[&quot;4. EXTERNAL AGENTS (KiloCode, Claude Code, Codex)\nDelegate to dedicated coding CLIs\nBest for: heavy coding, PRs, refactoring&quot;]
+    end
+```
+
+---
+
+## 6.2 Delegation — `delegate_task`
+
+The fastest way to parallelize. You spawn a **subagent** — an isolated worker with its own conversation, terminal session, and toolset. The parent waits for the result, then continues.
+
+### Single Task Delegation
+
+```
+You: Research the top 5 React form libraries and compare them
+
+Hermes: I&#x27;ll delegate that research to a subagent.
+
+  [delegate_task(
+    goal=&quot;Research and compare top 5 React form libraries&quot;,
+    toolsets=[&#x27;web&#x27;],
+    role=&#x27;leaf&#x27;
+  )]
+
+  Subagent uses: web_search, web_extract
+  Subagent returns: summary of 5 libraries with pros/cons
+
+Hermes: Here&#x27;s the comparison:
+  1. React Hook Form — best performance, smallest bundle
+  2. Formik — mature, large community
+  3. Zod + React — best TypeScript integration
+  ...etc
+```
+
+### Batch Delegation — Up to 3 in Parallel
+
+Need multiple things at once? Batch them:
+
+```
+You: I need three things done: check the API health, review the
+     latest PR, and find me a good icon library.
+
+Hermes: Dispatching 3 subagents in parallel...
+
+  [delegate_task(tasks=[
+    {
+      goal: &quot;Check API health endpoints and report status&quot;,
+      toolsets: [&#x27;terminal&#x27;, &#x27;web&#x27;],
+    },
+    {
+      goal: &quot;Review PR #42 for security and code quality&quot;,
+      toolsets: [&#x27;terminal&#x27;, &#x27;file&#x27;],
+    },
+    {
+      goal: &quot;Find the best React icon library for a dashboard&quot;,
+      toolsets: [&#x27;web&#x27;],
+    }
+  ])]
+
+  All 3 run simultaneously. Results arrive together.
+```
+
+### Delegation Anatomy
+
+```mermaid
+flowchart TD
+    subgraph params [&quot;DELEGATION PARAMETERS&quot;]
+        G[&quot;goal — What the subagent should accomplish&quot;]
+        CTX[&quot;context — Background info the subagent needs&quot;]
+        TS[&quot;toolsets — Which tools to give it\n(default: inherits parent&#x27;s tools)&quot;]
+        R[&quot;role — &#x27;leaf&#x27; (default) or &#x27;orchestrator&#x27;&quot;]
+    end
+    G --&gt; CTX --&gt; TS --&gt; R
+    R -.- RTN[&quot;RETURNS: Final summary only.\nIntermediate tool output NEVER enters parent context.&quot;]
+    R -.- LIFE[&quot;LIFETIME: Bound to parent&#x27;s turn.\nIf parent is interrupted → child is cancelled.\nFor durable work, use cronjob or background terminal.&quot;]
+```
+
+### Leaf vs Orchestrator Roles
+
+- **Leaf** (default) — focused worker. Cannot re-delegate. Best for 95% of tasks.
+- **Orchestrator** — can spawn its own subagents. For multi-step workflows where a subagent needs to coordinate further workers.
+
+```yaml
+# Enable deeper nesting in config.yaml
+delegation:
+  max_spawn_depth: 2        # allow orchestrator subagents
+  max_concurrent_children: 3  # max parallel children
+  max_iterations: 50         # max agent loop turns per child
+```
+
+### Choosing What to Delegate
+
+```mermaid
+flowchart TD
+    subgraph when [&quot;WHEN TO DELEGATE&quot;]
+        subgraph do [&quot;DO delegate&quot;]
+            D1[&quot;Research tasks (web search + synthesis)&quot;]
+            D2[&quot;Code review (read files + assess quality)&quot;]
+            D3[&quot;File analysis (search + summarize)&quot;]
+            D4[&quot;Parallel independent subtasks&quot;]
+            D5[&quot;Tasks that would flood your context with data&quot;]
+        end
+        subgraph dont [&quot;DON&#x27;T delegate&quot;]
+            N1[&quot;Single tool calls (just call the tool directly)&quot;]
+            N2[&quot;Tasks needing user interaction (subagents can&#x27;t ask you)&quot;]
+            N3[&quot;Long-running work (use cronjob or background instead)&quot;]
+            N4[&quot;Simple questions (answer directly, no overhead)&quot;]
+        end
+    end
+```
+
+---
+
+## 6.3 Spawning Independent Agents
+
+Delegation is bounded by the parent session. For **long autonomous missions** — tasks that run for hours or days — spawn a fully independent Hermes process.
+
+### One-Shot Mode
+
+Fire-and-forget a single task:
+
+```bash
+# Foreground (waits for completion)
+hermes chat -q &quot;Refactor the auth module to use dependency injection&quot;
+
+# Background (non-blocking, from inside a session)
+terminal(command=&quot;hermes chat -q &#x27;Set up CI/CD for ~/myapp&#x27;&quot;, timeout=300)
+```
+
+No PTY needed. The agent runs, finishes, and exits.
+
+### Interactive Mode via tmux
+
+For tasks where you want to interact with the spawned agent or monitor progress:
+
+```bash
+# 1. Start a new Hermes in tmux
+tmux new-session -d -s backend -x 120 -y 40 &#x27;hermes&#x27;
+
+# 2. Wait for startup, then send a task
+sleep 8 &amp;&amp; tmux send-keys -t backend &#x27;Build REST API for user management&#x27; Enter
+
+# 3. Check progress anytime
+tmux capture-pane -t backend -p | tail -30
+
+# 4. Send follow-up instructions
+tmux send-keys -t backend &#x27;Add rate limiting middleware&#x27; Enter
+
+# 5. Done? Kill the session
+tmux send-keys -t backend &#x27;/exit&#x27; Enter &amp;&amp; sleep 2 &amp;&amp; tmux kill-session -t backend
+```
+
+### Multi-Agent Coordination
+
+The real power: spawn multiple agents, each on a different workstream, and relay context between them:
+
+```mermaid
+flowchart TD
+    BE[&quot;BACKEND agent\n(tmux:be)&quot;] &lt;--&gt;|&quot;API schema relay&quot;| FE[&quot;FRONTEND agent\n(tmux:fe)&quot;]
+    BE --&gt; YOU
+    FE --&gt; YOU
+    YOU[&quot;YOU (Hermes main)\nMonitor both, relay info&quot;]
+
+    BE -.- STEP[&quot;1. Spawn backend agent: Build REST API\n2. Spawn frontend agent: Build React dashboard\n3. Capture backend API schema\n4. Send schema to frontend agent\n5. Both work in parallel&quot;]
+```
+
+```bash
+# Agent A: Backend API
+tmux new-session -d -s backend -x 120 -y 40 &#x27;hermes -w&#x27;
+sleep 8 &amp;&amp; tmux send-keys -t backend &#x27;Build REST API for user management at ~/myapp&#x27; Enter
+
+# Agent B: Frontend dashboard (simultaneously)
+tmux new-session -d -s frontend -x 120 -y 40 &#x27;hermes -w&#x27;
+sleep 8 &amp;&amp; tmux send-keys -t frontend &#x27;Build React dashboard for user management at ~/myapp/frontend&#x27; Enter
+
+# Later: relay API schema from backend to frontend
+BACKEND_OUTPUT=$(tmux capture-pane -t backend -p | tail -50)
+tmux send-keys -t frontend &quot;Here is the API schema from the backend agent:\n$BACKEND_OUTPUT\nBuild the frontend to consume these endpoints.&quot; Enter
+```
+
+**The `-w` flag** is crucial when spawning agents that edit code — it creates an isolated git worktree so agents don&#x27;t conflict with each other&#x27;s changes.
+
+### Delegation vs Spawning — Quick Reference
+
+```mermaid
+flowchart TD
+    subgraph comparison [&quot;DELEGATE_TASK vs SPAWN HERMES&quot;]
+        subgraph dt [&quot;delegate_task&quot;]
+            D1[&quot;Isolation: Separate convo, shared process&quot;]
+            D2[&quot;Duration: Minutes&quot;]
+            D3[&quot;Tool access: Subset of parent&quot;]
+            D4[&quot;Interactive: No&quot;]
+            D5[&quot;Survives restart: No&quot;]
+            D6[&quot;Overhead: Low&quot;]
+            D7[&quot;Best for: Quick subtasks&quot;]
+        end
+        subgraph sh [&quot;Spawn hermes&quot;]
+            H1[&quot;Isolation: Fully independent process&quot;]
+            H2[&quot;Duration: Hours/days&quot;]
+            H3[&quot;Tool access: Full access&quot;]
+            H4[&quot;Interactive: Yes (via tmux)&quot;]
+            H5[&quot;Survives restart: Yes (tmux)&quot;]
+            H6[&quot;Overhead: Medium&quot;]
+            H7[&quot;Best for: Long missions&quot;]
+        end
+    end
+```
+
+---
+
+## 6.4 Kanban Board — Multi-Agent Work Queue
+
+For **project-scale work** that needs coordination, persistence, and specialist roles, use the Kanban board. It&#x27;s a durable SQLite-backed task board where multiple Hermes profiles collaborate.
+
+### What Makes Kanban Different
+
+Unlike delegation (ephemeral) or spawning (manual coordination), Kanban provides:
+
+- **Persistence** — tasks survive crashes, restarts, and reboots
+- **Specialization** — different profiles handle different task types
+- **Dependency tracking** — Task C waits for Task A and B to finish
+- **Automatic dispatch** — the dispatcher assigns and spawns workers
+- **Audit trail** — every action logged in the board&#x27;s history
+
+```mermaid
+stateDiagram-v2
+    [*] --&gt; TODO
+    TODO --&gt; READY : All parents done
+    READY --&gt; CLAIMED : Dispatcher picks up
+    CLAIMED --&gt; DONE : Worker finishes
+    CLAIMED --&gt; BLOCKED : Waiting for human input
+    BLOCKED --&gt; READY : Human provides input
+
+    NOTE_RIGHT of TODO: Parents not done → stays here
+    NOTE_RIGHT of READY: Dispatcher spawns worker
+    NOTE_RIGHT of DONE: Children auto-promoted
+```
+
+### Setting Up the Board
+
+```bash
+# Initialize a Kanban board
+hermes kanban init
+
+# Create tasks with profile assignment
+hermes kanban create &quot;Build authentication service&quot; --assignee backend-dev
+hermes kanban create &quot;Design login UI&quot; --assignee frontend-dev
+hermes kanban create &quot;Write auth documentation&quot; --assignee writer
+
+# View the board
+hermes kanban list
+
+# Show task details
+hermes kanban show &lt;task_id&gt;
+
+# Link dependencies (task 3 waits for tasks 1 and 2)
+hermes kanban link &lt;task1_id&gt; &lt;task3_id&gt;
+hermes kanban link &lt;task2_id&gt; &lt;task3_id&gt;
+```
+
+### The Dispatcher — Automatic Worker Spawning
+
+The dispatcher runs inside the gateway and automatically:
+
+1. **Claims** ready tasks for the assigned profile
+2. **Spawns** a worker Hermes instance for that profile
+3. **Monitors** the worker&#x27;s progress
+4. **Promotes** dependent tasks when parents complete
+5. **Reclaims** stale claims if a worker crashes
+
+```bash
+# Start the dispatcher (runs in gateway by default)
+hermes kanban dispatch
+
+# Watch live progress
+hermes kanban tail
+
+# View run history
+hermes kanban runs
+```
+
+### Profiles as Specialists
+
+Each profile is a specialist. You configure them with different models, tools, and skills:
+
+```bash
+# Create specialist profiles
+hermes profile create backend-dev --clone
+hermes profile create frontend-dev --clone
+hermes profile create reviewer --clone
+
+# Configure each one
+hermes -p backend-dev config set model.default deepseek/deepseek-chat
+hermes -p frontend-dev config set model.default anthropic/claude-sonnet-4
+hermes -p reviewer config set model.default anthropic/claude-sonnet-4
+
+# Assign skills per profile
+hermes -p backend-dev skills install test-driven-development
+hermes -p reviewer skills install requesting-code-review
+```
+
+### Task Dependencies — The Real Power
+
+Dependencies are what make Kanban shine for complex projects:
+
+```mermaid
+flowchart TD
+    T1[&quot;T1: Design database schema\n(backend-dev)&quot;]
+    T2[&quot;T2: Design API contract\n(backend-dev)&quot;]
+    T3[&quot;T3: Build REST API\n(backend-dev)&quot;]
+    T4[&quot;T4: Build React UI\n(frontend-dev)&quot;]
+    T5[&quot;T5: Integration testing\n(reviewer)&quot;]
+    T6[&quot;T6: Deploy\n(backend-dev)&quot;]
+
+    T1 --&gt; T3
+    T2 --&gt; T3
+    T3 --&gt; T5
+    T4 --&gt; T5
+    T5 --&gt; T6
+
+    T1 -.- NOTE1[&quot;T1 + T2 run in parallel (no dependencies)&quot;]
+    T3 -.- NOTE2[&quot;T3 starts when both T1 and T2 complete&quot;]
+    T4 -.- NOTE3[&quot;T4 runs in parallel with T3&quot;]
+    T5 -.- NOTE4[&quot;T5 starts when both T3 and T4 complete&quot;]
+    T6 -.- NOTE5[&quot;T6 starts when T5 completes&quot;]
+```
+
+### Managing Tasks
+
+```bash
+# Block a task (waiting for human input)
+hermes kanban block &lt;task_id&gt; --reason &quot;Need client approval on design&quot;
+
+# Unblock and resume
+hermes kanban unblock &lt;task_id&gt;
+
+# Add comments
+hermes kanban comment &lt;task_id&gt; &quot;Use JWT instead of session cookies&quot;
+
+# Link related tasks
+hermes kanban link &lt;parent_id&gt; &lt;child_id&gt;
+
+# Complete a task manually
+hermes kanban complete &lt;task_id&gt; --summary &quot;Auth service built with JWT&quot;
+
+# Archive completed tasks to clean the board
+hermes kanban archive &lt;task_id&gt;
+
+# View statistics
+hermes kanban stats
+```
+
+### When to Use Kanban
+
+```mermaid
+flowchart TD
+    subgraph when_kanban [&quot;USE KANBAN WHEN...&quot;]
+        subgraph use [&quot;Use Kanban&quot;]
+            K1[&quot;Multiple specialists are needed&quot;]
+            K2[&quot;Work should survive crashes/restarts&quot;]
+            K3[&quot;Human-in-the-loop at any step&quot;]
+            K4[&quot;Multiple subtasks can run in parallel&quot;]
+            K5[&quot;Review/iteration cycles are expected&quot;]
+            K6[&quot;Audit trail matters&quot;]
+        end
+        subgraph use_delegate [&quot;USE delegate_task FOR...&quot;]
+            D1[&quot;Quick one-off subtasks&quot;]
+            D2[&quot;Simple parallel research&quot;]
+            D3[&quot;Tasks that complete in minutes&quot;]
+        end
+    end
+```
+
+---
+
+## 6.5 External Coding Agents
+
+Beyond its own subagents, Hermes can delegate to **dedicated coding CLIs** — specialized agents designed for heavy coding work.
+
+### Available External Agents
+
+| Agent | Install | Best For |
+|-------|---------|----------|
+| **KiloCode** | `npm i -g @anthropic/kilocode` | Multi-specialist coding, GitNexus integration |
+| **Claude Code** | `npm i -g @anthropic/claude-code` | Anthropic-native coding, deep reasoning |
+| **OpenAI Codex** | `npm i -g @openai/codex` | OpenAI-native coding, sandboxed execution |
+| **OpenCode** | Build from source | Lightweight, extensible |
+
+### Delegating to External Agents
+
+```bash
+# KiloCode — full feature with GitNexus context injection
+kilo run --auto --format json &quot;Implement user authentication with JWT&quot;
+
+# Claude Code — deep reasoning coding
+claude --acp --stdio &quot;Refactor the database layer to use repositories&quot;
+
+# Codex — sandboxed execution
+codex &quot;Write unit tests for the payment module&quot;
+```
+
+Hermes wraps these via the terminal tool:
+
+```
+You: Implement the payment service with Stripe integration
+
+Hermes: I&#x27;ll delegate this to KiloCode for heavy coding.
+
+  [terminal(command=&quot;kilo run --auto --format json &#x27;Implement payment
+   service with Stripe integration at ~/myapp/src/services/payment.ts&#x27;&quot;,
+   timeout=300)]
+
+  KiloCode completes: creates file, writes tests, commits.
+
+Hermes: ✅ Payment service implemented by KiloCode:
+  - Stripe integration with webhook handling
+  - Unit tests passing (12/12)
+  - Committed as feat: add payment service
+```
+
+### Why Use External Agents?
+
+- **Specialization** — they&#x27;re built specifically for coding, with deep IDE integration
+- **Cost efficiency** — use cheaper models for bulk coding, premium models for review
+- **Safety** — sandboxes and approval flows prevent unauthorized changes
+- **Context windows** — dedicated agents can focus their entire context on the code
+
+---
+
+## 6.6 Coordination Patterns — Real Workflows
+
+Let&#x27;s see how these mechanisms combine in practice.
+
+### Pattern 1: Research + Write (Delegation)
+
+```
+You: Write a blog post about Rust&#x27;s ownership model
+
+Hermes:
+
+  1. [delegate_task: Research subagent]
+     goal: &quot;Research Rust ownership model — key concepts, common
+            misconceptions, real-world examples&quot;
+     toolsets: [&#x27;web&#x27;]
+     → Returns: research summary with sources
+
+  2. [Hermes writes using research]
+     Uses research as context, applies blog skill,
+     produces final article
+
+  Total: ~3 minutes vs ~8 minutes sequential
+```
+
+### Pattern 2: Backend + Frontend (Spawning)
+
+```
+You: Build a user management feature — API and dashboard
+
+Hermes:
+
+  1. [Spawn backend agent via tmux]
+     &quot;Build REST API: /users CRUD + /auth/login + /auth/register&quot;
+
+  2. [Spawn frontend agent via tmux — simultaneously]
+     &quot;Build React dashboard: user list, create/edit forms, login page&quot;
+
+  3. [Monitor both, relay API schema when backend finishes]
+
+  4. [Review integration when both complete]
+
+  Total: ~50 minutes vs ~95 minutes sequential
+```
+
+### Pattern 3: Full Project Pipeline (Kanban)
+
+```
+You: Build an e-commerce checkout system
+
+Hermes:
+
+  T1: Design checkout database schema      [backend-dev]
+  T2: Design checkout API contract          [backend-dev]    } parallel
+  T3: Design checkout UI mockups            [frontend-dev]   }
+
+  T4: Implement checkout API                [backend-dev]    ← depends on T1, T2
+  T5: Implement checkout UI                 [frontend-dev]   ← depends on T3
+
+  T6: Integration testing                   [reviewer]       ← depends on T4, T5
+
+  T7: Security review                       [reviewer]       ← depends on T6
+
+  T8: Deploy to staging                     [backend-dev]    ← depends on T7
+
+  Dispatcher handles all spawning, monitoring, and promotion automatically.
+```
+
+### Pattern 4: Daily Operations (Cron + Delegation)
+
+```mermaid
+flowchart TD
+    subgraph daily [&quot;DAILY AUTOMATED PIPELINE&quot;]
+        C1[&quot;6:00 AM — Cron: Check server health\nScript-only job, $0, alert if down&quot;]
+        C2[&quot;9:00 AM — Cron: Daily competitive digest\nAgent job: web search + summarize\ndelegate_task for parallel research&quot;]
+        C3[&quot;12:00 PM — Cron: Review open PRs\nAgent job: gh pr list + code review\nUses github-code-review skill&quot;]
+        C4[&quot;6:00 PM — Cron: End-of-day report\nCollects results from all previous jobs\nUses context_from to chain outputs&quot;]
+    end
+    C1 --&gt; C2 --&gt; C3 --&gt; C4
+    C4 -.- NOTE[&quot;All automated. You review the 6 PM digest.&quot;]
+```
+
+---
+
+## 6.7 Multi-Agent Best Practices
+
+### 1. Right-Size Your Tooling
+
+Don&#x27;t use a Kanban board for a 10-minute task. Don&#x27;t manually coordinate what the dispatcher can automate.
+
+```
+Quick subtask (minutes)     → delegate_task
+Parallel research (minutes) → delegate_task (batch)
+Long coding (hours)         → spawn hermes (tmux)
+Project with specialists    → Kanban board
+```
+
+### 2. Isolate File Edits
+
+When multiple agents touch the same codebase, use **git worktrees** (`-w` flag):
+
+```bash
+hermes -w    # creates an isolated worktree for this agent
+```
+
+Without worktrees, two agents editing the same files will create merge conflicts.
+
+### 3. Keep Subagent Context Focused
+
+Subagents get a **fresh conversation** — no memory of your session. Provide everything they need in the `context` parameter:
+
+```
+❌ &quot;Fix the bug we discussed earlier&quot;
+✅ &quot;Fix the TypeError in src/api/auth.py line 42 — the login
+    function expects a dict but receives a string. The function
+    signature is def login(credentials: dict).&quot;
+```
+
+### 4. Verify External Results
+
+Subagents are **self-reporting**. They might claim &quot;uploaded successfully&quot; when they didn&#x27;t. For operations with side effects:
+
+```bash
+# After a subagent claims it created a file:
+read_file(&quot;path/to/file&quot;)  # verify it exists and has content
+
+# After a subagent claims it deployed:
+terminal(command=&quot;curl -s https://myapp.com/health&quot;)  # verify it&#x27;s live
+```
+
+### 5. Don&#x27;t Delegate Trivial Work
+
+```
+❌ delegate_task(goal=&quot;Read package.json&quot;)
+   → Just use read_file(&quot;package.json&quot;) directly
+
+✅ delegate_task(goal=&quot;Analyze all dependencies in package.json,
+    check for security vulnerabilities, find outdated packages,
+    and suggest updates&quot;)
+   → Complex analysis worth the overhead
+```
+
+### 6. Handle Stuck Kanban Workers
+
+When a worker crashes or hallucinates:
+
+```bash
+# Reclaim — abort and reset to ready
+hermes kanban reclaim &lt;task_id&gt;
+
+# Reassign — switch to a different profile
+hermes kanban reassign &lt;task_id&gt; backend-dev --reclaim
+
+# View the audit trail
+hermes kanban log &lt;task_id&gt;
+```
+
+---
+
+## 6.8 Key Vocabulary
+
+| Term | Definition |
+|------|-----------|
+| **Delegation** | Spawning a synchronous subagent via `delegate_task` |
+| **Subagent** | An isolated worker with its own conversation and tools |
+| **Leaf** | A subagent that cannot re-delegate (default role) |
+| **Orchestrator** | A subagent that can spawn its own subagents |
+| **Batch delegation** | Running up to 3 subagent tasks in parallel |
+| **Spawning** | Launching a fully independent Hermes process via tmux |
+| **Worktree** | Isolated git working directory (`-w` flag) for parallel agents |
+| **Kanban board** | Durable SQLite-backed task queue for multi-profile coordination |
+| **Dispatcher** | Background service that auto-claims and spawns workers for ready tasks |
+| **Profile** | An isolated Hermes configuration used as a specialist role |
+| **Dependency** | Parent-child link — child waits for parent(s) to complete |
+| **External agent** | Third-party coding CLI (KiloCode, Claude Code, Codex) |
+
+---
+
+## Chapter 6 Summary
+
+| Topic | What You Learned |
+|-------|-----------------|
+| Why multi-agent | Parallelism = 2-5x throughput for multi-workstream tasks |
+| Delegation | Quick synchronous subagents, batch up to 3 in parallel, leaf vs orchestrator |
+| Spawning | Independent Hermes processes via tmux for long autonomous missions |
+| Kanban board | Durable task queue with dependencies, specialist profiles, auto-dispatch |
+| External agents | KiloCode, Claude Code, Codex for heavy coding with specialized CLIs |
+| Coordination patterns | Research+write, backend+frontend, project pipeline, daily operations |
+| Best practices | Right-size tooling, isolate edits, focused context, verify results |
+
+**Next:** [Chapter 7: Advanced Configuration &amp; Power User Tips →](ch07-advanced-config.md)
+
+---
+
+&lt;!-- SCREENSHOT: delegate_task parallel execution output --&gt;
+&lt;!-- SCREENSHOT: tmux multi-agent session layout --&gt;
+&lt;!-- SCREENSHOT: hermes kanban list showing task board --&gt;
+&lt;!-- SCREENSHOT: Kanban dependency graph visualization --&gt;
+&lt;!-- SCREENSHOT: External agent delegation output --&gt;
+</script>
         <footer>
             <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
             <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
@@ -1197,6 +1894,24 @@ hermes kanban log &lt;task_id&gt;
                 });
             });
         });
+        // Copy as Markdown
+        (function() {
+            var btn = document.getElementById('copyMdBtn');
+            var label = document.getElementById('copyMdLabel');
+            var src = document.getElementById('mdSource');
+            if (!btn || !src) return;
+            btn.addEventListener('click', function() {
+                var md = src.textContent;
+                navigator.clipboard.writeText(md).then(function() {
+                    label.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(function() {
+                        label.textContent = 'Copy Markdown';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        })();
     </script>
 </body>
 </html>

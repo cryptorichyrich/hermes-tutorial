@@ -350,6 +350,27 @@
         .chapter-nav .prev, .chapter-nav .next { border: 1px solid var(--hairline); background: var(--surface-card); color: var(--ink); }
         .chapter-nav .prev:hover, .chapter-nav .next:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
+        /* Copy as Markdown button */
+        .copy-md-btn {
+            position: fixed; bottom: 24px; right: 24px; z-index: 900;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 9999px;
+            background: var(--surface-card); border: 1px solid var(--hairline);
+            color: var(--ink); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; letter-spacing: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .copy-md-btn:hover {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+        .copy-md-btn svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;
+        }
+        .copy-md-btn.copied {
+            background: #16a34a; color: white; border-color: #16a34a;
+        }
+
         /* Author bio — subtle */
         .author-bio {
             display: flex; align-items: center; gap: 16px; margin-top: 48px;
@@ -1029,7 +1050,7 @@ Hermes: [loads memory, knows the project structure]
 </tr>
 </tbody>
 </table>
-<p><strong>Next:</strong> <a href="ch05-automation-scheduling.md">Chapter 5: Automation &amp; Scheduling →</a></p>
+<p><strong>Next:</strong> <a href="ch05-automation-scheduling.html">Chapter 5: Automation &amp; Scheduling →</a></p>
 <hr />
 <!-- SCREENSHOT: hermes skills browse interactive UI -->
 <!-- SCREENSHOT: Skill SKILL.md file in editor -->
@@ -1048,6 +1069,650 @@ Hermes: [loads memory, knows the project structure]
     </aside>
     
         </article>
+        <button class="copy-md-btn" id="copyMdBtn" aria-label="Copy as Markdown">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copyMdLabel">Copy Markdown</span>
+        </button>
+        <script type="text/markdown" id="mdSource"># Chapter 4: Skills &amp; Memory — Making Hermes Smarter Over Time
+
+&gt; **Every conversation with Hermes makes it better. Skills teach it procedures. Memory gives it permanence. Together, they transform a general AI into your personal expert.**
+
+---
+
+## 4.1 The Learning Loop — How Hermes Improves Itself
+
+The most surprising thing about Hermes isn&#x27;t what it can do — it&#x27;s that **it changes**. The more you use it, the better it gets. This isn&#x27;t marketing. It&#x27;s an observable, verifiable closed loop.
+
+```mermaid
+flowchart TD
+    A[&quot;1️⃣ CURATE MEMORY&lt;br/&gt;After each task, decide what&#x27;s worth&lt;br/&gt;remembering → save to persistent store&quot;]
+    B[&quot;2️⃣ CREATE SKILL&lt;br/&gt;If the solution is reusable, distill it&lt;br/&gt;into a SKILL.md with steps + pitfalls&quot;]
+    C[&quot;3️⃣ IMPROVE SKILL&lt;br/&gt;When a Skill fails or gets corrected,&lt;br/&gt;patch it — it never makes the same mistake twice&quot;]
+    D[&quot;4️⃣ RECALL via FTS5&lt;br/&gt;FTS5 full-text search finds the right&lt;br/&gt;skill/memory instantly on next task&quot;]
+    E[&quot;5️⃣ USER MODEL&lt;br/&gt;Over time, Hermes builds a model of&lt;br/&gt;who you are, what you prefer, how you work&quot;]
+
+    A --&gt; B --&gt; C --&gt; D --&gt; E
+
+    classDef step fill:#3498db,color:#fff,stroke:#2980b9,rx:8,ry:8
+    class A,B,C,D,E step
+```
+
+*Nobody teaches it any of this. It figures it out alone.*
+
+**Step 1: Memory Curation** — After each conversation, Hermes actively decides what&#x27;s worth remembering. Not brute-force chat history dumps — selective, indexed saves to a SQLite database with FTS5 full-text search. (Covered in §4.3)
+
+**Step 2: Skill Creation** — When Hermes finishes a complex task, it asks: *will this solution be useful again?* If yes, it distills the approach into a standalone Skill file. (Covered in §4.2)
+
+**Step 3: Skill Self-Improvement** — Creating a Skill isn&#x27;t the end. Every time you correct Hermes or a Skill produces a suboptimal result, it patches the Skill itself. The longer you use it, the fewer mistakes it repeats. (Covered in §4.2, Curator section)
+
+**Step 4: FTS5 Recall** — When a new task arrives, Hermes searches its skill library and memory with full-text search. It finds relevant experience in milliseconds, not by re-deriving solutions from scratch. (Covered in §4.3, Session Search)
+
+**Step 5: User Modeling** — Over time, Hermes builds a picture of who you are — your stack, your style, your quirks. This is injected into every session automatically. (Covered in §4.3, Memory Architecture)
+
+These five steps form a flywheel: **more use → more data → better skills → better results → more use.** The harness grows on its own.
+
+---
+
+## 4.2 Skills — Reusable Procedures
+
+A **skill** is a structured document that teaches Hermes how to handle a specific type of task. Think of it as a playbook — step-by-step instructions, pitfalls, commands, and context that load into the agent&#x27;s prompt when relevant.
+
+### What Skills Look Like
+
+Every skill is a `SKILL.md` file with YAML frontmatter and a markdown body:
+
+```mermaid
+flowchart TD
+    subgraph skill[&quot;SKILL STRUCTURE&quot;]
+        FM[&quot;📋 YAML frontmatter&lt;br/&gt;name · description · version · author&lt;br/&gt;metadata → tags&quot;]
+        BODY[&quot;📝 Markdown Body&lt;br/&gt;&lt;br/&gt;# Skill Name&lt;br/&gt;## When to Use — trigger conditions&lt;br/&gt;## Steps — numbered with exact commands&lt;br/&gt;## Verification — confirm it worked&quot;]
+        OPT[&quot;📁 Optional Extras&lt;br/&gt;references/ · templates/ · scripts/&quot;]
+    end
+
+    FM --&gt; BODY --&gt; OPT
+
+    classDef yaml fill:#f39c12,color:#fff,stroke:#d68910
+    classDef md fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef opt fill:#95a5a6,color:#fff,stroke:#7f8c8d
+    class FM yaml
+    class BODY md
+    class OPT opt
+```
+
+The YAML frontmatter provides metadata (name, description, tags, version). The markdown body is the actual knowledge — step-by-step procedures, commands, pitfalls, and verification steps.
+
+### The Skills Hub — 88+ Pre-Built Skills
+
+Hermes ships with a **skills hub** — a curated catalog of community-maintained skills across 17+ categories:
+
+```bash
+# Browse all available skills interactively
+hermes skills browse
+
+# Search by keyword
+hermes skills search &quot;docker&quot;
+
+# Preview without installing
+hermes skills inspect github-code-review
+
+# Install a skill
+hermes skills install github-code-review
+
+# Install from a direct URL
+hermes skills install https://raw.githubusercontent.com/user/repo/main/SKILL.md
+```
+
+**Category highlights:**
+
+```mermaid
+flowchart LR
+    subgraph cats[&quot;SKILL CATEGORIES — 88+ skills&quot;]
+        direction TB
+        subgraph sw[&quot;🔧 Software Dev&quot;]
+            SW1[&quot;debugging · test-driven-dev&lt;br/&gt;writing-plans · spike&quot;]
+        end
+        subgraph cr[&quot;🎨 Creative&quot;]
+            CR1[&quot;ascii-art · design-md&lt;br/&gt;excalidraw · sketch&quot;]
+        end
+        subgraph wd[&quot;🌐 Web Dev&quot;]
+            WD1[&quot;blog · fullstack&lt;br/&gt;devcard · web-dkc&quot;]
+        end
+        subgraph ai[&quot;🤖 AI Agents&quot;]
+            AI1[&quot;claude-code · codex&lt;br/&gt;kilocode · opencode&quot;]
+        end
+        subgraph ds[&quot;📊 Data Science&quot;]
+            DS1[&quot;jupyter-live&quot;]
+        end
+        subgraph pr[&quot;📝 Productivity&quot;]
+            PR1[&quot;notion · linear&lt;br/&gt;google-ws · powerpoint&quot;]
+        end
+        subgraph gm[&quot;🎮 Gaming &amp; Media&quot;]
+            GM1[&quot;youtube-content · gif-search&lt;br/&gt;spotify · songsee&quot;]
+        end
+        subgraph rs[&quot;🔬 Research&quot;]
+            RS1[&quot;arxiv · blogwatcher&lt;br/&gt;polymarket · llm-wiki&quot;]
+        end
+        subgraph sh[&quot;🏠 Smart Home&quot;]
+            SH1[&quot;openhue&quot;]
+        end
+        subgraph rt[&quot;🔒 Red Teaming&quot;]
+            RT1[&quot;godmode&quot;]
+        end
+        subgraph dv[&quot;🛠 DevOps&quot;]
+            DV1[&quot;webhook-subs · kanban&quot;]
+        end
+        subgraph em[&quot;📧 Email&quot;]
+            EM1[&quot;himalaya&quot;]
+        end
+        subgraph aa[&quot;🚀 Autonomous Agents&quot;]
+            AA1[&quot;hermes-agent&lt;br/&gt;kanban-worker · kanban-orchestrator&quot;]
+        end
+    end
+
+    classDef cat fill:#3498db,color:#fff,stroke:#2980b9
+    class SW1,CR1,WD1,AI1,DS1,PR1,GM1,RS1,SH1,RT1,DV1,EM1,AA1 cat
+```
+
+### Loading Skills into a Session
+
+Skills are loaded automatically when relevant, or manually when you need them:
+
+```bash
+# Preload skills at startup
+hermes -s github-code-review,plan
+
+# Load inside a session
+/skill plan
+
+# Browse and install from inside a session
+/skills
+```
+
+**In cron jobs**, attach skills so the scheduled agent has the right knowledge:
+
+```yaml
+# A cron job that writes blog articles
+skills: [&quot;blog&quot;, &quot;marketing-copy&quot;, &quot;humanizer&quot;]
+prompt: &quot;Write and publish today&#x27;s blog article&quot;
+```
+
+### Creating Your Own Skills
+
+When Hermes solves a complex problem or discovers a non-trivial workflow, save it:
+
+```
+You: That debugging session was rough. Save it as a skill so you 
+     never have to rediscover all this.
+
+Hermes: ✓ Skill saved as &quot;systematic-debugging&quot;
+
+  Covers:
+  - 4-phase root cause analysis
+  - Environment-specific pitfalls
+  - Verification steps
+  - Exact commands for each phase
+```
+
+**When to save a skill:**
+- Complex task with 5+ tool calls that succeeded
+- You corrected Hermes and the corrected approach worked
+- Non-trivial workflow discovered (API integration, deployment pipeline, etc.)
+- User asked you to remember a procedure
+
+**What makes a good skill:**
+- Clear trigger conditions (&quot;Use when...&quot;)
+- Numbered steps with exact commands
+- Pitfalls section (what went wrong before)
+- Verification steps (how to confirm it worked)
+
+### The Curator — Automatic Skill Maintenance
+
+Hermes has a built-in **curator** that automatically maintains skills over time:
+
+```mermaid
+flowchart LR
+    ACTIVE[&quot;✅ ACTIVE&lt;br/&gt;&lt;i&gt;in use&lt;/i&gt;&quot;] --&gt;|&quot;idle over time&quot;| STALE[&quot;⏳ STALE&lt;br/&gt;&lt;i&gt;idle&lt;/i&gt;&quot;]
+    STALE --&gt;|&quot;further idle&quot;| ARCHIVED[&quot;📦 ARCHIVED&lt;br/&gt;&lt;i&gt;backed up&lt;/i&gt;&quot;]
+
+    classDef active fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef stale fill:#f39c12,color:#fff,stroke:#d68910
+    classDef archived fill:#95a5a6,color:#fff,stroke:#7f8c8d
+    class ACTIVE active
+    class STALE stale
+    class ARCHIVED archived
+```
+
+- Usage tracked via `.usage.json`
+- Pinned skills are exempt from all auto-transitions
+- Only agent-created skills are touched; hub/bundled skills are never modified
+- Nothing is ever deleted — max action is archive
+
+```bash
+# Check curator status
+hermes curator status
+/curator status
+
+# Pin a skill (protect from archive)
+hermes curator pin my-critical-skill
+
+# Force a maintenance run
+hermes curator run
+
+# Restore an archived skill
+hermes curator restore my-old-skill
+```
+
+**The curator never deletes** — it archives with a backup. Pinned skills are completely protected.
+
+---
+
+## 4.3 Memory — Persistent Knowledge Across Sessions
+
+While skills store *procedures*, **memory** stores *facts*. Memory survives across sessions — when you close a conversation and start a new one, Hermes still knows who you are, what you&#x27;re working on, and what matters to you.
+
+### Two Memory Stores
+
+```mermaid
+flowchart TD
+    subgraph memory[&quot;MEMORY ARCHITECTURE&quot;]
+        UP[&quot;👤 USER PROFILE&lt;br/&gt;&lt;b&gt;Who you are:&lt;/b&gt;&lt;br/&gt;• Name, role, timezone&lt;br/&gt;• Tech stack preferences&lt;br/&gt;• Communication style&lt;br/&gt;• Device info&lt;br/&gt;&lt;br/&gt;&lt;i&gt;\&quot;Bio is a senior fullstack&lt;br/&gt;architect using React,&lt;br/&gt;TypeScript, Flutter...\&quot;&lt;/i&gt;&quot;]
+        AN[&quot;🤖 AGENT NOTES&lt;br/&gt;&lt;b&gt;What Hermes has learned:&lt;/b&gt;&lt;br/&gt;• Environment facts&lt;br/&gt;• Project conventions&lt;br/&gt;• Tool quirks discovered&lt;br/&gt;• Lessons from mistakes&lt;br/&gt;&lt;br/&gt;&lt;i&gt;\&quot;Hermes home is at&lt;br/&gt;C:\\Users\\bio\\AppData...\&quot;&lt;/i&gt;&quot;]
+    end
+
+    UP &amp; AN --&gt;|&quot;injected into&lt;br/&gt;every session&quot;| SESSION[&quot;💬 Every Session&quot;]
+
+    classDef profile fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef notes fill:#e74c3c,color:#fff,stroke:#c0392b
+    classDef session fill:#2ecc71,color:#fff,stroke:#25a25a
+    class UP profile
+    class AN notes
+    class SESSION session
+```
+
+*Both are injected into every session automatically. Memory is compact — only facts that persist.*
+
+### How Memory Gets Saved
+
+Memory is saved proactively — Hermes stores facts that will matter later:
+
+**User profile** — saved when:
+- User shares personal details (name, role, timezone)
+- User corrects behavior or states preferences
+- User&#x27;s tech stack or workflow becomes clear
+
+**Agent notes** — saved when:
+- Environment facts discovered (OS, paths, tool versions)
+- Project conventions identified
+- Tool quirks or non-obvious behaviors found
+- User corrects an approach
+
+**What NOT to save to memory:**
+- Task progress or session outcomes → use `session_search` instead
+- Temporary TODO state → use the `todo` tool
+- Raw data dumps → save to files
+- Anything that will be stale in 7 days
+
+### Memory Commands
+
+```bash
+# Check memory status
+hermes memory status
+
+# In-session memory management (Hermes does this automatically,
+# but you can also request it)
+```
+
+Inside a session:
+```
+You: Remember that I always use pytest with xdist for testing
+
+Hermes: ✓ Saved to memory: &quot;User prefers pytest with xdist for 
+        parallel test execution.&quot;
+```
+
+### Session Search — Recalling the Past
+
+When you need to find something from a previous conversation, **session search** is your time machine. It uses FTS5 (full-text search) against the local SQLite session store — no LLM calls, instant results.
+
+```bash
+# Browse recent sessions
+hermes sessions browse
+
+# Search sessions by keyword
+hermes sessions list --search &quot;auth refactor&quot;
+```
+
+Inside a session, Hermes uses session_search automatically when you reference past events:
+
+```
+You: What did we decide about the database schema last week?
+
+Hermes: [searches session history]
+        Last week in the &quot;project-setup&quot; session, we decided on:
+        - PostgreSQL 16 with UUID primary keys
+        - Async SQLAlchemy 2.0
+        - Alembic for migrations
+        - Separate read/write connection pools
+```
+
+**Three search modes:**
+
+```mermaid
+flowchart TD
+    subgraph modes[&quot;SESSION SEARCH MODES&quot;]
+        M1[&quot;1️⃣ DISCOVERY — search by keyword&lt;br/&gt;&lt;code&gt;session_search(query=&#x27;docker networking&#x27;)&lt;/code&gt;&lt;br/&gt;→ matching sessions + context windows&quot;]
+        M2[&quot;2️⃣ SCROLL — read inside a found session&lt;br/&gt;&lt;code&gt;session_search(session_id=&#x27;...&#x27;, around_msg=42)&lt;/code&gt;&lt;br/&gt;→ ±5 messages around the match&quot;]
+        M3[&quot;3️⃣ BROWSE — recent sessions chronologically&lt;br/&gt;&lt;code&gt;session_search()&lt;/code&gt;&lt;br/&gt;→ latest sessions with previews&quot;]
+    end
+
+    classDef mode fill:#9b59b6,color:#fff,stroke:#7d3c98
+    class M1,M2,M3 mode
+```
+
+### Memory Backends
+
+Hermes supports pluggable memory backends:
+
+| Backend | Setup | Best For |
+|---------|-------|----------|
+| **Built-in** (default) | No config needed | Most users — fast, local, private |
+| **Honcho** | `hermes honcho setup` | Multi-agent memory sharing, cloud sync |
+| **Mem0** | Set `MEM0_API_KEY` | Advanced memory with deduplication |
+
+```bash
+# Switch memory provider
+hermes config set memory.provider honcho
+hermes memory setup
+
+# Disable memory entirely
+hermes memory off
+```
+
+**Recommendation:** Stick with built-in unless you need multi-agent memory sharing or cloud sync.
+
+---
+
+## 4.4 Profiles — Isolated Hermes Instances
+
+Profiles let you run multiple independent Hermes configurations on the same machine:
+
+```mermaid
+flowchart TD
+    subgraph hermes[&quot;~/.hermes/&quot;]
+        CFG[&quot;📄 config.yaml&lt;br/&gt;&lt;i&gt;← Default profile&lt;/i&gt;&quot;]
+        ENV[&quot;🔐 .env&quot;]
+        SKILLS[&quot;📁 skills/&quot;]
+        SESSIONS[&quot;📁 sessions/&quot;]
+        STATE[&quot;🗄️ state.db&lt;br/&gt;&lt;i&gt;← Shared session store&lt;/i&gt;&quot;]
+        subgraph profiles[&quot;📁 profiles/&quot;]
+            subgraph work[&quot;🏢 work/ — Work profile&quot;]
+                WCFG[&quot;📄 config.yaml&lt;br/&gt;&lt;i&gt;separate model, tools&lt;/i&gt;&quot;]
+                WENV[&quot;🔐 .env&lt;br/&gt;&lt;i&gt;separate API keys&lt;/i&gt;&quot;]
+                WSKILLS[&quot;📁 skills/&lt;br/&gt;&lt;i&gt;separate skills&lt;/i&gt;&quot;]
+                WSESSIONS[&quot;📁 sessions/&lt;br/&gt;&lt;i&gt;separate history&lt;/i&gt;&quot;]
+            end
+            subgraph personal[&quot;🏠 personal/ — Personal profile&quot;]
+                PCFG[&quot;📄 config.yaml&quot;]
+                PENV[&quot;🔐 .env&quot;]
+                PSKILLS[&quot;📁 skills/&quot;]
+                PSESSIONS[&quot;📁 sessions/&quot;]
+            end
+        end
+    end
+
+    classDef file fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef dir fill:#2ecc71,color:#fff,stroke:#25a25a
+    classDef profile fill:#e74c3c,color:#fff,stroke:#c0392b
+    class CFG,ENV,STATE,WCFG,WENV,PCFG,PENV file
+    class SKILLS,SESSIONS,WSKILLS,WSESSIONS,PSKILLS,PSESSIONS dir
+    class profiles,work,personal profile
+```
+
+**Each profile gets its own:** config, API keys, skills, sessions, and memory.
+
+```bash
+# Create a profile (clones current config)
+hermes profile create work --clone
+
+# Create with everything cloned (sessions, skills, memory)
+hermes profile create work --clone-all
+
+# Switch default profile
+hermes profile use work
+
+# Use a profile for one command
+hermes -p work chat -q &quot;Check production logs&quot;
+
+# List profiles
+hermes profile list
+
+# Export/import (share configs between machines)
+hermes profile export work &gt; work-profile.tar.gz
+hermes profile import work-profile.tar.gz
+```
+
+**When to use profiles:**
+- **Work vs personal** — different API keys, different projects, different memory
+- **Client work** — each client gets isolated memory and sessions
+- **Experimentation** — test new models/configs without risking your main setup
+- **Multi-tenant** — run separate Hermes instances for different purposes
+
+---
+
+## 4.5 Credential Pools — Rate Limit Busting
+
+Running into rate limits? Add multiple API keys for the same provider and Hermes rotates automatically:
+
+```bash
+# Add additional API keys interactively
+hermes auth add
+
+# View all keys for a provider
+hermes auth list openrouter
+
+# Remove a specific key
+hermes auth remove openrouter 2
+
+# Reset exhaustion status (if keys recover)
+hermes auth reset openrouter
+```
+
+```mermaid
+flowchart LR
+    K1[&quot;🔑 Key 1&quot;] --&gt;|&quot;Rate limited?&quot;| R1[&quot;🔄 Rotate&quot;]
+    K2[&quot;🔑 Key 2&quot;] --&gt;|&quot;Rate limited?&quot;| R2[&quot;🔄 Rotate&quot;]
+    K3[&quot;🔑 Key 3&quot;] --&gt;|&quot;Available!&quot;| USE[&quot;✅ Use this&quot;]
+
+    R1 --&gt; K2
+    R2 --&gt; K3
+
+    classDef key fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef rotate fill:#f39c12,color:#fff,stroke:#d68910
+    classDef use fill:#2ecc71,color:#fff,stroke:#25a25a
+    class K1,K2,K3 key
+    class R1,R2 rotate
+    class USE use
+```
+
+*Automatic, silent, zero interruption.*
+
+**When this matters:**
+- Heavy cron job schedules hitting the same provider
+- Multiple concurrent agents sharing keys
+- Free tier keys with low rate limits
+- Batch processing large datasets
+
+---
+
+## 4.6 Context Compression — Staying Within Limits
+
+When a conversation grows long (approaching the model&#x27;s token limit), Hermes automatically **compresses context** — summarizing older messages while preserving recent ones:
+
+```yaml
+# config.yaml
+compression:
+  enabled: true
+  threshold: 0.50    # Compress when 50% of context window used
+  target_ratio: 0.20  # Compress down to 20% of original
+```
+
+```mermaid
+flowchart TD
+    subgraph lifecycle[&quot;CONTEXT LIFECYCLE&quot;]
+        direction LR
+        NEW[&quot;📄 New session&lt;br/&gt;&lt;i&gt;empty&lt;/i&gt;&quot;] --&gt;|&quot;messages arrive&quot;| GROW[&quot;📈 Growing&lt;br/&gt;&lt;i&gt;messages accumulating&lt;/i&gt;&quot;]
+        GROW --&gt;|&quot;50% full&quot;| NEAR[&quot;⚠️ Near limit&quot;]
+        NEAR --&gt;|&quot;auto-trigger&quot;| COMP[&quot;📦 Compressed&lt;br/&gt;&lt;i&gt;summarized&lt;/i&gt;&quot;]
+    end
+
+    subgraph before[&quot;Before compression&quot;]
+        B1[&quot;msg 1&quot;] --- B2[&quot;msg 2&quot;] --- BD[&quot;...&quot;] --- B48[&quot;msg 48&quot;] --- B49[&quot;msg 49&quot;] --- BN[&quot;new&quot;]
+    end
+
+    subgraph after[&quot;After compression&quot;]
+        SUM[&quot;📝 Summary of&lt;br/&gt;msgs 1-47&quot;] --- A48[&quot;msg 48&quot;] --- A49[&quot;msg 49&quot;] --- AN[&quot;new&quot;] --- AD[&quot;...&quot;]
+    end
+
+    NEAR -.-&gt;|&quot;shows&quot;| before
+    COMP -.-&gt;|&quot;becomes&quot;| after
+
+    classDef phase fill:#3498db,color:#fff,stroke:#2d7dd2
+    classDef old fill:#e74c3c,color:#fff,stroke:#c0392b
+    classDef sum fill:#2ecc71,color:#fff,stroke:#25a25a
+    class NEW,GROW,NEAR,COMP phase
+    class B1,B2,BD,B48,B49,BN old
+    class SUM,A48,A49,AN,AD sum
+```
+
+*Recent messages preserved verbatim. Older messages become a summary. You can also trigger manually: `/compress`*
+
+---
+
+## 4.7 Skills + Memory in Practice
+
+Let&#x27;s see how skills and memory work together in a real workflow:
+
+### Scenario: Building a New Project
+
+```
+Day 1 — First time building a FastAPI project with auth:
+
+You: Set up a FastAPI project with JWT auth and PostgreSQL
+
+Hermes: [uses tools to create project structure]
+        [hits a few snags with async SQLAlchemy setup]
+        [eventually gets everything working]
+        
+        ✓ Project created. That async SQLAlchemy + Alembic 
+        setup had some version-specific quirks.
+        
+You: Save this as a skill and remember the key facts.
+
+Hermes: ✓ Skill saved: &quot;fastapi-auth-setup&quot;
+        ✓ Memory saved: &quot;User prefers FastAPI with SQLAlchemy 
+          2.0 async, Alembic migrations, JWT auth via 
+          python-jose&quot;
+
+──────────────────────────────────────────────────────
+
+Day 15 — Building another API project:
+
+You: Set up another FastAPI project, this time for inventory 
+     management.
+
+Hermes: [loads skill: fastapi-auth-setup]
+        [loads memory: user&#x27;s FastAPI preferences]
+        [skips all the discovery from Day 1]
+        
+        ✓ Project created with your preferred stack:
+        FastAPI + SQLAlchemy 2.0 async + Alembic + JWT.
+        Used the same auth pattern from the skill.
+        3 minutes instead of 15.
+```
+
+### Scenario: Cross-Session Continuity
+
+```
+Monday — You tell Hermes about your project:
+
+You: I&#x27;m working on a fintech dashboard at ~/projects/dashboard.
+     Stack is Next.js 15 with App Router, Tailwind, and tRPC.
+
+Hermes: ✓ Saved to memory: project details, tech stack, path.
+
+──────────────────────────────────────────────────────
+
+Wednesday — New session, different platform:
+
+You: [on Telegram] What was the tech stack for the dashboard 
+     project?
+
+Hermes: Your fintech dashboard at ~/projects/dashboard uses:
+        Next.js 15 (App Router) + Tailwind CSS + tRPC.
+        I remember from Monday.
+
+──────────────────────────────────────────────────────
+
+Friday — Yet another session:
+
+You: Add a new route to the dashboard for transaction history.
+
+Hermes: [loads memory, knows the project structure]
+        [uses correct patterns: App Router, tRPC procedure]
+        [follows project conventions automatically]
+        
+        ✓ Added /transactions route with tRPC router.
+```
+
+**Memory makes every session feel like a continuation, not a fresh start.**
+
+---
+
+## Chapter 4 Key Vocabulary
+
+| Term | Definition |
+|------|-----------|
+| **Skill** | A reusable procedure document (SKILL.md) that teaches Hermes how to handle a task type |
+| **Skill hub** | The curated catalog of 88+ community-maintained skills |
+| **Frontmatter** | YAML metadata at the top of a skill (name, description, tags, version) |
+| **Curator** | Automatic maintenance system that tracks skill usage and archives idle ones |
+| **Memory** | Persistent facts (user profile + agent notes) that survive across sessions |
+| **User profile** | Facts about the user (name, role, preferences, tech stack) |
+| **Agent notes** | Facts Hermes discovers (environment, conventions, tool quirks) |
+| **Session search** | FTS5-powered search across past conversation transcripts |
+| **Profile** | An isolated Hermes configuration (config + .env + skills + sessions + memory) |
+| **Credential pool** | Multiple API keys for the same provider, auto-rotated on rate limits |
+| **Context compression** | Automatic summarization of old messages when approaching token limits |
+| **Pin** | Protect a skill from curator auto-archival |
+
+---
+
+## Chapter 4 Summary
+
+| Topic | What You Learned |
+|-------|-----------------|
+| Why skills &amp; memory | The improvement flywheel — solve, save, reuse |
+| Skill structure | YAML frontmatter + markdown body, stored as SKILL.md |
+| Skills hub | 88+ skills across 17 categories, browse/install/search |
+| Creating skills | Save after complex tasks, good skills have triggers + steps + pitfalls |
+| Curator | Auto-maintenance lifecycle: active → stale → archived (never deleted) |
+| Memory stores | User profile (who you are) + agent notes (what Hermes learned) |
+| Session search | FTS5 full-text search across past conversations, instant recall |
+| Profiles | Isolated configs for work/personal/client/experiment separation |
+| Credential pools | Multiple API keys, auto-rotation on rate limits |
+| Context compression | Auto-summarize old messages when approaching token limits |
+
+**Next:** [Chapter 5: Automation &amp; Scheduling →](ch05-automation-scheduling.md)
+
+---
+
+&lt;!-- SCREENSHOT: hermes skills browse interactive UI --&gt;
+&lt;!-- SCREENSHOT: Skill SKILL.md file in editor --&gt;
+&lt;!-- SCREENSHOT: Memory injection in session startup --&gt;
+&lt;!-- SCREENSHOT: hermes profile list output --&gt;
+&lt;!-- SCREENSHOT: hermes auth list openrouter showing multiple keys --&gt;
+&lt;!-- SCREENSHOT: Context compression notification in chat --&gt;
+</script>
         <footer>
             <p>Hermes Agent Tutorial by <a href="https://biotama.cv" target="_blank" rel="noopener">Bio</a> ·
             <a href="https://github.com/cryptorichyrich/hermes-tutorial">Source on GitHub</a></p>
@@ -1176,6 +1841,24 @@ Hermes: [loads memory, knows the project structure]
                 });
             });
         });
+        // Copy as Markdown
+        (function() {
+            var btn = document.getElementById('copyMdBtn');
+            var label = document.getElementById('copyMdLabel');
+            var src = document.getElementById('mdSource');
+            if (!btn || !src) return;
+            btn.addEventListener('click', function() {
+                var md = src.textContent;
+                navigator.clipboard.writeText(md).then(function() {
+                    label.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(function() {
+                        label.textContent = 'Copy Markdown';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        })();
     </script>
 </body>
 </html>
